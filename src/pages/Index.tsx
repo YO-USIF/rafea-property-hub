@@ -3,6 +3,15 @@ import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import Dashboard from '../components/Dashboard';
+import ProjectsPage from '../components/ProjectsPage';
+import SalesPage from '../components/SalesPage';
+import ContractorsPage from '../components/ContractorsPage';
+import SuppliersPage from '../components/SuppliersPage';
+import PurchasesPage from '../components/PurchasesPage';
+import MaintenancePage from '../components/MaintenancePage';
+import TasksPage from '../components/TasksPage';
+import ReportsPage from '../components/ReportsPage';
+import SettingsPage from '../components/SettingsPage';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -13,68 +22,23 @@ const Index = () => {
       case 'dashboard':
         return <Dashboard />;
       case 'projects':
-        return (
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">إدارة المشاريع</h2>
-            <p className="text-gray-600">قريباً... إدارة شاملة لجميع المشاريع العقارية</p>
-          </div>
-        );
+        return <ProjectsPage />;
       case 'sales':
-        return (
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">مبيعات الشقق</h2>
-            <p className="text-gray-600">قريباً... نظام إدارة المبيعات والعقود</p>
-          </div>
-        );
+        return <SalesPage />;
       case 'contractors':
-        return (
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">المقاولون والمستخلصات</h2>
-            <p className="text-gray-600">قريباً... إدارة المقاولين والمستخلصات</p>
-          </div>
-        );
+        return <ContractorsPage />;
       case 'suppliers':
-        return (
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">الموردون والفواتير</h2>
-            <p className="text-gray-600">قريباً... إدارة الموردين والفواتير</p>
-          </div>
-        );
+        return <SuppliersPage />;
       case 'purchases':
-        return (
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">المشتريات</h2>
-            <p className="text-gray-600">قريباً... نظام إدارة المشتريات</p>
-          </div>
-        );
+        return <PurchasesPage />;
       case 'maintenance':
-        return (
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">الصيانة والتشغيل</h2>
-            <p className="text-gray-600">قريباً... نظام إدارة الصيانة</p>
-          </div>
-        );
+        return <MaintenancePage />;
       case 'tasks':
-        return (
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">المهام اليومية</h2>
-            <p className="text-gray-600">قريباً... إدارة المهام والأنشطة</p>
-          </div>
-        );
+        return <TasksPage />;
       case 'reports':
-        return (
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">التقارير</h2>
-            <p className="text-gray-600">قريباً... تقارير تفصيلية وتحليلات</p>
-          </div>
-        );
+        return <ReportsPage />;
       case 'settings':
-        return (
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">الإعدادات</h2>
-            <p className="text-gray-600">قريباً... إعدادات النظام والمستخدمين</p>
-          </div>
-        );
+        return <SettingsPage />;
       default:
         return <Dashboard />;
     }

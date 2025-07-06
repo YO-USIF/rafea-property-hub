@@ -1,55 +1,99 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Building, MapPin, Calendar, TrendingUp } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Plus, Search, Building, MapPin, Calendar, TrendingUp, Edit, Trash2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import ProjectForm from './forms/ProjectForm';
+
+interface Project {
+  id: string;
+  name: string;
+  type: string;
+  location: string;
+  total_units: number;
+  sold_units: number;
+  total_cost: number;
+  progress: number;
+  start_date: string;
+  expected_completion: string;
+  status: string;
+}
 
 const ProjectsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | undefined>();
+  const { user } = useAuth();
+  const { toast } = useToast();
 
-  const projects = [
-    {
-      id: 1,
-      name: 'مجمع النخيل السكني',
-      type: 'سكني',
-      location: 'الرياض - حي الملك فهد',
-      totalUnits: 120,
-      soldUnits: 85,
-      totalCost: 45000000,
-      progress: 78,
-      startDate: '2023-06-01',
-      expectedCompletion: '2024-12-31',
-      status: 'قيد التنفيذ'
-    },
-    {
-      id: 2,
-      name: 'برج الياسمين التجاري',
-      type: 'تجاري',
-      location: 'جدة - طريق الملك عبدالعزيز',
-      totalUnits: 45,
-      soldUnits: 32,
-      totalCost: 28000000,
-      progress: 65,
-      startDate: '2023-09-15',
-      expectedCompletion: '2025-03-30',
-      status: 'قيد التنفيذ'
-    },
-    {
-      id: 3,
-      name: 'مجمع الورود السكني',
-      type: 'سكني',
-      location: 'الدمام - حي الشاطئ',
-      totalUnits: 80,
-      soldUnits: 80,
-      totalCost: 32000000,
-      progress: 100,
-      startDate: '2022-01-10',
-      expectedCompletion: '2023-12-15',
-      status: 'مكتمل'
+  useEffect(() => {
+    if (user) {
+      fetchProjects();
     }
-  ];
+  }, [user]);
+
+  const fetchProjects = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setProjects(data || []);
+    } catch (error: any) {
+      toast({
+        title: "خطأ في تحميل المشاريع",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      toast({ title: "تم حذف المشروع بنجاح" });
+      fetchProjects();
+    } catch (error: any) {
+      toast({
+        title: "خطأ في حذف المشروع",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleEdit = (project: Project) => {
+    setEditingProject(project);
+    setFormOpen(true);
+  };
+
+  const handleFormClose = () => {
+    setFormOpen(false);
+    setEditingProject(undefined);
+  };
+
+  const filteredProjects = projects.filter(project =>
+    project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    project.location.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -67,7 +111,17 @@ const ProjectsPage = () => {
   const totalProjects = projects.length;
   const activeProjects = projects.filter(p => p.status === 'قيد التنفيذ').length;
   const completedProjects = projects.filter(p => p.status === 'مكتمل').length;
-  const totalInvestment = projects.reduce((sum, p) => sum + p.totalCost, 0);
+  const totalInvestment = projects.reduce((sum, p) => sum + p.total_cost, 0);
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-8">
+          <div className="text-lg">جارٍ تحميل المشاريع...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -77,7 +131,7 @@ const ProjectsPage = () => {
           <h1 className="text-3xl font-bold text-gray-900">إدارة المشاريع</h1>
           <p className="text-gray-600 mt-2">متابعة وإدارة جميع المشاريع العقارية</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90">
+        <Button className="bg-primary hover:bg-primary/90" onClick={() => setFormOpen(true)}>
           <Plus className="w-4 h-4 ml-2" />
           إضافة مشروع جديد
         </Button>
@@ -163,15 +217,16 @@ const ProjectsPage = () => {
                   <TableHead className="text-right">التكلفة الإجمالية</TableHead>
                   <TableHead className="text-right">الحالة</TableHead>
                   <TableHead className="text-right">تاريخ الانتهاء المتوقع</TableHead>
+                  <TableHead className="text-right">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {projects.map((project) => (
+                {filteredProjects.map((project) => (
                   <TableRow key={project.id}>
                     <TableCell className="font-medium">{project.name}</TableCell>
                     <TableCell>{project.type}</TableCell>
                     <TableCell>{project.location}</TableCell>
-                    <TableCell>{project.soldUnits}/{project.totalUnits}</TableCell>
+                    <TableCell>{project.sold_units}/{project.total_units}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <div className="w-full bg-gray-200 rounded-full h-2">
@@ -183,9 +238,49 @@ const ProjectsPage = () => {
                         <span className="text-sm">{project.progress}%</span>
                       </div>
                     </TableCell>
-                    <TableCell>{project.totalCost.toLocaleString()} ر.س</TableCell>
+                    <TableCell>{project.total_cost.toLocaleString()} ر.س</TableCell>
                     <TableCell>{getStatusBadge(project.status)}</TableCell>
-                    <TableCell>{project.expectedCompletion}</TableCell>
+                    <TableCell>{project.expected_completion}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(project)}
+                          className="hover:bg-blue-50"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="hover:bg-red-50 hover:text-red-600"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                هل أنت متأكد من حذف المشروع "{project.name}"؟ هذا الإجراء لا يمكن التراجع عنه.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDelete(project.id)}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                حذف
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -193,6 +288,13 @@ const ProjectsPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      <ProjectForm
+        open={formOpen}
+        onOpenChange={handleFormClose}
+        project={editingProject}
+        onSuccess={fetchProjects}
+      />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   Home, 
   Building, 
@@ -13,7 +14,8 @@ import {
   BarChart3,
   Bell,
   Menu,
-  X
+  X,
+  LogOut
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -23,6 +25,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { signOut, user } = useAuth();
 
   const menuItems = [
     { id: 'dashboard', name: 'لوحة التحكم', icon: Home },
@@ -96,6 +99,29 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
           })}
         </ul>
       </nav>
+
+      {/* User section and logout */}
+      <div className="absolute bottom-4 left-0 right-0 px-3">
+        {!isCollapsed && user && (
+          <div className="mb-3 p-3 bg-sidebar-accent rounded-lg">
+            <p className="text-sm text-sidebar-foreground/70">مسجل باسم:</p>
+            <p className="text-sm font-medium text-sidebar-foreground truncate">{user.email}</p>
+          </div>
+        )}
+        <button
+          onClick={signOut}
+          className={`
+            w-full flex items-center px-3 py-3 rounded-lg transition-all duration-200
+            hover:bg-red-500/10 text-red-500 hover:text-red-600
+            ${isCollapsed ? 'justify-center' : 'justify-start space-x-3 space-x-reverse'}
+          `}
+        >
+          <LogOut className="w-5 h-5" />
+          {!isCollapsed && (
+            <span className="font-medium">تسجيل الخروج</span>
+          )}
+        </button>
+      </div>
     </div>
   );
 };

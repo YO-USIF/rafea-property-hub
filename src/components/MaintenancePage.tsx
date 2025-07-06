@@ -1,14 +1,71 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Wrench, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Plus, Search, Wrench, AlertTriangle, CheckCircle, Clock, Edit, Trash2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import MaintenanceForm from './forms/MaintenanceForm';
 
 const MaintenancePage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingRequest, setEditingRequest] = useState(undefined);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (user) {
+      fetchRequests();
+    }
+  }, [user]);
+
+  const fetchRequests = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('maintenance_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setRequests(data || []);
+    } catch (error) {
+      toast({
+        title: "خطأ في تحميل طلبات الصيانة",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const { error } = await supabase
+        .from('maintenance_requests')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      toast({ title: "تم حذف طلب الصيانة بنجاح" });
+      fetchRequests();
+    } catch (error) {
+      toast({
+        title: "خطأ في حذف طلب الصيانة",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
 
   const maintenanceRequests = [
     {
@@ -73,10 +130,10 @@ const MaintenancePage = () => {
     }
   };
 
-  const totalRequests = maintenanceRequests.length;
-  const completedRequests = maintenanceRequests.filter(req => req.status === 'مكتمل').length;
-  const pendingRequests = maintenanceRequests.filter(req => req.status !== 'مكتمل').length;
-  const totalCost = maintenanceRequests.reduce((sum, req) => sum + req.estimatedCost, 0);
+  const totalRequests = requests.length;
+  const completedRequests = requests.filter(req => req.status === 'مكتمل').length;
+  const pendingRequests = requests.filter(req => req.status !== 'مكتمل').length;
+  const totalCost = requests.reduce((sum, req) => sum + req.estimated_cost, 0);
 
   return (
     <div className="space-y-6">
@@ -86,7 +143,7 @@ const MaintenancePage = () => {
           <h1 className="text-3xl font-bold text-gray-900">الصيانة والتشغيل</h1>
           <p className="text-gray-600 mt-2">إدارة طلبات الصيانة والأعطال</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90">
+        <Button className="bg-primary hover:bg-primary/90" onClick={() => setFormOpen(true)}>
           <Plus className="w-4 h-4 ml-2" />
           إضافة طلب صيانة
         </Button>
@@ -176,22 +233,57 @@ const MaintenancePage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {maintenanceRequests.map((request) => (
+                {requests.map((request) => (
                   <TableRow key={request.id}>
-                    <TableCell className="font-medium">#{request.id}</TableCell>
-                    <TableCell>{request.buildingName}</TableCell>
+                    <TableCell className="font-medium">#{request.id.slice(0,8)}</TableCell>
+                    <TableCell>{request.building_name}</TableCell>
                     <TableCell>{request.unit}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {getPriorityIcon(request.priority)}
-                        {request.issueType}
+                        {request.issue_type}
                       </div>
                     </TableCell>
                     <TableCell>{request.priority}</TableCell>
                     <TableCell>{getStatusBadge(request.status)}</TableCell>
-                    <TableCell>{request.assignedTo}</TableCell>
-                    <TableCell>{request.estimatedCost} ر.س</TableCell>
-                    <TableCell>{request.reportedDate}</TableCell>
+                    <TableCell>{request.assigned_to || 'غير محدد'}</TableCell>
+                    <TableCell>{request.estimated_cost} ر.س</TableCell>
+                    <TableCell>{request.reported_date}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setEditingRequest(request);
+                            setFormOpen(true);
+                          }}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="hover:bg-red-50">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                هل أنت متأكد من حذف هذا الطلب؟
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDelete(request.id)}>
+                                حذف
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -199,6 +291,16 @@ const MaintenancePage = () => {
           </div>
         </CardContent>
       </Card>
+
+      <MaintenanceForm
+        open={formOpen}
+        onOpenChange={(open) => {
+          setFormOpen(open);
+          if (!open) setEditingRequest(undefined);
+        }}
+        request={editingRequest}
+        onSuccess={fetchRequests}
+      />
     </div>
   );
 };

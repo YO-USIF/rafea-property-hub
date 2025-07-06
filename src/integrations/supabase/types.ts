@@ -9,7 +9,183 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      contractors: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          specialization: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          specialization?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          specialization?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      maintenance_requests: {
+        Row: {
+          assigned_to: string | null
+          building_name: string
+          created_at: string
+          description: string | null
+          estimated_cost: number
+          id: string
+          issue_type: string
+          priority: string
+          reported_date: string
+          status: string
+          unit: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          building_name: string
+          created_at?: string
+          description?: string | null
+          estimated_cost?: number
+          id?: string
+          issue_type: string
+          priority?: string
+          reported_date?: string
+          status?: string
+          unit: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          building_name?: string
+          created_at?: string
+          description?: string | null
+          estimated_cost?: number
+          id?: string
+          issue_type?: string
+          priority?: string
+          reported_date?: string
+          status?: string
+          unit?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          created_at: string
+          expected_completion: string
+          id: string
+          location: string
+          name: string
+          progress: number
+          sold_units: number
+          start_date: string
+          status: string
+          total_cost: number
+          total_units: number
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expected_completion: string
+          id?: string
+          location: string
+          name: string
+          progress?: number
+          sold_units?: number
+          start_date: string
+          status?: string
+          total_cost?: number
+          total_units?: number
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expected_completion?: string
+          id?: string
+          location?: string
+          name?: string
+          progress?: number
+          sold_units?: number
+          start_date?: string
+          status?: string
+          total_cost?: number
+          total_units?: number
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      suppliers: {
+        Row: {
+          category: string | null
+          company: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

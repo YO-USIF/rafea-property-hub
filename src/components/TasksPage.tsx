@@ -5,61 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, ClipboardList, User, Calendar, CheckCircle2 } from 'lucide-react';
+import { Plus, Search, ClipboardList, User, Calendar, CheckCircle2, Trash2, Edit } from 'lucide-react';
+import { useTasks } from '@/hooks/useTasks';
 
 const TasksPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { tasks, isLoading, deleteTask } = useTasks();
 
-  const tasks = [
-    {
-      id: 1,
-      title: 'مراجعة عقود البيع للمرحلة الثانية',
-      description: 'مراجعة وتدقيق جميع عقود البيع المحررة خلال الأسبوع',
-      assignedTo: 'سارة أحمد',
-      department: 'المبيعات',
-      priority: 'عالية',
-      status: 'مكتملة',
-      dueDate: '2024-01-20',
-      createdDate: '2024-01-15',
-      progress: 100
-    },
-    {
-      id: 2,
-      title: 'تحديث جدولة المدفوعات',
-      description: 'تحديث جداول الدفع للعملاء وفقاً للتعديلات الجديدة',
-      assignedTo: 'محمد علي',
-      department: 'المحاسبة',
-      priority: 'متوسطة',
-      status: 'قيد التنفيذ',
-      dueDate: '2024-01-25',
-      createdDate: '2024-01-18',
-      progress: 65
-    },
-    {
-      id: 3,
-      title: 'إعداد تقرير التقدم الشهري',
-      description: 'إعداد التقرير الشهري لتقدم المشاريع وتسليمه للإدارة',
-      assignedTo: 'أحمد محمد',
-      department: 'إدارة المشاريع',
-      priority: 'عالية',
-      status: 'جديدة',
-      dueDate: '2024-01-30',
-      createdDate: '2024-01-19',
-      progress: 0
-    },
-    {
-      id: 4,
-      title: 'متابعة مستخلصات المقاولين',
-      description: 'مراجعة ومتابعة المستخلصات المعلقة مع المقاولين',
-      assignedTo: 'فاطمة سالم',
-      department: 'المشتريات',
-      priority: 'متوسطة',
-      status: 'قيد التنفيذ',
-      dueDate: '2024-01-28',
-      createdDate: '2024-01-16',
-      progress: 40
-    }
-  ];
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg text-gray-600">جارٍ تحميل البيانات...</div>
+      </div>
+    );
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -188,6 +147,7 @@ const TasksPage = () => {
                   <TableHead className="text-right">الحالة</TableHead>
                   <TableHead className="text-right">نسبة الإنجاز</TableHead>
                   <TableHead className="text-right">تاريخ الاستحقاق</TableHead>
+                  <TableHead className="text-right">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -200,7 +160,7 @@ const TasksPage = () => {
                         <div className="text-sm text-gray-500 mt-1">{task.description}</div>
                       </div>
                     </TableCell>
-                    <TableCell>{task.assignedTo}</TableCell>
+                    <TableCell>{task.assigned_to}</TableCell>
                     <TableCell>{task.department}</TableCell>
                     <TableCell>
                       <span className={getPriorityColor(task.priority)}>{task.priority}</span>
@@ -217,7 +177,21 @@ const TasksPage = () => {
                         <span className="text-sm text-gray-600">{task.progress}%</span>
                       </div>
                     </TableCell>
-                    <TableCell>{task.dueDate}</TableCell>
+                    <TableCell>{task.due_date}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => deleteTask.mutate(task.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

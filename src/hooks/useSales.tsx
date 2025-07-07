@@ -1,0 +1,94 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './useAuth';
+import { useToast } from './use-toast';
+
+export const useSales = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const { data: sales = [], isLoading } = useQuery({
+    queryKey: ['sales'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sales')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  const createSale = useMutation({
+    mutationFn: async (saleData: any) => {
+      const { data, error } = await supabase
+        .from('sales')
+        .insert([{ ...saleData, user_id: user?.id }])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
+      toast({ title: "تم إضافة المبيعة بنجاح" });
+    },
+    onError: (error) => {
+      toast({ title: "خطأ في إضافة المبيعة", variant: "destructive" });
+    },
+  });
+
+  const updateSale = useMutation({
+    mutationFn: async ({ id, ...saleData }: any) => {
+      const { data, error } = await supabase
+        .from('sales')
+        .update(saleData)
+        .eq('id', id)
+        .eq('user_id', user?.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
+      toast({ title: "تم تحديث المبيعة بنجاح" });
+    },
+    onError: (error) => {
+      toast({ title: "خطأ في تحديث المبيعة", variant: "destructive" });
+    },
+  });
+
+  const deleteSale = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('sales')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user?.id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
+      toast({ title: "تم حذف المبيعة بنجاح" });
+    },
+    onError: (error) => {
+      toast({ title: "خطأ في حذف المبيعة", variant: "destructive" });
+    },
+  });
+
+  return {
+    sales,
+    isLoading,
+    createSale,
+    updateSale,
+    deleteSale,
+  };
+};

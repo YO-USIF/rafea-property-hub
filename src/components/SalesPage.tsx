@@ -4,55 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Home, Users, DollarSign, Calendar } from 'lucide-react';
+import { Plus, Search, Home, Users, DollarSign, Calendar, Trash2, Edit } from 'lucide-react';
+import { useSales } from '@/hooks/useSales';
 
 const SalesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { sales, isLoading, deleteSale } = useSales();
 
-  const apartmentSales = [
-    {
-      id: 1,
-      projectName: 'مجمع النخيل السكني',
-      unitNumber: 'شقة 205',
-      unitType: '3 غرف + صالة',
-      area: 120,
-      price: 450000,
-      customerName: 'أحمد محمد العلي',
-      customerPhone: '0501234567',
-      status: 'مباع',
-      saleDate: '2024-01-15',
-      installmentPlan: 'نقدي',
-      remainingAmount: 0
-    },
-    {
-      id: 2,
-      projectName: 'برج الياسمين التجاري',
-      unitNumber: 'مكتب 101',
-      unitType: 'مكتب إداري',
-      area: 85,
-      price: 280000,
-      customerName: 'شركة الأعمال المتقدمة',
-      customerPhone: '0507654321',
-      status: 'محجوز',
-      saleDate: '2024-01-10',
-      installmentPlan: 'أقساط',
-      remainingAmount: 140000
-    },
-    {
-      id: 3,
-      projectName: 'مجمع الورود السكني',
-      unitNumber: 'شقة 302',
-      unitType: '2 غرفة + صالة',
-      area: 95,
-      price: 380000,
-      customerName: 'فاطمة سعد الغامدي',
-      customerPhone: '0509876543',
-      status: 'متاح',
-      saleDate: null,
-      installmentPlan: null,
-      remainingAmount: 380000
-    }
-  ];
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg text-gray-600">جارٍ تحميل البيانات...</div>
+      </div>
+    );
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -67,10 +32,10 @@ const SalesPage = () => {
     }
   };
 
-  const totalUnits = apartmentSales.length;
-  const soldUnits = apartmentSales.filter(unit => unit.status === 'مباع').length;
-  const reservedUnits = apartmentSales.filter(unit => unit.status === 'محجوز').length;
-  const totalRevenue = apartmentSales
+  const totalUnits = sales.length;
+  const soldUnits = sales.filter(unit => unit.status === 'مباع').length;
+  const reservedUnits = sales.filter(unit => unit.status === 'محجوز').length;
+  const totalRevenue = sales
     .filter(unit => unit.status === 'مباع')
     .reduce((sum, unit) => sum + unit.price, 0);
 
@@ -169,27 +134,42 @@ const SalesPage = () => {
                   <TableHead className="text-right">الحالة</TableHead>
                   <TableHead className="text-right">المبلغ المتبقي</TableHead>
                   <TableHead className="text-right">تاريخ البيع</TableHead>
+                  <TableHead className="text-right">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {apartmentSales.map((sale) => (
+                {sales.map((sale) => (
                   <TableRow key={sale.id}>
-                    <TableCell className="font-medium">{sale.projectName}</TableCell>
-                    <TableCell>{sale.unitNumber}</TableCell>
-                    <TableCell>{sale.unitType}</TableCell>
+                    <TableCell className="font-medium">{sale.project_name}</TableCell>
+                    <TableCell>{sale.unit_number}</TableCell>
+                    <TableCell>{sale.unit_type}</TableCell>
                     <TableCell>{sale.area} م²</TableCell>
                     <TableCell>{sale.price.toLocaleString()} ر.س</TableCell>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{sale.customerName}</div>
-                        <div className="text-sm text-gray-500">{sale.customerPhone}</div>
+                        <div className="font-medium">{sale.customer_name}</div>
+                        <div className="text-sm text-gray-500">{sale.customer_phone}</div>
                       </div>
                     </TableCell>
                     <TableCell>{getStatusBadge(sale.status)}</TableCell>
                     <TableCell>
-                      {sale.remainingAmount > 0 ? `${sale.remainingAmount.toLocaleString()} ر.س` : 'مسدد بالكامل'}
+                      {sale.remaining_amount > 0 ? `${sale.remaining_amount.toLocaleString()} ر.س` : 'مسدد بالكامل'}
                     </TableCell>
-                    <TableCell>{sale.saleDate || 'غير محدد'}</TableCell>
+                    <TableCell>{sale.sale_date || 'غير محدد'}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => deleteSale.mutate(sale.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

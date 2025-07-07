@@ -4,55 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Truck, FileText, DollarSign, Calendar } from 'lucide-react';
+import { Plus, Search, Truck, FileText, DollarSign, Calendar, Trash2, Edit } from 'lucide-react';
+import { useSuppliers } from '@/hooks/useSuppliers';
 
 const SuppliersPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { suppliers, isLoading, deleteSupplier } = useSuppliers();
 
-  const suppliers = [
-    {
-      id: 1,
-      name: 'شركة مواد البناء المتحدة',
-      category: 'مواد بناء',
-      contactPerson: 'خالد العتيبي',
-      phone: '0501234567',
-      email: 'info@united-materials.com',
-      address: 'الرياض - طريق الخرج',
-      totalPurchases: 850000,
-      outstandingBalance: 120000,
-      paymentTerms: '30 يوم',
-      rating: 4.7,
-      status: 'نشط'
-    },
-    {
-      id: 2,
-      name: 'مؤسسة الأدوات الكهربائية',
-      category: 'أدوات كهربائية',
-      contactPerson: 'سعد المطيري',
-      phone: '0507654321',
-      email: 'sales@electrical-tools.com',
-      address: 'جدة - شارع فلسطين',
-      totalPurchases: 450000,
-      outstandingBalance: 75000,
-      paymentTerms: '15 يوم',
-      rating: 4.3,
-      status: 'نشط'
-    },
-    {
-      id: 3,
-      name: 'شركة الحديد والصلب',
-      category: 'حديد وصلب',
-      contactPerson: 'محمد الغامدي',
-      phone: '0509876543',
-      email: 'orders@steel-company.com',
-      address: 'الدمام - المنطقة الصناعية',
-      totalPurchases: 1200000,
-      outstandingBalance: 0,
-      paymentTerms: '45 يوم',
-      rating: 4.9,
-      status: 'نشط'
-    }
-  ];
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg text-gray-600">جارٍ تحميل البيانات...</div>
+      </div>
+    );
+  }
 
   const invoices = [
     {
@@ -116,8 +81,6 @@ const SuppliersPage = () => {
 
   const totalSuppliers = suppliers.length;
   const activeSuppliers = suppliers.filter(s => s.status === 'نشط').length;
-  const totalPurchases = suppliers.reduce((sum, s) => sum + s.totalPurchases, 0);
-  const totalOutstanding = suppliers.reduce((sum, s) => sum + s.outstandingBalance, 0);
 
   return (
     <div className="space-y-6">
@@ -169,7 +132,7 @@ const SuppliersPage = () => {
             <DollarSign className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(totalPurchases / 1000000).toFixed(1)}م</div>
+            <div className="text-2xl font-bold">-</div>
             <p className="text-xs text-muted-foreground">ريال سعودي</p>
           </CardContent>
         </Card>
@@ -180,7 +143,7 @@ const SuppliersPage = () => {
             <FileText className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{totalOutstanding.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-red-600">-</div>
             <p className="text-xs text-muted-foreground">ريال سعودي</p>
           </CardContent>
         </Card>
@@ -220,6 +183,7 @@ const SuppliersPage = () => {
                   <TableHead className="text-right">شروط الدفع</TableHead>
                   <TableHead className="text-right">التقييم</TableHead>
                   <TableHead className="text-right">الحالة</TableHead>
+                  <TableHead className="text-right">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -227,18 +191,27 @@ const SuppliersPage = () => {
                   <TableRow key={supplier.id}>
                     <TableCell className="font-medium">{supplier.name}</TableCell>
                     <TableCell>{supplier.category}</TableCell>
-                    <TableCell>{supplier.contactPerson}</TableCell>
+                    <TableCell>{supplier.company}</TableCell>
                     <TableCell>{supplier.phone}</TableCell>
-                    <TableCell>{supplier.totalPurchases.toLocaleString()} ر.س</TableCell>
-                    <TableCell>{supplier.outstandingBalance.toLocaleString()} ر.س</TableCell>
-                    <TableCell>{supplier.paymentTerms}</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>{getStatusBadge(supplier.status)}</TableCell>
                     <TableCell>
-                      <div className="flex items-center">
-                        <span className="text-yellow-500">★</span>
-                        <span className="ml-1">{supplier.rating}</span>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => deleteSupplier.mutate(supplier.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </TableCell>
-                    <TableCell>{getStatusBadge(supplier.status)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -254,33 +227,9 @@ const SuppliersPage = () => {
           <CardDescription>آخر الفواتير الواردة من الموردين</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="border rounded-lg overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-right">رقم الفاتورة</TableHead>
-                  <TableHead className="text-right">المورد</TableHead>
-                  <TableHead className="text-right">المبلغ</TableHead>
-                  <TableHead className="text-right">الوصف</TableHead>
-                  <TableHead className="text-right">تاريخ الإصدار</TableHead>
-                  <TableHead className="text-right">تاريخ الاستحقاق</TableHead>
-                  <TableHead className="text-right">الحالة</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {invoices.map((invoice) => (
-                  <TableRow key={invoice.id}>
-                    <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
-                    <TableCell>{invoice.supplierName}</TableCell>
-                    <TableCell>{invoice.amount.toLocaleString()} ر.س</TableCell>
-                    <TableCell>{invoice.description}</TableCell>
-                    <TableCell>{invoice.issueDate}</TableCell>
-                    <TableCell>{invoice.dueDate}</TableCell>
-                    <TableCell>{getInvoiceStatusBadge(invoice.status)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <div className="text-center py-8 text-gray-500">
+            <p>لا توجد فواتير حديثة</p>
+            <p className="text-xs mt-1">سيتم عرض الفواتير عند إضافتها</p>
           </div>
         </CardContent>
       </Card>

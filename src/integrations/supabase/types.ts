@@ -152,6 +152,149 @@ export type Database = {
         }
         Relationships: []
       }
+      purchase_items: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          purchase_id: string
+          quantity: number
+          unit: string
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          purchase_id: string
+          quantity: number
+          unit: string
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          purchase_id?: string
+          quantity?: number
+          unit?: string
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_items_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "purchases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchases: {
+        Row: {
+          approved_by: string | null
+          created_at: string
+          delivery_status: string
+          expected_delivery: string
+          id: string
+          order_date: string
+          order_number: string
+          project_name: string
+          requested_by: string
+          status: string
+          supplier_name: string
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved_by?: string | null
+          created_at?: string
+          delivery_status?: string
+          expected_delivery: string
+          id?: string
+          order_date: string
+          order_number: string
+          project_name: string
+          requested_by: string
+          status?: string
+          supplier_name: string
+          total_amount: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved_by?: string | null
+          created_at?: string
+          delivery_status?: string
+          expected_delivery?: string
+          id?: string
+          order_date?: string
+          order_number?: string
+          project_name?: string
+          requested_by?: string
+          status?: string
+          supplier_name?: string
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sales: {
+        Row: {
+          area: number
+          created_at: string
+          customer_name: string
+          customer_phone: string | null
+          id: string
+          installment_plan: string | null
+          price: number
+          project_name: string
+          remaining_amount: number | null
+          sale_date: string | null
+          status: string
+          unit_number: string
+          unit_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          area: number
+          created_at?: string
+          customer_name: string
+          customer_phone?: string | null
+          id?: string
+          installment_plan?: string | null
+          price: number
+          project_name: string
+          remaining_amount?: number | null
+          sale_date?: string | null
+          status?: string
+          unit_number: string
+          unit_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          area?: number
+          created_at?: string
+          customer_name?: string
+          customer_phone?: string | null
+          id?: string
+          installment_plan?: string | null
+          price?: number
+          project_name?: string
+          remaining_amount?: number | null
+          sale_date?: string | null
+          status?: string
+          unit_number?: string
+          unit_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       suppliers: {
         Row: {
           category: string | null
@@ -186,6 +329,51 @@ export type Database = {
           name?: string
           phone?: string | null
           status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          assigned_to: string
+          created_at: string
+          department: string
+          description: string | null
+          due_date: string
+          id: string
+          priority: string
+          progress: number
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_to: string
+          created_at?: string
+          department: string
+          description?: string | null
+          due_date: string
+          id?: string
+          priority?: string
+          progress?: number
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_to?: string
+          created_at?: string
+          department?: string
+          description?: string | null
+          due_date?: string
+          id?: string
+          priority?: string
+          progress?: number
+          status?: string
+          title?: string
           updated_at?: string
           user_id?: string
         }

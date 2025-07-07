@@ -4,55 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, HardHat, FileText, DollarSign, Clock } from 'lucide-react';
+import { Plus, Search, HardHat, FileText, DollarSign, Clock, Trash2, Edit } from 'lucide-react';
+import { useContractors } from '@/hooks/useContractors';
 
 const ContractorsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { contractors, isLoading, deleteContractor } = useContractors();
 
-  const contractors = [
-    {
-      id: 1,
-      name: 'شركة البناء المتقدم',
-      specialty: 'أعمال خرسانية',
-      contactPerson: 'المهندس محمد أحمد',
-      phone: '0501234567',
-      email: 'info@advanced-construction.com',
-      projectsAssigned: 2,
-      totalContracts: 2500000,
-      completedExtracts: 5,
-      pendingPayments: 350000,
-      rating: 4.8,
-      status: 'نشط'
-    },
-    {
-      id: 2,
-      name: 'مؤسسة الأعمال الكهربائية',
-      specialty: 'أعمال كهربائية',
-      contactPerson: 'أحمد سالم العتيبي',
-      phone: '0507654321',
-      email: 'electrical@works.com',
-      projectsAssigned: 3,
-      totalContracts: 1200000,
-      completedExtracts: 3,
-      pendingPayments: 180000,
-      rating: 4.5,
-      status: 'نشط'
-    },
-    {
-      id: 3,
-      name: 'شركة السباكة الحديثة',
-      specialty: 'أعمال سباكة',
-      contactPerson: 'عبدالله فهد المطيري',
-      phone: '0509876543',
-      email: 'modern@plumbing.com',
-      projectsAssigned: 1,
-      totalContracts: 800000,
-      completedExtracts: 2,
-      pendingPayments: 120000,
-      rating: 4.2,
-      status: 'مكتمل'
-    }
-  ];
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg text-gray-600">جارٍ تحميل البيانات...</div>
+      </div>
+    );
+  }
 
   const extracts = [
     {
@@ -106,8 +71,6 @@ const ContractorsPage = () => {
 
   const totalContractors = contractors.length;
   const activeContractors = contractors.filter(c => c.status === 'نشط').length;
-  const totalContracts = contractors.reduce((sum, c) => sum + c.totalContracts, 0);
-  const totalPendingPayments = contractors.reduce((sum, c) => sum + c.pendingPayments, 0);
 
   return (
     <div className="space-y-6">
@@ -159,7 +122,7 @@ const ContractorsPage = () => {
             <FileText className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(totalContracts / 1000000).toFixed(1)}م</div>
+            <div className="text-2xl font-bold">-</div>
             <p className="text-xs text-muted-foreground">ريال سعودي</p>
           </CardContent>
         </Card>
@@ -170,7 +133,7 @@ const ContractorsPage = () => {
             <DollarSign className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{totalPendingPayments.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-red-600">-</div>
             <p className="text-xs text-muted-foreground">ريال سعودي</p>
           </CardContent>
         </Card>
@@ -210,25 +173,35 @@ const ContractorsPage = () => {
                   <TableHead className="text-right">المدفوعات المعلقة</TableHead>
                   <TableHead className="text-right">التقييم</TableHead>
                   <TableHead className="text-right">الحالة</TableHead>
+                  <TableHead className="text-right">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {contractors.map((contractor) => (
                   <TableRow key={contractor.id}>
                     <TableCell className="font-medium">{contractor.name}</TableCell>
-                    <TableCell>{contractor.specialty}</TableCell>
-                    <TableCell>{contractor.contactPerson}</TableCell>
+                    <TableCell>{contractor.specialization}</TableCell>
+                    <TableCell>{contractor.email}</TableCell>
                     <TableCell>{contractor.phone}</TableCell>
-                    <TableCell>{contractor.projectsAssigned}</TableCell>
-                    <TableCell>{contractor.totalContracts.toLocaleString()} ر.س</TableCell>
-                    <TableCell>{contractor.pendingPayments.toLocaleString()} ر.س</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>{getStatusBadge(contractor.status)}</TableCell>
                     <TableCell>
-                      <div className="flex items-center">
-                        <span className="text-yellow-500">★</span>
-                        <span className="ml-1">{contractor.rating}</span>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => deleteContractor.mutate(contractor.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </TableCell>
-                    <TableCell>{getStatusBadge(contractor.status)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -244,33 +217,9 @@ const ContractorsPage = () => {
           <CardDescription>آخر المستخلصات المقدمة من المقاولين</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="border rounded-lg overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-right">رقم المستخلص</TableHead>
-                  <TableHead className="text-right">المقاول</TableHead>
-                  <TableHead className="text-right">المشروع</TableHead>
-                  <TableHead className="text-right">المبلغ</TableHead>
-                  <TableHead className="text-right">وصف العمل</TableHead>
-                  <TableHead className="text-right">تاريخ التقديم</TableHead>
-                  <TableHead className="text-right">الحالة</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {extracts.map((extract) => (
-                  <TableRow key={extract.id}>
-                    <TableCell className="font-medium">{extract.extractNumber}</TableCell>
-                    <TableCell>{extract.contractorName}</TableCell>
-                    <TableCell>{extract.projectName}</TableCell>
-                    <TableCell>{extract.extractAmount.toLocaleString()} ر.س</TableCell>
-                    <TableCell>{extract.workDescription}</TableCell>
-                    <TableCell>{extract.submissionDate}</TableCell>
-                    <TableCell>{getExtractStatusBadge(extract.status)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <div className="text-center py-8 text-gray-500">
+            <p>لا توجد مستخلصات حديثة</p>
+            <p className="text-xs mt-1">سيتم عرض المستخلصات عند إضافتها</p>
           </div>
         </CardContent>
       </Card>

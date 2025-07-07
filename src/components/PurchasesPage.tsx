@@ -4,64 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, ShoppingCart, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { Plus, Search, ShoppingCart, CheckCircle, Clock, AlertCircle, Trash2, Edit } from 'lucide-react';
+import { usePurchases } from '@/hooks/usePurchases';
 
 const PurchasesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { purchases, isLoading, deletePurchase } = usePurchases();
 
-  const purchaseOrders = [
-    {
-      id: 1,
-      orderNumber: 'PO-2024-001',
-      supplierName: 'شركة مواد البناء المتحدة',
-      projectName: 'مجمع النخيل السكني',
-      requestedBy: 'المهندس أحمد سالم',
-      orderDate: '2024-01-15',
-      expectedDelivery: '2024-01-25',
-      totalAmount: 185000,
-      items: [
-        { name: 'أسمنت بورتلاندي', quantity: 100, unit: 'كيس', unitPrice: 45 },
-        { name: 'حديد تسليح 16مم', quantity: 50, unit: 'طن', unitPrice: 2800 }
-      ],
-      status: 'معتمد',
-      approvedBy: 'مدير المشتريات',
-      deliveryStatus: 'تم التسليم'
-    },
-    {
-      id: 2,
-      orderNumber: 'PO-2024-002',
-      supplierName: 'مؤسسة الأدوات الكهربائية',
-      projectName: 'برج الياسمين التجاري',
-      requestedBy: 'فني الكهرباء محمد',
-      orderDate: '2024-01-18',
-      expectedDelivery: '2024-01-28',
-      totalAmount: 75000,
-      items: [
-        { name: 'كابلات كهربائية 4مم', quantity: 500, unit: 'متر', unitPrice: 12 },
-        { name: 'قواطع كهربائية', quantity: 20, unit: 'قطعة', unitPrice: 350 }
-      ],
-      status: 'في انتظار الموافقة',
-      approvedBy: null,
-      deliveryStatus: 'لم يتم التسليم'
-    },
-    {
-      id: 3,
-      orderNumber: 'PO-2024-003',
-      supplierName: 'شركة الحديد والصلب',
-      projectName: 'مجمع الورود السكني',
-      requestedBy: 'المهندس عبدالله فهد',
-      orderDate: '2024-01-20',
-      expectedDelivery: '2024-02-05',
-      totalAmount: 320000,
-      items: [
-        { name: 'حديد تسليح 12مم', quantity: 80, unit: 'طن', unitPrice: 2750 },
-        { name: 'حديد تسليح 20مم', quantity: 40, unit: 'طن', unitPrice: 2850 }
-      ],
-      status: 'معتمد',
-      approvedBy: 'مدير المشتريات',
-      deliveryStatus: 'قيد التجهيز'
-    }
-  ];
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg text-gray-600">جارٍ تحميل البيانات...</div>
+      </div>
+    );
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -91,12 +47,12 @@ const PurchasesPage = () => {
     }
   };
 
-  const totalOrders = purchaseOrders.length;
-  const approvedOrders = purchaseOrders.filter(order => order.status === 'معتمد').length;
-  const pendingOrders = purchaseOrders.filter(order => order.status === 'في انتظار الموافقة').length;
-  const totalAmount = purchaseOrders
+  const totalOrders = purchases.length;
+  const approvedOrders = purchases.filter(order => order.status === 'معتمد').length;
+  const pendingOrders = purchases.filter(order => order.status === 'في انتظار الموافقة').length;
+  const totalAmount = purchases
     .filter(order => order.status === 'معتمد')
-    .reduce((sum, order) => sum + order.totalAmount, 0);
+    .reduce((sum, order) => sum + order.total_amount, 0);
 
   return (
     <div className="space-y-6">
@@ -196,17 +152,17 @@ const PurchasesPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {purchaseOrders.map((order) => (
+                {purchases.map((order) => (
                   <TableRow key={order.id}>
-                    <TableCell className="font-medium">{order.orderNumber}</TableCell>
-                    <TableCell>{order.supplierName}</TableCell>
-                    <TableCell>{order.projectName}</TableCell>
-                    <TableCell>{order.requestedBy}</TableCell>
-                    <TableCell>{order.orderDate}</TableCell>
-                    <TableCell>{order.expectedDelivery}</TableCell>
-                    <TableCell>{order.totalAmount.toLocaleString()} ر.س</TableCell>
+                    <TableCell className="font-medium">{order.order_number}</TableCell>
+                    <TableCell>{order.supplier_name}</TableCell>
+                    <TableCell>{order.project_name}</TableCell>
+                    <TableCell>{order.requested_by}</TableCell>
+                    <TableCell>{order.order_date}</TableCell>
+                    <TableCell>{order.expected_delivery}</TableCell>
+                    <TableCell>{order.total_amount.toLocaleString()} ر.س</TableCell>
                     <TableCell>{getStatusBadge(order.status)}</TableCell>
-                    <TableCell>{getDeliveryStatusBadge(order.deliveryStatus)}</TableCell>
+                    <TableCell>{getDeliveryStatusBadge(order.delivery_status)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -226,37 +182,16 @@ const PurchasesPage = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm font-medium text-gray-500">رقم الطلب</p>
-                <p className="text-lg font-semibold">{purchaseOrders[0]?.orderNumber}</p>
+                <p className="text-lg font-semibold">{purchases[0]?.order_number || 'لا يوجد'}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">المورد</p>
-                <p className="text-lg font-semibold">{purchaseOrders[0]?.supplierName}</p>
+                <p className="text-lg font-semibold">{purchases[0]?.supplier_name || 'لا يوجد'}</p>
               </div>
             </div>
             
-            <div className="border rounded-lg overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-right">المادة</TableHead>
-                    <TableHead className="text-right">الكمية</TableHead>
-                    <TableHead className="text-right">الوحدة</TableHead>
-                    <TableHead className="text-right">سعر الوحدة</TableHead>
-                    <TableHead className="text-right">المبلغ الإجمالي</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {purchaseOrders[0]?.items.map((item, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>{item.quantity}</TableCell>
-                      <TableCell>{item.unit}</TableCell>
-                      <TableCell>{item.unitPrice} ر.س</TableCell>
-                      <TableCell>{(item.quantity * item.unitPrice).toLocaleString()} ر.س</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <div className="text-center py-4 text-gray-500">
+              <p>تفاصيل المواد ستعرض هنا عند إضافة طلبات شراء</p>
             </div>
           </div>
         </CardContent>

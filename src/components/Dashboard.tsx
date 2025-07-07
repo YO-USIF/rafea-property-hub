@@ -10,63 +10,73 @@ import {
   AlertCircle,
   CheckCircle
 } from 'lucide-react';
+import { useDashboardData } from '@/hooks/useDashboardData';
+import { useAuth } from '@/hooks/useAuth';
 
 const Dashboard = () => {
-  const stats = [
+  const { user } = useAuth();
+  const { isLoading, stats, recentActivities, upcomingTasks } = useDashboardData();
+
+  const formatCurrency = (value: number) => {
+    if (value >= 1000000) {
+      return `${(value / 1000000).toFixed(1)}M ريال`;
+    } else if (value >= 1000) {
+      return `${(value / 1000).toFixed(0)}K ريال`;
+    }
+    return `${value} ريال`;
+  };
+
+  const statsDisplay = [
     {
       title: 'إجمالي المشاريع',
-      value: '24',
-      change: '+3 هذا الشهر',
+      value: stats.totalProjects.toString(),
+      change: stats.totalProjects > 0 ? 'مشاريع نشطة' : 'لا توجد مشاريع',
       icon: Building,
       gradient: 'gradient-real-estate',
       changePositive: true
     },
     {
       title: 'الشقق المباعة',
-      value: '186',
-      change: '+12 هذا الأسبوع',
+      value: stats.soldUnits.toString(),
+      change: stats.soldUnits > 0 ? 'وحدات مباعة' : 'لا توجد مبيعات',
       icon: Home,
       gradient: 'gradient-gold',
       changePositive: true
     },
     {
       title: 'إجمالي الإيرادات',
-      value: '2.4M ريال',
-      change: '+8.2% من الشهر السابق',
+      value: formatCurrency(stats.totalRevenue),
+      change: stats.totalRevenue > 0 ? 'إيرادات متوقعة' : 'لا توجد إيرادات',
       icon: DollarSign,
       gradient: 'gradient-navy',
       changePositive: true
     },
     {
-      title: 'العملاء النشطين',
-      value: '142',
-      change: '+6 عملاء جدد',
+      title: 'المتعاونون النشطون',
+      value: stats.activeContractors.toString(),
+      change: stats.activeContractors > 0 ? 'متعاونون نشطون' : 'لا يوجد متعاونون',
       icon: Users,
       gradient: 'gradient-real-estate',
       changePositive: true
     }
   ];
 
-  const recentActivities = [
-    { id: 1, title: 'بيع شقة في مشروع الواحة الخضراء', time: 'منذ ساعتين', type: 'sale' },
-    { id: 2, title: 'موافقة على مستخلص المقاول الرئيسي', time: 'منذ 3 ساعات', type: 'approval' },
-    { id: 3, title: 'إضافة مشروع جديد: برج النخيل', time: 'منذ 5 ساعات', type: 'project' },
-    { id: 4, title: 'دفع مستحقات المورد الأساسي', time: 'أمس', type: 'payment' },
-  ];
-
-  const upcomingTasks = [
-    { id: 1, title: 'مراجعة تقرير المبيعات الشهرية', due: 'غداً', priority: 'high' },
-    { id: 2, title: 'اجتماع مع فريق التطوير', due: 'بعد غد', priority: 'medium' },
-    { id: 3, title: 'زيارة موقع مشروع الواحة', due: 'الأحد', priority: 'high' },
-    { id: 4, title: 'مراجعة عقود الموردين', due: 'الإثنين', priority: 'low' },
-  ];
+  if (isLoading) {
+    return (
+      <div className="animate-fade-in">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg text-gray-600">جارٍ تحميل البيانات...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in">
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          مرحباً، أحمد محمد 👋
+          مرحباً، {user?.email?.split('@')[0] || 'مستخدم'} 👋
         </h1>
         <p className="text-gray-600">
           نظرة شاملة على أداء شركة رافع للتطوير العقاري
@@ -75,7 +85,7 @@ const Dashboard = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat, index) => {
+        {statsDisplay.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <div 
@@ -109,15 +119,22 @@ const Dashboard = () => {
             </button>
           </div>
           <div className="space-y-4">
-            {recentActivities.map((activity) => (
-              <div key={activity.id} className="flex items-start space-x-3 space-x-reverse p-3 hover:bg-gray-50 rounded-lg transition-colors">
-                <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">{activity.title}</p>
-                  <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+            {recentActivities.length > 0 ? (
+              recentActivities.map((activity) => (
+                <div key={activity.id} className="flex items-start space-x-3 space-x-reverse p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                  <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">{activity.title}</p>
+                    <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>لا توجد أنشطة حديثة</p>
+                <p className="text-xs mt-1">قم بإضافة مشاريع أو طلبات صيانة لرؤية الأنشطة</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
 
@@ -130,21 +147,28 @@ const Dashboard = () => {
             </button>
           </div>
           <div className="space-y-4">
-            {upcomingTasks.map((task) => (
-              <div key={task.id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors">
-                <div className="flex items-center space-x-3 space-x-reverse">
-                  <div className={`w-3 h-3 rounded-full ${
-                    task.priority === 'high' ? 'bg-red-500' :
-                    task.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
-                  }`}></div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{task.title}</p>
-                    <p className="text-xs text-gray-500">{task.due}</p>
+            {upcomingTasks.length > 0 ? (
+              upcomingTasks.map((task) => (
+                <div key={task.id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                  <div className="flex items-center space-x-3 space-x-reverse">
+                    <div className={`w-3 h-3 rounded-full ${
+                      task.priority === 'high' ? 'bg-red-500' :
+                      task.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                    }`}></div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{task.title}</p>
+                      <p className="text-xs text-gray-500">{task.due}</p>
+                    </div>
                   </div>
+                  <CheckCircle className="w-4 h-4 text-gray-400 hover:text-green-500 cursor-pointer transition-colors" />
                 </div>
-                <CheckCircle className="w-4 h-4 text-gray-400 hover:text-green-500 cursor-pointer transition-colors" />
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>لا توجد مهام عاجلة</p>
+                <p className="text-xs mt-1">المهام العاجلة ستظهر هنا</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

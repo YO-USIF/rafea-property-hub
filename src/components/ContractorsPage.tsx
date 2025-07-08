@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ContractorForm from '@/components/forms/ContractorForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,8 @@ import { useContractors } from '@/hooks/useContractors';
 
 const ContractorsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [editingContractor, setEditingContractor] = useState<any>(null);
   const { contractors, isLoading, deleteContractor } = useContractors();
 
   if (isLoading) {
@@ -81,7 +84,10 @@ const ContractorsPage = () => {
           <p className="text-gray-600 mt-2">إدارة المقاولين ومتابعة المستخلصات والمدفوعات</p>
         </div>
         <div className="flex gap-2">
-          <Button className="bg-primary hover:bg-primary/90">
+          <Button 
+            className="bg-primary hover:bg-primary/90"
+            onClick={() => setShowForm(true)}
+          >
             <Plus className="w-4 h-4 ml-2" />
             إضافة مقاول
           </Button>
@@ -190,7 +196,14 @@ const ContractorsPage = () => {
                     <TableCell>{getStatusBadge(contractor.status)}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            setEditingContractor(contractor);
+                            setShowForm(true);
+                          }}
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button 
@@ -223,6 +236,19 @@ const ContractorsPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      <ContractorForm
+        open={showForm}
+        onOpenChange={(open) => {
+          setShowForm(open);
+          if (!open) setEditingContractor(null);
+        }}
+        contractor={editingContractor}
+        onSuccess={() => {
+          setShowForm(false);
+          setEditingContractor(null);
+        }}
+      />
     </div>
   );
 };

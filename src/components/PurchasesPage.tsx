@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PurchaseForm from '@/components/forms/PurchaseForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,8 @@ import { usePurchases } from '@/hooks/usePurchases';
 
 const PurchasesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [editingPurchase, setEditingPurchase] = useState<any>(null);
   const { purchases, isLoading, deletePurchase } = usePurchases();
 
   if (isLoading) {
@@ -62,7 +65,10 @@ const PurchasesPage = () => {
           <h1 className="text-3xl font-bold text-gray-900">المشتريات</h1>
           <p className="text-gray-600 mt-2">إدارة طلبات الشراء والموافقات والتوريد</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90">
+        <Button 
+          className="bg-primary hover:bg-primary/90"
+          onClick={() => setShowForm(true)}
+        >
           <Plus className="w-4 h-4 ml-2" />
           طلب شراء جديد
         </Button>
@@ -149,6 +155,7 @@ const PurchasesPage = () => {
                   <TableHead className="text-right">المبلغ الإجمالي</TableHead>
                   <TableHead className="text-right">حالة الموافقة</TableHead>
                   <TableHead className="text-right">حالة التسليم</TableHead>
+                  <TableHead className="text-right">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -163,6 +170,27 @@ const PurchasesPage = () => {
                     <TableCell>{order.total_amount.toLocaleString()} ر.س</TableCell>
                     <TableCell>{getStatusBadge(order.status)}</TableCell>
                     <TableCell>{getDeliveryStatusBadge(order.delivery_status)}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            setEditingPurchase(order);
+                            setShowForm(true);
+                          }}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => deletePurchase.mutate(order.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -196,6 +224,19 @@ const PurchasesPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      <PurchaseForm
+        open={showForm}
+        onOpenChange={(open) => {
+          setShowForm(open);
+          if (!open) setEditingPurchase(null);
+        }}
+        purchase={editingPurchase}
+        onSuccess={() => {
+          setShowForm(false);
+          setEditingPurchase(null);
+        }}
+      />
     </div>
   );
 };

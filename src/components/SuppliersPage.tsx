@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SupplierForm from '@/components/forms/SupplierForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,8 @@ import { useSuppliers } from '@/hooks/useSuppliers';
 
 const SuppliersPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [editingSupplier, setEditingSupplier] = useState<any>(null);
   const { suppliers, isLoading, deleteSupplier } = useSuppliers();
 
   if (isLoading) {
@@ -91,7 +94,10 @@ const SuppliersPage = () => {
           <p className="text-gray-600 mt-2">إدارة الموردين ومتابعة الفواتير والمدفوعات</p>
         </div>
         <div className="flex gap-2">
-          <Button className="bg-primary hover:bg-primary/90">
+          <Button 
+            className="bg-primary hover:bg-primary/90"
+            onClick={() => setShowForm(true)}
+          >
             <Plus className="w-4 h-4 ml-2" />
             إضافة مورد
           </Button>
@@ -200,7 +206,14 @@ const SuppliersPage = () => {
                     <TableCell>{getStatusBadge(supplier.status)}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            setEditingSupplier(supplier);
+                            setShowForm(true);
+                          }}
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button 
@@ -233,6 +246,19 @@ const SuppliersPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      <SupplierForm
+        open={showForm}
+        onOpenChange={(open) => {
+          setShowForm(open);
+          if (!open) setEditingSupplier(null);
+        }}
+        supplier={editingSupplier}
+        onSuccess={() => {
+          setShowForm(false);
+          setEditingSupplier(null);
+        }}
+      />
     </div>
   );
 };

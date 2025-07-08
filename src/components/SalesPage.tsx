@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SaleForm from '@/components/forms/SaleForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,8 @@ import { useSales } from '@/hooks/useSales';
 
 const SalesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [editingSale, setEditingSale] = useState<any>(null);
   const { sales, isLoading, deleteSale } = useSales();
 
   if (isLoading) {
@@ -47,7 +50,10 @@ const SalesPage = () => {
           <h1 className="text-3xl font-bold text-gray-900">مبيعات الشقق</h1>
           <p className="text-gray-600 mt-2">إدارة مبيعات الشقق والعقود والعملاء</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90">
+        <Button 
+          className="bg-primary hover:bg-primary/90"
+          onClick={() => setShowForm(true)}
+        >
           <Plus className="w-4 h-4 ml-2" />
           إضافة عملية بيع
         </Button>
@@ -158,7 +164,14 @@ const SalesPage = () => {
                     <TableCell>{sale.sale_date || 'غير محدد'}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            setEditingSale(sale);
+                            setShowForm(true);
+                          }}
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button 
@@ -177,6 +190,19 @@ const SalesPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      <SaleForm
+        open={showForm}
+        onOpenChange={(open) => {
+          setShowForm(open);
+          if (!open) setEditingSale(null);
+        }}
+        sale={editingSale}
+        onSuccess={() => {
+          setShowForm(false);
+          setEditingSale(null);
+        }}
+      />
     </div>
   );
 };

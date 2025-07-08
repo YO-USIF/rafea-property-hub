@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import TaskForm from '@/components/forms/TaskForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,8 @@ import { useTasks } from '@/hooks/useTasks';
 
 const TasksPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [editingTask, setEditingTask] = useState<any>(null);
   const { tasks, isLoading, deleteTask } = useTasks();
 
   if (isLoading) {
@@ -61,7 +64,10 @@ const TasksPage = () => {
           <h1 className="text-3xl font-bold text-gray-900">المهام اليومية</h1>
           <p className="text-gray-600 mt-2">إدارة وتتبع المهام والأنشطة اليومية</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90">
+        <Button 
+          className="bg-primary hover:bg-primary/90"
+          onClick={() => setShowForm(true)}
+        >
           <Plus className="w-4 h-4 ml-2" />
           إضافة مهمة جديدة
         </Button>
@@ -180,7 +186,14 @@ const TasksPage = () => {
                     <TableCell>{task.due_date}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            setEditingTask(task);
+                            setShowForm(true);
+                          }}
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button 
@@ -199,6 +212,19 @@ const TasksPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      <TaskForm
+        open={showForm}
+        onOpenChange={(open) => {
+          setShowForm(open);
+          if (!open) setEditingTask(null);
+        }}
+        task={editingTask}
+        onSuccess={() => {
+          setShowForm(false);
+          setEditingTask(null);
+        }}
+      />
     </div>
   );
 };

@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      backup_logs: {
+        Row: {
+          backup_type: string
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          file_path: string | null
+          file_size: number | null
+          id: string
+          status: string
+        }
+        Insert: {
+          backup_type: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          status?: string
+        }
+        Update: {
+          backup_type?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       company_settings: {
         Row: {
           company_address: string | null
@@ -138,6 +171,75 @@ export type Database = {
           reported_date?: string
           status?: string
           unit?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notification_settings: {
+        Row: {
+          created_at: string
+          daily_summary: boolean
+          email_notifications: boolean
+          id: string
+          push_notifications: boolean
+          sms_notifications: boolean
+          updated_at: string
+          user_id: string
+          weekly_report: boolean
+        }
+        Insert: {
+          created_at?: string
+          daily_summary?: boolean
+          email_notifications?: boolean
+          id?: string
+          push_notifications?: boolean
+          sms_notifications?: boolean
+          updated_at?: string
+          user_id: string
+          weekly_report?: boolean
+        }
+        Update: {
+          created_at?: string
+          daily_summary?: boolean
+          email_notifications?: boolean
+          id?: string
+          push_notifications?: boolean
+          sms_notifications?: boolean
+          updated_at?: string
+          user_id?: string
+          weekly_report?: boolean
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          read: boolean
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean
+          title: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean
+          title?: string
+          type?: string
           updated_at?: string
           user_id?: string
         }
@@ -370,6 +472,48 @@ export type Database = {
           unit_type?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      security_settings: {
+        Row: {
+          created_at: string
+          id: string
+          max_login_attempts: number
+          password_min_length: number
+          require_lowercase: boolean
+          require_numbers: boolean
+          require_special_chars: boolean
+          require_uppercase: boolean
+          session_timeout: number
+          two_factor_enabled: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          max_login_attempts?: number
+          password_min_length?: number
+          require_lowercase?: boolean
+          require_numbers?: boolean
+          require_special_chars?: boolean
+          require_uppercase?: boolean
+          session_timeout?: number
+          two_factor_enabled?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          max_login_attempts?: number
+          password_min_length?: number
+          require_lowercase?: boolean
+          require_numbers?: boolean
+          require_special_chars?: boolean
+          require_uppercase?: boolean
+          session_timeout?: number
+          two_factor_enabled?: boolean
+          updated_at?: string
         }
         Relationships: []
       }

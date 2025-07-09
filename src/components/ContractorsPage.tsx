@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ContractorForm from '@/components/forms/ContractorForm';
+import ExtractForm from '@/components/forms/ExtractForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ const ContractorsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingContractor, setEditingContractor] = useState<any>(null);
+  const [showExtractForm, setShowExtractForm] = useState(false);
   const { contractors, isLoading, deleteContractor } = useContractors();
 
   if (isLoading) {
@@ -91,7 +93,7 @@ const ContractorsPage = () => {
             <Plus className="w-4 h-4 ml-2" />
             إضافة مقاول
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => setShowExtractForm(true)}>
             <FileText className="w-4 h-4 ml-2" />
             إضافة مستخلص
           </Button>
@@ -247,6 +249,15 @@ const ContractorsPage = () => {
         onSuccess={() => {
           setShowForm(false);
           setEditingContractor(null);
+        }}
+      />
+
+      <ExtractForm
+        open={showExtractForm}
+        onOpenChange={setShowExtractForm}
+        onSuccess={() => {
+          setShowExtractForm(false);
+          // Refresh data if needed
         }}
       />
     </div>

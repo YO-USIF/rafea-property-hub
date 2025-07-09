@@ -5,9 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { BarChart3, FileText, Download, Filter, Calendar, TrendingUp, DollarSign, Users, Building2 } from 'lucide-react';
+import CustomReportForm from '@/components/forms/CustomReportForm';
+import { useToast } from '@/hooks/use-toast';
 
 const ReportsPage = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('monthly');
+  const [showCustomReportForm, setShowCustomReportForm] = useState(false);
+  const { toast } = useToast();
 
   const reportCategories = [
     {
@@ -96,11 +100,11 @@ const ReportsPage = () => {
           <p className="text-gray-600 mt-2">إنشاء وإدارة التقارير التفصيلية والتحليلات</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => toast({ title: "تصفية", description: "ميزة التصفية قيد التطوير" })}>
             <Filter className="w-4 h-4 ml-2" />
             تصفية
           </Button>
-          <Button className="bg-primary hover:bg-primary/90">
+          <Button className="bg-primary hover:bg-primary/90" onClick={() => setShowCustomReportForm(true)}>
             <FileText className="w-4 h-4 ml-2" />
             إنشاء تقرير مخصص
           </Button>
@@ -196,10 +200,10 @@ const ReportsPage = () => {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" onClick={() => toast({ title: "تحميل", description: "جارٍ تحميل التقرير..." })}>
                         <Download className="w-4 h-4" />
                       </Button>
-                      <Button size="sm">عرض</Button>
+                      <Button size="sm" onClick={() => toast({ title: "عرض", description: "جارٍ فتح التقرير..." })}>عرض</Button>
                     </div>
                   </div>
                 ))}
@@ -217,7 +221,7 @@ const ReportsPage = () => {
               <CardTitle>التقارير الأخيرة</CardTitle>
               <CardDescription>التقارير المُنشأة مؤخراً</CardDescription>
             </div>
-            <Button variant="outline" size="sm">عرض الكل</Button>
+            <Button variant="outline" size="sm" onClick={() => toast({ title: "عرض الكل", description: "جارٍ عرض جميع التقارير..." })}>عرض الكل</Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -242,7 +246,7 @@ const ReportsPage = () => {
                   <Badge variant={report.status === 'مكتمل' ? 'default' : 'secondary'}>
                     {report.status}
                   </Badge>
-                  <Button size="sm" variant="outline">
+                  <Button size="sm" variant="outline" onClick={() => toast({ title: "تحميل", description: `جارٍ تحميل ${report.name}...` })}>
                     <Download className="w-4 h-4" />
                   </Button>
                 </div>
@@ -251,6 +255,14 @@ const ReportsPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      <CustomReportForm
+        open={showCustomReportForm}
+        onOpenChange={setShowCustomReportForm}
+        onSuccess={() => {
+          setShowCustomReportForm(false);
+        }}
+      />
     </div>
   );
 };

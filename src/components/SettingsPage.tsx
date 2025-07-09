@@ -7,9 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Settings, User, Shield, Bell, Database, Key, Users, Mail } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState('general');
+  const { toast } = useToast();
 
   const settingsTabs = [
     { id: 'general', name: 'الإعدادات العامة', icon: Settings },
@@ -103,7 +105,7 @@ const SettingsPage = () => {
               <Input id="company-address" defaultValue="الرياض، المملكة العربية السعودية" />
             </div>
           </div>
-          <Button>حفظ التغييرات</Button>
+          <Button onClick={() => toast({ title: "تم الحفظ", description: "تم حفظ معلومات الشركة بنجاح" })}>حفظ التغييرات</Button>
         </CardContent>
       </Card>
 
@@ -131,7 +133,7 @@ const SettingsPage = () => {
               <Input id="date-format" defaultValue="DD/MM/YYYY" />
             </div>
           </div>
-          <Button>حفظ الإعدادات</Button>
+          <Button onClick={() => toast({ title: "تم الحفظ", description: "تم حفظ إعدادات النظام بنجاح" })}>حفظ الإعدادات</Button>
         </CardContent>
       </Card>
     </div>
@@ -146,7 +148,7 @@ const SettingsPage = () => {
               <CardTitle>إدارة المستخدمين</CardTitle>
               <CardDescription>إضافة وإدارة حسابات المستخدمين</CardDescription>
             </div>
-            <Button>
+            <Button onClick={() => toast({ title: "إضافة مستخدم", description: "ميزة إضافة مستخدم جديد قيد التطوير" })}>
               <User className="w-4 h-4 ml-2" />
               إضافة مستخدم جديد
             </Button>
@@ -180,8 +182,8 @@ const SettingsPage = () => {
                   <TableCell>{user.lastLogin}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline">تعديل</Button>
-                      <Button size="sm" variant="outline">حذف</Button>
+                      <Button size="sm" variant="outline" onClick={() => toast({ title: "تعديل", description: `جارٍ تعديل ${user.name}...` })}>تعديل</Button>
+                      <Button size="sm" variant="outline" onClick={() => toast({ title: "حذف", description: `تم حذف ${user.name}` })}>حذف</Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -202,7 +204,7 @@ const SettingsPage = () => {
               <CardTitle>إدارة الأدوار والصلاحيات</CardTitle>
               <CardDescription>تحديد صلاحيات المستخدمين حسب الأدوار</CardDescription>
             </div>
-            <Button>
+            <Button onClick={() => toast({ title: "إضافة دور", description: "ميزة إضافة دور جديد قيد التطوير" })}>
               <Shield className="w-4 h-4 ml-2" />
               إضافة دور جديد
             </Button>
@@ -231,8 +233,8 @@ const SettingsPage = () => {
                       </div>
                     </div>
                     <div className="flex gap-2 pt-2">
-                      <Button size="sm" variant="outline">تعديل</Button>
-                      <Button size="sm" variant="outline">حذف</Button>
+                      <Button size="sm" variant="outline" onClick={() => toast({ title: "تعديل", description: `جارٍ تعديل دور ${role.name}...` })}>تعديل</Button>
+                      <Button size="sm" variant="outline" onClick={() => toast({ title: "حذف", description: `تم حذف دور ${role.name}` })}>حذف</Button>
                     </div>
                   </div>
                 </CardContent>

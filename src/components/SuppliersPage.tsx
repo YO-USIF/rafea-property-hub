@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import SupplierForm from '@/components/forms/SupplierForm';
+import InvoiceForm from '@/components/forms/InvoiceForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ const SuppliersPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<any>(null);
+  const [showInvoiceForm, setShowInvoiceForm] = useState(false);
   const { suppliers, isLoading, deleteSupplier } = useSuppliers();
 
   if (isLoading) {
@@ -101,7 +103,7 @@ const SuppliersPage = () => {
             <Plus className="w-4 h-4 ml-2" />
             إضافة مورد
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => setShowInvoiceForm(true)}>
             <FileText className="w-4 h-4 ml-2" />
             إضافة فاتورة
           </Button>
@@ -257,6 +259,15 @@ const SuppliersPage = () => {
         onSuccess={() => {
           setShowForm(false);
           setEditingSupplier(null);
+        }}
+      />
+
+      <InvoiceForm
+        open={showInvoiceForm}
+        onOpenChange={setShowInvoiceForm}
+        onSuccess={() => {
+          setShowInvoiceForm(false);
+          // Refresh data if needed
         }}
       />
     </div>

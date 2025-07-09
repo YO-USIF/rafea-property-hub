@@ -5,17 +5,18 @@ import { useUserRole } from './useUserRole';
 
 export const useDashboardData = () => {
   const { user } = useAuth();
-  const { isManager } = useUserRole();
+  const { isManager, isAdmin } = useUserRole();
+  const isManagerOrAdmin = isManager || isAdmin;
 
   const { data: projects, isLoading: projectsLoading } = useQuery({
-    queryKey: ['dashboard-projects', isManager],
+    queryKey: ['dashboard-projects', isManagerOrAdmin],
     queryFn: async () => {
       let query = supabase
         .from('projects')
         .select('*');
       
-      // إذا لم يكن المستخدم مديراً، اجلب فقط مشاريعه
-      if (!isManager) {
+      // إذا لم يكن المستخدم مديراً أو مدير نظام، اجلب فقط مشاريعه
+      if (!isManagerOrAdmin) {
         query = query.eq('user_id', user?.id);
       }
       
@@ -28,14 +29,14 @@ export const useDashboardData = () => {
   });
 
   const { data: maintenanceRequests, isLoading: maintenanceLoading } = useQuery({
-    queryKey: ['dashboard-maintenance', isManager],
+    queryKey: ['dashboard-maintenance', isManagerOrAdmin],
     queryFn: async () => {
       let query = supabase
         .from('maintenance_requests')
         .select('*');
       
-      // إذا لم يكن المستخدم مديراً، اجلب فقط طلبات الصيانة الخاصة به
-      if (!isManager) {
+      // إذا لم يكن المستخدم مديراً أو مدير نظام، اجلب فقط طلبات الصيانة الخاصة به
+      if (!isManagerOrAdmin) {
         query = query.eq('user_id', user?.id);
       }
       
@@ -50,14 +51,14 @@ export const useDashboardData = () => {
   });
 
   const { data: contractors, isLoading: contractorsLoading } = useQuery({
-    queryKey: ['dashboard-contractors', isManager],
+    queryKey: ['dashboard-contractors', isManagerOrAdmin],
     queryFn: async () => {
       let query = supabase
         .from('contractors')
         .select('*');
       
-      // إذا لم يكن المستخدم مديراً، اجلب فقط مقاوليه
-      if (!isManager) {
+      // إذا لم يكن المستخدم مديراً أو مدير نظام، اجلب فقط مقاوليه
+      if (!isManagerOrAdmin) {
         query = query.eq('user_id', user?.id);
       }
       
@@ -70,14 +71,14 @@ export const useDashboardData = () => {
   });
 
   const { data: suppliers, isLoading: suppliersLoading } = useQuery({
-    queryKey: ['dashboard-suppliers', isManager],
+    queryKey: ['dashboard-suppliers', isManagerOrAdmin],
     queryFn: async () => {
       let query = supabase
         .from('suppliers')
         .select('*');
       
-      // إذا لم يكن المستخدم مديراً، اجلب فقط مورديه
-      if (!isManager) {
+      // إذا لم يكن المستخدم مديراً أو مدير نظام، اجلب فقط مورديه
+      if (!isManagerOrAdmin) {
         query = query.eq('user_id', user?.id);
       }
       

@@ -30,9 +30,11 @@ export const useUserRole = () => {
         }
 
         const role = data?.role || null;
+        console.log('User role fetched:', role, 'for user:', user.id);
         setUserRole(role);
         setIsManager(role === 'مدير' || role === 'مدير النظام');
         setIsAdmin(role === 'مدير النظام');
+        console.log('Manager status:', role === 'مدير' || role === 'مدير النظام', 'Admin status:', role === 'مدير النظام');
       } catch (error) {
         console.error('Error fetching user role:', error);
       } finally {

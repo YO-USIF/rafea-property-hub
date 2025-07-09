@@ -6,12 +6,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Settings, User, Shield, Bell, Database, Key, Users, Mail } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Settings, User, Shield, Bell, Database, Key, Users, Mail, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useProfiles } from '@/hooks/useProfiles';
+import { useCompanySettings } from '@/hooks/useCompanySettings';
+import UserForm from '@/components/forms/UserForm';
 
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState('general');
+  const [isUserFormOpen, setIsUserFormOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const { toast } = useToast();
+  const { profiles, loading: profilesLoading, updateProfile, updateUserRole, deleteProfile } = useProfiles();
+  const { settings, loading: settingsLoading, updateSettings } = useCompanySettings();
 
   const settingsTabs = [
     { id: 'general', name: 'الإعدادات العامة', icon: Settings },
@@ -22,35 +30,44 @@ const SettingsPage = () => {
     { id: 'security', name: 'الأمان', icon: Key }
   ];
 
-  const users = [
-    {
-      id: 1,
-      name: 'أحمد محمد',
-      email: 'ahmed@rafaa.com',
-      role: 'مدير النظام',
-      department: 'الإدارة',
-      status: 'نشط',
-      lastLogin: '2024-01-20 14:30'
-    },
-    {
-      id: 2,
-      name: 'سارة أحمد',
-      email: 'sara@rafaa.com',
-      role: 'موظف مبيعات',
-      department: 'المبيعات',
-      status: 'نشط',
-      lastLogin: '2024-01-20 09:15'
-    },
-    {
-      id: 3,
-      name: 'محمد علي',
-      email: 'mohammed@rafaa.com',
-      role: 'محاسب',
-      department: 'المحاسبة',
-      status: 'غير نشط',
-      lastLogin: '2024-01-18 16:45'
+  const handleSaveCompanySettings = async (formData: FormData) => {
+    if (!settings) return;
+    
+    const updatedSettings = {
+      company_name: formData.get('company-name') as string,
+      company_email: formData.get('company-email') as string,
+      company_phone: formData.get('company-phone') as string,
+      company_address: formData.get('company-address') as string,
+      currency: formData.get('currency') as string,
+      timezone: formData.get('timezone') as string,
+      language: formData.get('language') as string,
+      date_format: formData.get('date-format') as string,
+    };
+    
+    await updateSettings(updatedSettings);
+  };
+
+  const handleUserSubmit = async (userData: any) => {
+    if (selectedUser) {
+      await updateProfile(selectedUser.id, userData);
     }
-  ];
+    setSelectedUser(null);
+  };
+
+  const handleEditUser = (user: any) => {
+    setSelectedUser(user);
+    setIsUserFormOpen(true);
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+      await deleteProfile(userId);
+    }
+  };
+
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    await updateUserRole(userId, newRole);
+  };
 
   const roles = [
     {
@@ -86,26 +103,46 @@ const SettingsPage = () => {
           <CardTitle>معلومات الشركة</CardTitle>
           <CardDescription>إعدادات الشركة الأساسية</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="company-name">اسم الشركة</Label>
-              <Input id="company-name" defaultValue="شركة رافع للتطوير العقاري" />
+        <CardContent>
+          <form onSubmit={(e) => { e.preventDefault(); handleSaveCompanySettings(new FormData(e.currentTarget)); }} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="company-name">اسم الشركة</Label>
+                <Input 
+                  id="company-name" 
+                  name="company-name"
+                  defaultValue={settings?.company_name || ''} 
+                />
+              </div>
+              <div>
+                <Label htmlFor="company-email">البريد الإلكتروني</Label>
+                <Input 
+                  id="company-email" 
+                  name="company-email"
+                  defaultValue={settings?.company_email || ''} 
+                />
+              </div>
+              <div>
+                <Label htmlFor="company-phone">رقم الهاتف</Label>
+                <Input 
+                  id="company-phone" 
+                  name="company-phone"
+                  defaultValue={settings?.company_phone || ''} 
+                />
+              </div>
+              <div>
+                <Label htmlFor="company-address">العنوان</Label>
+                <Input 
+                  id="company-address" 
+                  name="company-address"
+                  defaultValue={settings?.company_address || ''} 
+                />
+              </div>
             </div>
-            <div>
-              <Label htmlFor="company-email">البريد الإلكتروني</Label>
-              <Input id="company-email" defaultValue="info@rafaa.com" />
-            </div>
-            <div>
-              <Label htmlFor="company-phone">رقم الهاتف</Label>
-              <Input id="company-phone" defaultValue="+966 11 234 5678" />
-            </div>
-            <div>
-              <Label htmlFor="company-address">العنوان</Label>
-              <Input id="company-address" defaultValue="الرياض، المملكة العربية السعودية" />
-            </div>
-          </div>
-          <Button onClick={() => toast({ title: "تم الحفظ", description: "تم حفظ معلومات الشركة بنجاح" })}>حفظ التغييرات</Button>
+            <Button type="submit" disabled={settingsLoading}>
+              حفظ التغييرات
+            </Button>
+          </form>
         </CardContent>
       </Card>
 
@@ -114,26 +151,46 @@ const SettingsPage = () => {
           <CardTitle>إعدادات النظام</CardTitle>
           <CardDescription>تخصيص سلوك النظام</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="currency">العملة الافتراضية</Label>
-              <Input id="currency" defaultValue="ريال سعودي (SAR)" />
+        <CardContent>
+          <form onSubmit={(e) => { e.preventDefault(); handleSaveCompanySettings(new FormData(e.currentTarget)); }} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="currency">العملة الافتراضية</Label>
+                <Input 
+                  id="currency" 
+                  name="currency"
+                  defaultValue={settings?.currency || ''} 
+                />
+              </div>
+              <div>
+                <Label htmlFor="timezone">المنطقة الزمنية</Label>
+                <Input 
+                  id="timezone" 
+                  name="timezone"
+                  defaultValue={settings?.timezone || ''} 
+                />
+              </div>
+              <div>
+                <Label htmlFor="language">لغة النظام</Label>
+                <Input 
+                  id="language" 
+                  name="language"
+                  defaultValue={settings?.language || ''} 
+                />
+              </div>
+              <div>
+                <Label htmlFor="date-format">تنسيق التاريخ</Label>
+                <Input 
+                  id="date-format" 
+                  name="date-format"
+                  defaultValue={settings?.date_format || ''} 
+                />
+              </div>
             </div>
-            <div>
-              <Label htmlFor="timezone">المنطقة الزمنية</Label>
-              <Input id="timezone" defaultValue="آسيا/الرياض" />
-            </div>
-            <div>
-              <Label htmlFor="language">لغة النظام</Label>
-              <Input id="language" defaultValue="العربية" />
-            </div>
-            <div>
-              <Label htmlFor="date-format">تنسيق التاريخ</Label>
-              <Input id="date-format" defaultValue="DD/MM/YYYY" />
-            </div>
-          </div>
-          <Button onClick={() => toast({ title: "تم الحفظ", description: "تم حفظ إعدادات النظام بنجاح" })}>حفظ الإعدادات</Button>
+            <Button type="submit" disabled={settingsLoading}>
+              حفظ الإعدادات
+            </Button>
+          </form>
         </CardContent>
       </Card>
     </div>
@@ -148,48 +205,78 @@ const SettingsPage = () => {
               <CardTitle>إدارة المستخدمين</CardTitle>
               <CardDescription>إضافة وإدارة حسابات المستخدمين</CardDescription>
             </div>
-            <Button onClick={() => toast({ title: "إضافة مستخدم", description: "ميزة إضافة مستخدم جديد قيد التطوير" })}>
+            <Button onClick={() => setIsUserFormOpen(true)}>
               <User className="w-4 h-4 ml-2" />
               إضافة مستخدم جديد
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-right">الاسم</TableHead>
-                <TableHead className="text-right">البريد الإلكتروني</TableHead>
-                <TableHead className="text-right">الدور</TableHead>
-                <TableHead className="text-right">القسم</TableHead>
-                <TableHead className="text-right">الحالة</TableHead>
-                <TableHead className="text-right">آخر دخول</TableHead>
-                <TableHead className="text-right">الإجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell>{user.department}</TableCell>
-                  <TableCell>
-                    <Badge variant={user.status === 'نشط' ? 'default' : 'secondary'}>
-                      {user.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{user.lastLogin}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => toast({ title: "تعديل", description: `جارٍ تعديل ${user.name}...` })}>تعديل</Button>
-                      <Button size="sm" variant="outline" onClick={() => toast({ title: "حذف", description: `تم حذف ${user.name}` })}>حذف</Button>
-                    </div>
-                  </TableCell>
+          {profilesLoading ? (
+            <div className="text-center py-8">جارٍ تحميل البيانات...</div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-right">الاسم</TableHead>
+                  <TableHead className="text-right">البريد الإلكتروني</TableHead>
+                  <TableHead className="text-right">الدور</TableHead>
+                  <TableHead className="text-right">القسم</TableHead>
+                  <TableHead className="text-right">الحالة</TableHead>
+                  <TableHead className="text-right">الإجراءات</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {profiles.map((profile) => (
+                  <TableRow key={profile.id}>
+                    <TableCell className="font-medium">{profile.full_name}</TableCell>
+                    <TableCell>{profile.email}</TableCell>
+                    <TableCell>
+                      <Select
+                        value={profile.roles?.[0] || 'موظف'}
+                        onValueChange={(value) => handleRoleChange(profile.user_id, value)}
+                      >
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="مدير النظام">مدير النظام</SelectItem>
+                          <SelectItem value="مدير">مدير</SelectItem>
+                          <SelectItem value="موظف مبيعات">موظف مبيعات</SelectItem>
+                          <SelectItem value="محاسب">محاسب</SelectItem>
+                          <SelectItem value="موظف">موظف</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>{profile.department}</TableCell>
+                    <TableCell>
+                      <Badge variant={profile.status === 'نشط' ? 'default' : 'secondary'}>
+                        {profile.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleEditUser(profile)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleDeleteUser(profile.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
@@ -301,6 +388,17 @@ const SettingsPage = () => {
           {renderContent()}
         </div>
       </div>
+
+      {/* User Form Dialog */}
+      <UserForm
+        user={selectedUser}
+        isOpen={isUserFormOpen}
+        onClose={() => {
+          setIsUserFormOpen(false);
+          setSelectedUser(null);
+        }}
+        onSubmit={handleUserSubmit}
+      />
     </div>
   );
 };

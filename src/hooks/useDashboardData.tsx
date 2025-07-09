@@ -1,17 +1,25 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useUserRole } from './useUserRole';
 
 export const useDashboardData = () => {
   const { user } = useAuth();
+  const { isManager } = useUserRole();
 
   const { data: projects, isLoading: projectsLoading } = useQuery({
-    queryKey: ['projects'],
+    queryKey: ['dashboard-projects', isManager],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('projects')
-        .select('*')
-        .eq('user_id', user?.id);
+        .select('*');
+      
+      // إذا لم يكن المستخدم مديراً، اجلب فقط مشاريعه
+      if (!isManager) {
+        query = query.eq('user_id', user?.id);
+      }
+      
+      const { data, error } = await query;
       
       if (error) throw error;
       return data;
@@ -20,12 +28,18 @@ export const useDashboardData = () => {
   });
 
   const { data: maintenanceRequests, isLoading: maintenanceLoading } = useQuery({
-    queryKey: ['maintenance_requests'],
+    queryKey: ['dashboard-maintenance', isManager],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('maintenance_requests')
-        .select('*')
-        .eq('user_id', user?.id)
+        .select('*');
+      
+      // إذا لم يكن المستخدم مديراً، اجلب فقط طلبات الصيانة الخاصة به
+      if (!isManager) {
+        query = query.eq('user_id', user?.id);
+      }
+      
+      const { data, error } = await query
         .order('created_at', { ascending: false })
         .limit(10);
       
@@ -36,12 +50,18 @@ export const useDashboardData = () => {
   });
 
   const { data: contractors, isLoading: contractorsLoading } = useQuery({
-    queryKey: ['contractors'],
+    queryKey: ['dashboard-contractors', isManager],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('contractors')
-        .select('*')
-        .eq('user_id', user?.id);
+        .select('*');
+      
+      // إذا لم يكن المستخدم مديراً، اجلب فقط مقاوليه
+      if (!isManager) {
+        query = query.eq('user_id', user?.id);
+      }
+      
+      const { data, error } = await query;
       
       if (error) throw error;
       return data;
@@ -50,12 +70,18 @@ export const useDashboardData = () => {
   });
 
   const { data: suppliers, isLoading: suppliersLoading } = useQuery({
-    queryKey: ['suppliers'],
+    queryKey: ['dashboard-suppliers', isManager],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('suppliers')
-        .select('*')
-        .eq('user_id', user?.id);
+        .select('*');
+      
+      // إذا لم يكن المستخدم مديراً، اجلب فقط مورديه
+      if (!isManager) {
+        query = query.eq('user_id', user?.id);
+      }
+      
+      const { data, error } = await query;
       
       if (error) throw error;
       return data;

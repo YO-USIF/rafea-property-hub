@@ -4,20 +4,20 @@ import { useAuth } from './useAuth';
 import { useUserRole } from './useUserRole';
 import { useToast } from './use-toast';
 
-export const useTasks = () => {
+export const useProjects = () => {
   const { user } = useAuth();
   const { isManager } = useUserRole();
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: tasks = [], isLoading } = useQuery({
-    queryKey: ['tasks', isManager],
+  const { data: projects = [], isLoading } = useQuery({
+    queryKey: ['projects', isManager],
     queryFn: async () => {
       let query = supabase
-        .from('tasks')
+        .from('projects')
         .select('*');
       
-      // إذا لم يكن المستخدم مديراً، اجلب فقط مهامه
+      // إذا لم يكن المستخدم مديراً، اجلب فقط مشاريعه
       if (!isManager) {
         query = query.eq('user_id', user?.id);
       }
@@ -30,11 +30,11 @@ export const useTasks = () => {
     enabled: !!user?.id,
   });
 
-  const createTask = useMutation({
-    mutationFn: async (taskData: any) => {
+  const createProject = useMutation({
+    mutationFn: async (projectData: any) => {
       const { data, error } = await supabase
-        .from('tasks')
-        .insert([{ ...taskData, user_id: user?.id }])
+        .from('projects')
+        .insert([{ ...projectData, user_id: user?.id }])
         .select()
         .single();
       
@@ -42,19 +42,19 @@ export const useTasks = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast({ title: "تم إضافة المهمة بنجاح" });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      toast({ title: "تم إضافة المشروع بنجاح" });
     },
     onError: (error) => {
-      toast({ title: "خطأ في إضافة المهمة", variant: "destructive" });
+      toast({ title: "خطأ في إضافة المشروع", variant: "destructive" });
     },
   });
 
-  const updateTask = useMutation({
-    mutationFn: async ({ id, ...taskData }: any) => {
+  const updateProject = useMutation({
+    mutationFn: async ({ id, ...projectData }: any) => {
       const { data, error } = await supabase
-        .from('tasks')
-        .update(taskData)
+        .from('projects')
+        .update(projectData)
         .eq('id', id)
         .eq('user_id', user?.id)
         .select()
@@ -64,18 +64,18 @@ export const useTasks = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast({ title: "تم تحديث المهمة بنجاح" });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      toast({ title: "تم تحديث المشروع بنجاح" });
     },
     onError: (error) => {
-      toast({ title: "خطأ في تحديث المهمة", variant: "destructive" });
+      toast({ title: "خطأ في تحديث المشروع", variant: "destructive" });
     },
   });
 
-  const deleteTask = useMutation({
+  const deleteProject = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('tasks')
+        .from('projects')
         .delete()
         .eq('id', id)
         .eq('user_id', user?.id);
@@ -83,19 +83,19 @@ export const useTasks = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast({ title: "تم حذف المهمة بنجاح" });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      toast({ title: "تم حذف المشروع بنجاح" });
     },
     onError: (error) => {
-      toast({ title: "خطأ في حذف المهمة", variant: "destructive" });
+      toast({ title: "خطأ في حذف المشروع", variant: "destructive" });
     },
   });
 
   return {
-    tasks,
+    projects,
     isLoading,
-    createTask,
-    updateTask,
-    deleteTask,
+    createProject,
+    updateProject,
+    deleteProject,
   };
 };

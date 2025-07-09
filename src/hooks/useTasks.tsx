@@ -6,19 +6,20 @@ import { useToast } from './use-toast';
 
 export const useTasks = () => {
   const { user } = useAuth();
-  const { isManager } = useUserRole();
+  const { isManager, isAdmin } = useUserRole();
+  const isManagerOrAdmin = isManager || isAdmin;
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const { data: tasks = [], isLoading } = useQuery({
-    queryKey: ['tasks', isManager],
+    queryKey: ['tasks', isManagerOrAdmin],
     queryFn: async () => {
       let query = supabase
         .from('tasks')
         .select('*');
       
-      // إذا لم يكن المستخدم مديراً، اجلب فقط مهامه
-      if (!isManager) {
+      // إذا لم يكن المستخدم مديراً أو مدير نظام، اجلب فقط مهامه
+      if (!isManagerOrAdmin) {
         query = query.eq('user_id', user?.id);
       }
       

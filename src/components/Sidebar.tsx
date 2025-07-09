@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
 import { 
   Home, 
   Building, 
@@ -26,6 +27,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { signOut, user } = useAuth();
+  const { isAdmin } = useUserRole();
 
   const menuItems = [
     { id: 'dashboard', name: 'لوحة التحكم', icon: Home },
@@ -72,7 +74,15 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
       {/* Navigation */}
       <nav className="mt-6 px-3">
         <ul className="space-y-2">
-          {menuItems.map((item) => {
+          {menuItems
+            .filter(item => {
+              // إخفاء الإعدادات عن غير مديري النظام
+              if (item.id === 'settings' && !isAdmin) {
+                return false;
+              }
+              return true;
+            })
+            .map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             

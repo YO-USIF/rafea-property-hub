@@ -8,12 +8,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, Search, ClipboardList, User, Calendar, CheckCircle2, Trash2, Edit } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
+import { useUserRole } from '@/hooks/useUserRole';
 
 const TasksPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
   const { tasks, isLoading, deleteTask } = useTasks();
+  const { isAdmin } = useUserRole();
 
   if (isLoading) {
     return (
@@ -64,13 +66,15 @@ const TasksPage = () => {
           <h1 className="text-3xl font-bold text-gray-900">المهام اليومية</h1>
           <p className="text-gray-600 mt-2">إدارة وتتبع المهام والأنشطة اليومية</p>
         </div>
-        <Button 
-          className="bg-primary hover:bg-primary/90"
-          onClick={() => setShowForm(true)}
-        >
-          <Plus className="w-4 h-4 ml-2" />
-          إضافة مهمة جديدة
-        </Button>
+        {isAdmin && (
+          <Button 
+            className="bg-primary hover:bg-primary/90"
+            onClick={() => setShowForm(true)}
+          >
+            <Plus className="w-4 h-4 ml-2" />
+            إضافة مهمة جديدة
+          </Button>
+        )}
       </div>
 
       {/* Statistics Cards */}
@@ -137,8 +141,12 @@ const TasksPage = () => {
                 className="pr-10"
               />
             </div>
-            <Button variant="outline">تصفية</Button>
-            <Button variant="outline">تصدير</Button>
+            {isAdmin && (
+              <>
+                <Button variant="outline">تصفية</Button>
+                <Button variant="outline">تصدير</Button>
+              </>
+            )}
           </div>
 
           <div className="border rounded-lg overflow-hidden">
@@ -153,7 +161,7 @@ const TasksPage = () => {
                   <TableHead className="text-right">الحالة</TableHead>
                   <TableHead className="text-right">نسبة الإنجاز</TableHead>
                   <TableHead className="text-right">تاريخ الاستحقاق</TableHead>
-                  <TableHead className="text-right">الإجراءات</TableHead>
+                  {isAdmin && <TableHead className="text-right">الإجراءات</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -184,27 +192,29 @@ const TasksPage = () => {
                       </div>
                     </TableCell>
                     <TableCell>{task.due_date}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => {
-                            setEditingTask(task);
-                            setShowForm(true);
-                          }}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => deleteTask.mutate(task.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+                    {isAdmin && (
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              setEditingTask(task);
+                              setShowForm(true);
+                            }}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => deleteTask.mutate(task.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
@@ -213,18 +223,20 @@ const TasksPage = () => {
         </CardContent>
       </Card>
 
-      <TaskForm
-        open={showForm}
-        onOpenChange={(open) => {
-          setShowForm(open);
-          if (!open) setEditingTask(null);
-        }}
-        task={editingTask}
-        onSuccess={() => {
-          setShowForm(false);
-          setEditingTask(null);
-        }}
-      />
+      {isAdmin && (
+        <TaskForm
+          open={showForm}
+          onOpenChange={(open) => {
+            setShowForm(open);
+            if (!open) setEditingTask(null);
+          }}
+          task={editingTask}
+          onSuccess={() => {
+            setShowForm(false);
+            setEditingTask(null);
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -91,37 +91,60 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // إنهاء الجلسة محلياً أولاً
+      // إيقاف تحديث الحالة مؤقتاً
+      setLoading(true);
+      
+      // تنظيف الحالة محلياً أولاً
       setUser(null);
       setSession(null);
       
-      // محاولة إنهاء الجلسة من الخادم
-      const { error } = await supabase.auth.signOut({ scope: 'global' });
+      // تنظيف localStorage يدوياً
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('supabase.auth.token') || key.includes('supabase'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
       
-      // إظهار رسالة النجاح حتى لو كان هناك خطأ في الخادم
+      // تنظيف sessionStorage أيضاً
+      sessionStorage.clear();
+      
+      // إنهاء الجلسة من الخادم
+      await supabase.auth.signOut({ scope: 'global' });
+      
+      // إظهار رسالة النجاح
       toast({
         title: "تم تسجيل الخروج",
         description: "شكراً لك على استخدام النظام",
       });
       
-      // إعادة تحميل الصفحة لضمان تنظيف كامل للحالة
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      // إعادة تعيين حالة التحميل
+      setLoading(false);
+      
+      // تأكد من إعادة توجيه للصفحة الرئيسية
+      window.location.href = '/';
       
     } catch (error) {
-      // في حالة أي خطأ، نظف الحالة محلياً
+      console.error('خطأ في تسجيل الخروج:', error);
+      
+      // في حالة أي خطأ، نظف كل شيء محلياً
       setUser(null);
       setSession(null);
+      setLoading(false);
+      
+      // تنظيف شامل للتخزين
+      localStorage.clear();
+      sessionStorage.clear();
       
       toast({
         title: "تم تسجيل الخروج",
         description: "تم تسجيل الخروج بنجاح",
       });
       
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      // إعادة توجيه قسري
+      window.location.href = '/';
     }
   };
 

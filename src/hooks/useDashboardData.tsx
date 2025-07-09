@@ -7,7 +7,6 @@ export const useDashboardData = () => {
   const { user } = useAuth();
   const { isManager, isAdmin } = useUserRole();
   const isManagerOrAdmin = isManager || isAdmin;
-  console.log('Dashboard - isManager:', isManager, 'isAdmin:', isAdmin, 'isManagerOrAdmin:', isManagerOrAdmin);
 
   const { data: projects, isLoading: projectsLoading } = useQuery({
     queryKey: ['dashboard-projects', isManagerOrAdmin],

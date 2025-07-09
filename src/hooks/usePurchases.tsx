@@ -62,13 +62,17 @@ export const usePurchases = () => {
 
   const updatePurchase = useMutation({
     mutationFn: async ({ id, ...purchaseData }: any) => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('purchases')
         .update(purchaseData)
-        .eq('id', id)
-        .eq('user_id', user?.id)
-        .select()
-        .single();
+        .eq('id', id);
+      
+      // إذا لم يكن المستخدم مديراً أو مدير نظام، قيد التحديث للمستخدم فقط
+      if (!isManagerOrAdmin) {
+        query = query.eq('user_id', user?.id);
+      }
+      
+      const { data, error } = await query.select().single();
       
       if (error) throw error;
       return data;
@@ -84,11 +88,17 @@ export const usePurchases = () => {
 
   const deletePurchase = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
+      let query = supabase
         .from('purchases')
         .delete()
-        .eq('id', id)
-        .eq('user_id', user?.id);
+        .eq('id', id);
+      
+      // إذا لم يكن المستخدم مديراً أو مدير نظام، قيد الحذف للمستخدم فقط
+      if (!isManagerOrAdmin) {
+        query = query.eq('user_id', user?.id);
+      }
+      
+      const { error } = await query;
       
       if (error) throw error;
     },

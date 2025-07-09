@@ -53,13 +53,17 @@ export const useContractors = () => {
 
   const updateContractor = useMutation({
     mutationFn: async ({ id, ...contractorData }: any) => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('contractors')
         .update(contractorData)
-        .eq('id', id)
-        .eq('user_id', user?.id)
-        .select()
-        .single();
+        .eq('id', id);
+      
+      // إذا لم يكن المستخدم مديراً أو مدير نظام، قيد التحديث للمستخدم فقط
+      if (!isManagerOrAdmin) {
+        query = query.eq('user_id', user?.id);
+      }
+      
+      const { data, error } = await query.select().single();
       
       if (error) throw error;
       return data;
@@ -75,11 +79,17 @@ export const useContractors = () => {
 
   const deleteContractor = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
+      let query = supabase
         .from('contractors')
         .delete()
-        .eq('id', id)
-        .eq('user_id', user?.id);
+        .eq('id', id);
+      
+      // إذا لم يكن المستخدم مديراً أو مدير نظام، قيد الحذف للمستخدم فقط
+      if (!isManagerOrAdmin) {
+        query = query.eq('user_id', user?.id);
+      }
+      
+      const { error } = await query;
       
       if (error) throw error;
     },

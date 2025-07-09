@@ -18,10 +18,7 @@ export const useProjects = () => {
         .from('projects')
         .select('*');
       
-      // إذا لم يكن المستخدم مديراً أو مدير نظام، اجلب فقط مشاريعه
-      if (!isManagerOrAdmin) {
-        query = query.eq('user_id', user?.id);
-      }
+      // جلب جميع المشاريع
       
       const { data, error } = await query.order('created_at', { ascending: false });
       

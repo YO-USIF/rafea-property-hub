@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,15 +32,41 @@ const TaskForm = ({ open, onOpenChange, task, onSuccess }: TaskFormProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Task>({
-    title: task?.title || '',
-    description: task?.description || '',
-    assigned_to: task?.assigned_to || '',
-    department: task?.department || 'الهندسة',
-    priority: task?.priority || 'متوسطة',
-    status: task?.status || 'جديدة',
-    progress: task?.progress || 0,
-    due_date: task?.due_date || ''
+    title: '',
+    description: '',
+    assigned_to: '',
+    department: 'الهندسة',
+    priority: 'متوسطة',
+    status: 'جديدة',
+    progress: 0,
+    due_date: ''
   });
+
+  useEffect(() => {
+    if (task) {
+      setFormData({
+        title: task.title || '',
+        description: task.description || '',
+        assigned_to: task.assigned_to || '',
+        department: task.department || 'الهندسة',
+        priority: task.priority || 'متوسطة',
+        status: task.status || 'جديدة',
+        progress: task.progress || 0,
+        due_date: task.due_date || ''
+      });
+    } else {
+      setFormData({
+        title: '',
+        description: '',
+        assigned_to: '',
+        department: 'الهندسة',
+        priority: 'متوسطة',
+        status: 'جديدة',
+        progress: 0,
+        due_date: ''
+      });
+    }
+  }, [task]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

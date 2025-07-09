@@ -15,10 +15,7 @@ export const useDashboardData = () => {
         .from('projects')
         .select('*');
       
-      // إذا لم يكن المستخدم مديراً أو مدير نظام، اجلب فقط مشاريعه
-      if (!isManagerOrAdmin) {
-        query = query.eq('user_id', user?.id);
-      }
+      // جلب جميع البيانات للوحة التحكم
       
       const { data, error } = await query;
       
@@ -35,10 +32,7 @@ export const useDashboardData = () => {
         .from('maintenance_requests')
         .select('*');
       
-      // إذا لم يكن المستخدم مديراً أو مدير نظام، اجلب فقط طلبات الصيانة الخاصة به
-      if (!isManagerOrAdmin) {
-        query = query.eq('user_id', user?.id);
-      }
+      // جلب جميع طلبات الصيانة للوحة التحكم
       
       const { data, error } = await query
         .order('created_at', { ascending: false })
@@ -57,10 +51,7 @@ export const useDashboardData = () => {
         .from('contractors')
         .select('*');
       
-      // إذا لم يكن المستخدم مديراً أو مدير نظام، اجلب فقط مقاوليه
-      if (!isManagerOrAdmin) {
-        query = query.eq('user_id', user?.id);
-      }
+      // جلب جميع المقاولين للوحة التحكم
       
       const { data, error } = await query;
       
@@ -77,10 +68,7 @@ export const useDashboardData = () => {
         .from('suppliers')
         .select('*');
       
-      // إذا لم يكن المستخدم مديراً أو مدير نظام، اجلب فقط مورديه
-      if (!isManagerOrAdmin) {
-        query = query.eq('user_id', user?.id);
-      }
+      // جلب جميع الموردين للوحة التحكم
       
       const { data, error } = await query;
       

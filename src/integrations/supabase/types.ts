@@ -631,6 +631,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      is_manager_or_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       user_role: "مدير النظام" | "مدير" | "موظف مبيعات" | "محاسب" | "موظف"

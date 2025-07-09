@@ -268,15 +268,22 @@ const SettingsPage = () => {
               <CardTitle>إدارة الأدوار والصلاحيات</CardTitle>
               <CardDescription>تحديد صلاحيات المستخدمين حسب الأدوار</CardDescription>
             </div>
+            <div className="flex gap-2">
+              <Button onClick={() => setActiveTab('users')}>
+                <Users className="w-4 h-4 ml-2" />
+                إدارة أدوار المستخدمين
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
-              { name: 'مدير النظام', permissions: ['قراءة', 'كتابة', 'حذف', 'إدارة المستخدمين'], usersCount: profiles.filter(p => p.roles?.includes('مدير النظام')).length, color: 'bg-red-100 text-red-800' },
-              { name: 'مدير', permissions: ['قراءة', 'كتابة', 'التقارير'], usersCount: profiles.filter(p => p.roles?.includes('مدير')).length, color: 'bg-blue-100 text-blue-800' },
+              { name: 'مدير النظام', permissions: ['قراءة', 'كتابة', 'حذف', 'إدارة المستخدمين', 'إدارة النظام'], usersCount: profiles.filter(p => p.roles?.includes('مدير النظام')).length, color: 'bg-red-100 text-red-800' },
+              { name: 'مدير', permissions: ['قراءة جميع البيانات', 'كتابة', 'التقارير', 'إدارة الفرق'], usersCount: profiles.filter(p => p.roles?.includes('مدير')).length, color: 'bg-blue-100 text-blue-800' },
               { name: 'موظف مبيعات', permissions: ['قراءة الشقق', 'كتابة العقود', 'متابعة العملاء'], usersCount: profiles.filter(p => p.roles?.includes('موظف مبيعات')).length, color: 'bg-green-100 text-green-800' },
-              { name: 'محاسب', permissions: ['قراءة المالية', 'كتابة الفواتير', 'التقارير المالية'], usersCount: profiles.filter(p => p.roles?.includes('محاسب')).length, color: 'bg-yellow-100 text-yellow-800' }
+              { name: 'محاسب', permissions: ['قراءة المالية', 'كتابة الفواتير', 'التقارير المالية'], usersCount: profiles.filter(p => p.roles?.includes('محاسب')).length, color: 'bg-yellow-100 text-yellow-800' },
+              { name: 'موظف', permissions: ['قراءة البيانات الخاصة', 'كتابة محدودة'], usersCount: profiles.filter(p => p.roles?.includes('موظف')).length, color: 'bg-gray-100 text-gray-800' }
             ].map((role, index) => (
               <Card key={index}>
                 <CardHeader>

@@ -150,8 +150,9 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
               <Input
                 id="total_amount"
                 type="number"
+                step="0.01"
                 value={formData.total_amount}
-                onChange={(e) => setFormData(prev => ({ ...prev, total_amount: parseInt(e.target.value) || 0 }))}
+                onChange={(e) => setFormData(prev => ({ ...prev, total_amount: parseFloat(e.target.value) || 0 }))}
                 required
               />
             </div>

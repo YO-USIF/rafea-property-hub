@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -36,6 +36,30 @@ const SupplierForm = ({ open, onOpenChange, supplier, onSuccess }: SupplierFormP
     email: supplier?.email || '',
     status: supplier?.status || 'نشط'
   });
+
+  // تحديث البيانات عند تغيير العنصر المرسل للتعديل
+  useEffect(() => {
+    if (supplier) {
+      setFormData({
+        name: supplier.name || '',
+        company: supplier.company || '',
+        category: supplier.category || 'مواد البناء',
+        phone: supplier.phone || '',
+        email: supplier.email || '',
+        status: supplier.status || 'نشط'
+      });
+    } else {
+      // إعادة تعيين النموذج للإضافة الجديدة
+      setFormData({
+        name: '',
+        company: '',
+        category: 'مواد البناء',
+        phone: '',
+        email: '',
+        status: 'نشط'
+      });
+    }
+  }, [supplier]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

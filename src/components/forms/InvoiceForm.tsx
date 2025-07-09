@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -37,6 +37,32 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
     dueDate: invoice?.dueDate || '',
     status: invoice?.status || 'غير مدفوع'
   });
+
+  // تحديث البيانات عند تغيير العنصر المرسل للتعديل
+  useEffect(() => {
+    if (invoice) {
+      setFormData({
+        invoiceNumber: invoice.invoiceNumber || '',
+        supplierName: invoice.supplierName || '',
+        amount: invoice.amount || 0,
+        description: invoice.description || '',
+        invoiceDate: invoice.invoiceDate || new Date().toISOString().split('T')[0],
+        dueDate: invoice.dueDate || '',
+        status: invoice.status || 'غير مدفوع'
+      });
+    } else {
+      // إعادة تعيين النموذج للإضافة الجديدة
+      setFormData({
+        invoiceNumber: '',
+        supplierName: '',
+        amount: 0,
+        description: '',
+        invoiceDate: new Date().toISOString().split('T')[0],
+        dueDate: '',
+        status: 'غير مدفوع'
+      });
+    }
+  }, [invoice]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

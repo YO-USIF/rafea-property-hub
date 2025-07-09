@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -44,6 +44,38 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
     delivery_status: purchase?.delivery_status || 'لم يتم التسليم',
     approved_by: purchase?.approved_by || ''
   });
+
+  // تحديث البيانات عند تغيير العنصر المرسل للتعديل
+  useEffect(() => {
+    if (purchase) {
+      setFormData({
+        order_number: purchase.order_number || `PO-${Date.now()}`,
+        supplier_name: purchase.supplier_name || '',
+        project_name: purchase.project_name || '',
+        requested_by: purchase.requested_by || '',
+        order_date: purchase.order_date || new Date().toISOString().split('T')[0],
+        expected_delivery: purchase.expected_delivery || '',
+        total_amount: purchase.total_amount || 0,
+        status: purchase.status || 'في انتظار الموافقة',
+        delivery_status: purchase.delivery_status || 'لم يتم التسليم',
+        approved_by: purchase.approved_by || ''
+      });
+    } else {
+      // إعادة تعيين النموذج للإضافة الجديدة
+      setFormData({
+        order_number: `PO-${Date.now()}`,
+        supplier_name: '',
+        project_name: '',
+        requested_by: '',
+        order_date: new Date().toISOString().split('T')[0],
+        expected_delivery: '',
+        total_amount: 0,
+        status: 'في انتظار الموافقة',
+        delivery_status: 'لم يتم التسليم',
+        approved_by: ''
+      });
+    }
+  }, [purchase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

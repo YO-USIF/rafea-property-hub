@@ -4,13 +4,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, FileText, Download, Filter, Calendar, TrendingUp, DollarSign, Users, Building2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { BarChart3, FileText, Download, Filter, Calendar, TrendingUp, DollarSign, Users, Building2, Eye } from 'lucide-react';
 import CustomReportForm from '@/components/forms/CustomReportForm';
 import { useToast } from '@/hooks/use-toast';
 
 const ReportsPage = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('monthly');
   const [showCustomReportForm, setShowCustomReportForm] = useState(false);
+  const [showReportViewer, setShowReportViewer] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<any>(null);
   const { toast } = useToast();
 
   const reportCategories = [
@@ -90,6 +93,55 @@ const ReportsPage = () => {
       color: 'text-orange-600'
     }
   ];
+
+  // وظائف التقارير
+  const handleViewReport = (reportName: string, category?: string) => {
+    setSelectedReport({ name: reportName, category: category || 'تقرير عام' });
+    setShowReportViewer(true);
+  };
+
+  const handleDownloadReport = (reportName: string) => {
+    toast({ 
+      title: "جاري التحميل", 
+      description: `جاري تحميل ${reportName}...` 
+    });
+    
+    // محاكاة تحميل ملف PDF
+    setTimeout(() => {
+      const element = document.createElement('a');
+      const file = new Blob([generateReportContent(reportName)], { type: 'text/plain' });
+      element.href = URL.createObjectURL(file);
+      element.download = `${reportName}.txt`;
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+      
+      toast({ 
+        title: "تم التحميل", 
+        description: `تم تحميل ${reportName} بنجاح` 
+      });
+    }, 1000);
+  };
+
+  const generateReportContent = (reportName: string) => {
+    return `تقرير: ${reportName}
+تاريخ الإنشاء: ${new Date().toLocaleDateString('ar-SA')}
+الفترة: ${selectedPeriod}
+
+=====================================
+
+هذا تقرير تجريبي يحتوي على بيانات وهمية لأغراض العرض.
+
+البيانات الرئيسية:
+- إجمالي العمليات: 150
+- المبلغ الإجمالي: 500,000 ريال
+- معدل النمو: 15%
+- عدد العملاء: 75
+
+ملاحظات:
+هذا تقرير تم إنشاؤه تلقائياً من نظام إدارة العقارات.
+`;
+  };
 
   return (
     <div className="space-y-6">
@@ -200,10 +252,13 @@ const ReportsPage = () => {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => toast({ title: "تحميل", description: "جارٍ تحميل التقرير..." })}>
+                      <Button size="sm" variant="outline" onClick={() => handleDownloadReport(report.name)}>
                         <Download className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" onClick={() => toast({ title: "عرض", description: "جارٍ فتح التقرير..." })}>عرض</Button>
+                      <Button size="sm" onClick={() => handleViewReport(report.name, category.title)}>
+                        <Eye className="w-4 h-4 ml-1" />
+                        عرض
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -246,7 +301,7 @@ const ReportsPage = () => {
                   <Badge variant={report.status === 'مكتمل' ? 'default' : 'secondary'}>
                     {report.status}
                   </Badge>
-                  <Button size="sm" variant="outline" onClick={() => toast({ title: "تحميل", description: `جارٍ تحميل ${report.name}...` })}>
+                  <Button size="sm" variant="outline" onClick={() => handleDownloadReport(report.name)}>
                     <Download className="w-4 h-4" />
                   </Button>
                 </div>
@@ -255,6 +310,66 @@ const ReportsPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* عارض التقارير */}
+      <Dialog open={showReportViewer} onOpenChange={setShowReportViewer}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>{selectedReport?.name}</DialogTitle>
+            <DialogDescription>
+              فئة التقرير: {selectedReport?.category}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="overflow-y-auto max-h-[60vh] space-y-4">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-semibold mb-2">ملخص التقرير</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">150</div>
+                  <div className="text-sm text-gray-600">إجمالي العمليات</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">500,000</div>
+                  <div className="text-sm text-gray-600">ريال سعودي</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">15%</div>
+                  <div className="text-sm text-gray-600">معدل النمو</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-600">75</div>
+                  <div className="text-sm text-gray-600">عدد العملاء</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <h3 className="font-semibold">تفاصيل التقرير</h3>
+              <div className="prose prose-sm max-w-none">
+                <p>هذا عرض تفصيلي للتقرير المختار. يمكنك مراجعة البيانات والإحصائيات بالتفصيل.</p>
+                <ul>
+                  <li>تم إنشاء التقرير في: {new Date().toLocaleDateString('ar-SA')}</li>
+                  <li>الفترة الزمنية: {selectedPeriod}</li>
+                  <li>نوع التقرير: {selectedReport?.category}</li>
+                  <li>حالة البيانات: محدثة</li>
+                </ul>
+                <p>لتحميل التقرير كملف، استخدم زر التحميل أعلاه.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button variant="outline" onClick={() => setShowReportViewer(false)}>
+              إغلاق
+            </Button>
+            <Button onClick={() => selectedReport && handleDownloadReport(selectedReport.name)}>
+              <Download className="w-4 h-4 ml-2" />
+              تحميل التقرير
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <CustomReportForm
         open={showCustomReportForm}

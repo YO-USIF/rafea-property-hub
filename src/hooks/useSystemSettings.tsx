@@ -107,7 +107,7 @@ export const useSecuritySettings = () => {
       const { data, error } = await supabase
         .from('security_settings')
         .select('*')
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 

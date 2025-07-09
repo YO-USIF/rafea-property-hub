@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { Bell, Search, User, Settings, LogOut } from 'lucide-react';
+import { Bell, Search, User, Settings, LogOut, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useToast } from '@/hooks/use-toast';
 
 interface HeaderProps {
   sidebarCollapsed: boolean;
@@ -11,6 +12,19 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ sidebarCollapsed }) => {
   const { user, signOut } = useAuth();
   const { userRole } = useUserRole();
+  const { toast } = useToast();
+
+  const handleRefresh = () => {
+    toast({
+      title: "جارٍ تحديث التطبيق",
+      description: "سيتم إعادة تحميل التطبيق لضمان أحدث التحديثات",
+    });
+    
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  };
+
   return (
     <header 
       className={`
@@ -37,6 +51,15 @@ const Header: React.FC<HeaderProps> = ({ sidebarCollapsed }) => {
           <button className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <Bell className="w-5 h-5 text-gray-600" />
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+          </button>
+
+          {/* Refresh */}
+          <button 
+            onClick={handleRefresh}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="تحديث التطبيق"
+          >
+            <RefreshCw className="w-5 h-5 text-gray-600" />
           </button>
 
           {/* Settings */}

@@ -90,12 +90,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (!error) {
+    try {
+      // إنهاء الجلسة محلياً أولاً
+      setUser(null);
+      setSession(null);
+      
+      // محاولة إنهاء الجلسة من الخادم
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
+      
+      // إظهار رسالة النجاح حتى لو كان هناك خطأ في الخادم
       toast({
         title: "تم تسجيل الخروج",
         description: "شكراً لك على استخدام النظام",
       });
+      
+      // إعادة تحميل الصفحة لضمان تنظيف كامل للحالة
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+      
+    } catch (error) {
+      // في حالة أي خطأ، نظف الحالة محلياً
+      setUser(null);
+      setSession(null);
+      
+      toast({
+        title: "تم تسجيل الخروج",
+        description: "تم تسجيل الخروج بنجاح",
+      });
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     }
   };
 

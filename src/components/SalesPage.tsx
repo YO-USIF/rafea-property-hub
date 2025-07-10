@@ -203,30 +203,6 @@ const SalesPage = () => {
                           size="sm" 
                           variant="outline"
                           onClick={() => {
-                            const printContent = `
-                              عقد بيع / عرض سعر
-                              =====================================
-                              
-                              المشروع: ${sale.project_name}
-                              رقم الوحدة: ${sale.unit_number}
-                              نوع الوحدة: ${sale.unit_type}
-                              المساحة: ${sale.area} متر مربع
-                              السعر: ${sale.price.toLocaleString()} ريال سعودي
-                              
-                              بيانات العميل:
-                              الاسم: ${sale.customer_name}
-                              الهاتف: ${sale.customer_phone || 'غير محدد'}
-                              
-                              تفاصيل الدفع:
-                              الحالة: ${sale.status}
-                              المبلغ المتبقي: ${sale.remaining_amount > 0 ? `${sale.remaining_amount.toLocaleString()} ر.س` : 'مسدد بالكامل'}
-                              تاريخ البيع: ${sale.sale_date || 'غير محدد'}
-                              خطة التقسيط: ${sale.installment_plan || 'غير محددة'}
-                              
-                              =====================================
-                              تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}
-                            `;
-                            
                             const printWindow = window.open('', '_blank');
                             if (printWindow) {
                               printWindow.document.write(`
@@ -234,13 +210,195 @@ const SalesPage = () => {
                                   <head>
                                     <title>عقد بيع - ${sale.project_name} - وحدة ${sale.unit_number}</title>
                                     <style>
-                                      body { font-family: Arial, sans-serif; direction: rtl; text-align: right; margin: 20px; }
-                                      pre { white-space: pre-wrap; font-family: Arial, sans-serif; }
-                                      @media print { body { margin: 0; } }
+                                      * { margin: 0; padding: 0; box-sizing: border-box; }
+                                      body { 
+                                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                                        direction: rtl; 
+                                        text-align: right; 
+                                        margin: 20px;
+                                        background: #fff;
+                                        color: #333;
+                                      }
+                                      .header { 
+                                        background: linear-gradient(135deg, #10b981, #059669);
+                                        color: white; 
+                                        padding: 30px; 
+                                        border-radius: 10px;
+                                        margin-bottom: 30px;
+                                        text-align: center;
+                                      }
+                                      .header h1 { font-size: 28px; margin-bottom: 10px; }
+                                      .header p { font-size: 14px; opacity: 0.9; }
+                                      .content { 
+                                        background: #f8fafc; 
+                                        padding: 30px; 
+                                        border-radius: 10px;
+                                        border: 2px solid #e2e8f0;
+                                      }
+                                      .sale-info { 
+                                        display: grid; 
+                                        grid-template-columns: 1fr 1fr; 
+                                        gap: 20px; 
+                                        margin-bottom: 25px;
+                                      }
+                                      .info-item { 
+                                        background: white; 
+                                        padding: 15px; 
+                                        border-radius: 8px;
+                                        border-right: 4px solid #10b981;
+                                      }
+                                      .info-label { 
+                                        font-size: 12px; 
+                                        color: #64748b; 
+                                        font-weight: 600;
+                                        margin-bottom: 5px;
+                                      }
+                                      .info-value { 
+                                        font-size: 16px; 
+                                        font-weight: bold; 
+                                        color: #1e293b;
+                                      }
+                                      .price-section { 
+                                        background: linear-gradient(135deg, #7c3aed, #5b21b6);
+                                        color: white; 
+                                        padding: 25px; 
+                                        border-radius: 10px;
+                                        text-align: center;
+                                        margin: 25px 0;
+                                      }
+                                      .price-section .price { 
+                                        font-size: 32px; 
+                                        font-weight: bold; 
+                                        margin-bottom: 10px;
+                                      }
+                                      .customer-section { 
+                                        background: linear-gradient(135deg, #3b82f6, #2563eb);
+                                        color: white; 
+                                        padding: 20px; 
+                                        border-radius: 10px;
+                                        margin: 20px 0;
+                                      }
+                                      .customer-section h3 { 
+                                        font-size: 18px; 
+                                        margin-bottom: 15px;
+                                        text-align: center;
+                                      }
+                                      .customer-info { 
+                                        display: grid; 
+                                        grid-template-columns: 1fr 1fr; 
+                                        gap: 15px;
+                                      }
+                                      .payment-section { 
+                                        background: white; 
+                                        padding: 20px; 
+                                        border-radius: 10px;
+                                        border: 2px solid #e2e8f0;
+                                        margin: 20px 0;
+                                      }
+                                      .payment-section h3 { 
+                                        color: #1e293b; 
+                                        margin-bottom: 15px;
+                                        text-align: center;
+                                      }
+                                      .status { 
+                                        display: inline-block; 
+                                        padding: 8px 16px; 
+                                        border-radius: 20px; 
+                                        font-size: 14px; 
+                                        font-weight: bold;
+                                        background: ${sale.status === 'مباع' ? '#dcfce7' : sale.status === 'محجوز' ? '#fef3c7' : '#dbeafe'};
+                                        color: ${sale.status === 'مباع' ? '#166534' : sale.status === 'محجوز' ? '#92400e' : '#1e40af'};
+                                      }
+                                      .footer { 
+                                        text-align: center; 
+                                        margin-top: 30px; 
+                                        padding: 20px;
+                                        border-top: 2px dashed #cbd5e1;
+                                        color: #64748b;
+                                        font-size: 12px;
+                                      }
+                                      @media print { 
+                                        body { margin: 0; } 
+                                        .header { background: #10b981 !important; }
+                                      }
                                     </style>
                                   </head>
                                   <body>
-                                    <pre>${printContent}</pre>
+                                    <div class="header">
+                                      <h1>🏠 عقد بيع / عرض سعر</h1>
+                                      <p>نظام إدارة المبيعات العقارية</p>
+                                    </div>
+                                    
+                                    <div class="content">
+                                      <div class="sale-info">
+                                        <div class="info-item">
+                                          <div class="info-label">المشروع</div>
+                                          <div class="info-value">${sale.project_name}</div>
+                                        </div>
+                                        <div class="info-item">
+                                          <div class="info-label">رقم الوحدة</div>
+                                          <div class="info-value">${sale.unit_number}</div>
+                                        </div>
+                                        <div class="info-item">
+                                          <div class="info-label">نوع الوحدة</div>
+                                          <div class="info-value">${sale.unit_type}</div>
+                                        </div>
+                                        <div class="info-item">
+                                          <div class="info-label">المساحة</div>
+                                          <div class="info-value">${sale.area} متر مربع</div>
+                                        </div>
+                                      </div>
+                                      
+                                      <div class="price-section">
+                                        <div class="info-label" style="color: rgba(255,255,255,0.8); margin-bottom: 10px;">السعر الإجمالي</div>
+                                        <div class="price">${sale.price.toLocaleString()} ريال سعودي</div>
+                                        <div style="color: rgba(255,255,255,0.8);">شامل ضريبة القيمة المضافة</div>
+                                      </div>
+                                      
+                                      <div class="customer-section">
+                                        <h3>👤 بيانات العميل</h3>
+                                        <div class="customer-info">
+                                          <div>
+                                            <div class="info-label" style="color: rgba(255,255,255,0.8);">الاسم</div>
+                                            <div class="info-value" style="color: white;">${sale.customer_name}</div>
+                                          </div>
+                                          <div>
+                                            <div class="info-label" style="color: rgba(255,255,255,0.8);">رقم الهاتف</div>
+                                            <div class="info-value" style="color: white;">${sale.customer_phone || 'غير محدد'}</div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      
+                                      <div class="payment-section">
+                                        <h3>💳 تفاصيل الدفع</h3>
+                                        <div class="sale-info">
+                                          <div class="info-item">
+                                            <div class="info-label">حالة البيع</div>
+                                            <div class="info-value">
+                                              <span class="status">${sale.status}</span>
+                                            </div>
+                                          </div>
+                                          <div class="info-item">
+                                            <div class="info-label">المبلغ المتبقي</div>
+                                            <div class="info-value">${sale.remaining_amount > 0 ? `${sale.remaining_amount.toLocaleString()} ر.س` : 'مسدد بالكامل'}</div>
+                                          </div>
+                                          <div class="info-item">
+                                            <div class="info-label">تاريخ البيع</div>
+                                            <div class="info-value">${sale.sale_date || 'غير محدد'}</div>
+                                          </div>
+                                          <div class="info-item">
+                                            <div class="info-label">خطة التقسيط</div>
+                                            <div class="info-value">${sale.installment_plan || 'دفعة واحدة'}</div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    
+                                    <div class="footer">
+                                      <p>📅 تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</p>
+                                      <p>🏢 شركة رافع للتطوير العقاري</p>
+                                      <p>📍 الرياض، المملكة العربية السعودية</p>
+                                    </div>
                                   </body>
                                 </html>
                               `);

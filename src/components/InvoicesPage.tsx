@@ -278,21 +278,6 @@ const InvoicesPage = () => {
                           size="sm" 
                           variant="outline" 
                           onClick={() => {
-                            const printContent = `
-                              فاتورة رقم: ${invoice.invoice_number}
-                              =====================================
-                              
-                              المورد: ${invoice.supplier_name}
-                              المبلغ: ${formatCurrency(invoice.amount)}
-                              تاريخ الفاتورة: ${invoice.invoice_date}
-                              تاريخ الاستحقاق: ${invoice.due_date}
-                              الحالة: ${invoice.status}
-                              الوصف: ${invoice.description || 'غير محدد'}
-                              
-                              =====================================
-                              تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}
-                            `;
-                            
                             const printWindow = window.open('', '_blank');
                             if (printWindow) {
                               printWindow.document.write(`
@@ -300,13 +285,147 @@ const InvoicesPage = () => {
                                   <head>
                                     <title>فاتورة ${invoice.invoice_number}</title>
                                     <style>
-                                      body { font-family: Arial, sans-serif; direction: rtl; text-align: right; margin: 20px; }
-                                      pre { white-space: pre-wrap; font-family: Arial, sans-serif; }
-                                      @media print { body { margin: 0; } }
+                                      * { margin: 0; padding: 0; box-sizing: border-box; }
+                                      body { 
+                                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                                        direction: rtl; 
+                                        text-align: right; 
+                                        margin: 20px;
+                                        background: #fff;
+                                        color: #333;
+                                      }
+                                      .header { 
+                                        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+                                        color: white; 
+                                        padding: 30px; 
+                                        border-radius: 10px;
+                                        margin-bottom: 30px;
+                                        text-align: center;
+                                      }
+                                      .header h1 { font-size: 28px; margin-bottom: 10px; }
+                                      .header p { font-size: 14px; opacity: 0.9; }
+                                      .content { 
+                                        background: #f8fafc; 
+                                        padding: 30px; 
+                                        border-radius: 10px;
+                                        border: 2px solid #e2e8f0;
+                                      }
+                                      .invoice-info { 
+                                        display: grid; 
+                                        grid-template-columns: 1fr 1fr; 
+                                        gap: 20px; 
+                                        margin-bottom: 25px;
+                                      }
+                                      .info-item { 
+                                        background: white; 
+                                        padding: 15px; 
+                                        border-radius: 8px;
+                                        border-right: 4px solid #4f46e5;
+                                      }
+                                      .info-label { 
+                                        font-size: 12px; 
+                                        color: #64748b; 
+                                        font-weight: 600;
+                                        margin-bottom: 5px;
+                                      }
+                                      .info-value { 
+                                        font-size: 16px; 
+                                        font-weight: bold; 
+                                        color: #1e293b;
+                                      }
+                                      .amount-section { 
+                                        background: linear-gradient(135deg, #10b981, #059669);
+                                        color: white; 
+                                        padding: 20px; 
+                                        border-radius: 10px;
+                                        text-align: center;
+                                        margin: 25px 0;
+                                      }
+                                      .amount-section .amount { 
+                                        font-size: 24px; 
+                                        font-weight: bold; 
+                                        margin-bottom: 5px;
+                                      }
+                                      .description { 
+                                        background: white; 
+                                        padding: 20px; 
+                                        border-radius: 8px;
+                                        border: 1px solid #e2e8f0;
+                                        margin: 20px 0;
+                                      }
+                                      .footer { 
+                                        text-align: center; 
+                                        margin-top: 30px; 
+                                        padding: 20px;
+                                        border-top: 2px dashed #cbd5e1;
+                                        color: #64748b;
+                                        font-size: 12px;
+                                      }
+                                      .status { 
+                                        display: inline-block; 
+                                        padding: 8px 16px; 
+                                        border-radius: 20px; 
+                                        font-size: 14px; 
+                                        font-weight: bold;
+                                        background: ${invoice.status === 'مدفوع' ? '#dcfce7' : '#fef3c7'};
+                                        color: ${invoice.status === 'مدفوع' ? '#166534' : '#92400e'};
+                                      }
+                                      @media print { 
+                                        body { margin: 0; } 
+                                        .header { background: #4f46e5 !important; }
+                                      }
                                     </style>
                                   </head>
                                   <body>
-                                    <pre>${printContent}</pre>
+                                    <div class="header">
+                                      <h1>🧾 فاتورة</h1>
+                                      <p>نظام إدارة الفواتير</p>
+                                    </div>
+                                    
+                                    <div class="content">
+                                      <div class="invoice-info">
+                                        <div class="info-item">
+                                          <div class="info-label">رقم الفاتورة</div>
+                                          <div class="info-value">${invoice.invoice_number}</div>
+                                        </div>
+                                        <div class="info-item">
+                                          <div class="info-label">اسم المورد</div>
+                                          <div class="info-value">${invoice.supplier_name}</div>
+                                        </div>
+                                        <div class="info-item">
+                                          <div class="info-label">تاريخ الفاتورة</div>
+                                          <div class="info-value">${invoice.invoice_date}</div>
+                                        </div>
+                                        <div class="info-item">
+                                          <div class="info-label">تاريخ الاستحقاق</div>
+                                          <div class="info-value">${invoice.due_date}</div>
+                                        </div>
+                                      </div>
+                                      
+                                      <div class="amount-section">
+                                        <div class="info-label" style="color: rgba(255,255,255,0.8); margin-bottom: 10px;">المبلغ الإجمالي</div>
+                                        <div class="amount">${formatCurrency(invoice.amount)}</div>
+                                      </div>
+                                      
+                                      <div class="info-item">
+                                        <div class="info-label">حالة الدفع</div>
+                                        <div class="info-value">
+                                          <span class="status">${invoice.status}</span>
+                                        </div>
+                                      </div>
+                                      
+                                      ${invoice.description ? `
+                                        <div class="description">
+                                          <div class="info-label">تفاصيل الفاتورة</div>
+                                          <div class="info-value">${invoice.description}</div>
+                                        </div>
+                                      ` : ''}
+                                    </div>
+                                    
+                                    <div class="footer">
+                                      <p>📅 تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</p>
+                                      <p>🏢 شركة رافع للتطوير العقاري</p>
+                                    </div>
                                   </body>
                                 </html>
                               `);

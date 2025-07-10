@@ -211,24 +211,6 @@ const PurchasesPage = () => {
                           size="sm" 
                           variant="outline"
                           onClick={() => {
-                            const printContent = `
-                              طلب شراء رقم: ${order.order_number}
-                              =====================================
-                              
-                              المورد: ${order.supplier_name}
-                              المشروع: ${order.project_name}
-                              طالب الشراء: ${order.requested_by}
-                              تاريخ الطلب: ${order.order_date}
-                              تاريخ التسليم المتوقع: ${order.expected_delivery}
-                              المبلغ الإجمالي: ${order.total_amount.toLocaleString()} ر.س
-                              حالة الموافقة: ${order.status}
-                              حالة التسليم: ${order.delivery_status}
-                              المعتمد من: ${order.approved_by || 'غير محدد'}
-                              
-                              =====================================
-                              تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}
-                            `;
-                            
                             const printWindow = window.open('', '_blank');
                             if (printWindow) {
                               printWindow.document.write(`
@@ -236,13 +218,178 @@ const PurchasesPage = () => {
                                   <head>
                                     <title>طلب شراء ${order.order_number}</title>
                                     <style>
-                                      body { font-family: Arial, sans-serif; direction: rtl; text-align: right; margin: 20px; }
-                                      pre { white-space: pre-wrap; font-family: Arial, sans-serif; }
-                                      @media print { body { margin: 0; } }
+                                      * { margin: 0; padding: 0; box-sizing: border-box; }
+                                      body { 
+                                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                                        direction: rtl; 
+                                        text-align: right; 
+                                        margin: 20px;
+                                        background: #fff;
+                                        color: #333;
+                                      }
+                                      .header { 
+                                        background: linear-gradient(135deg, #f59e0b, #d97706);
+                                        color: white; 
+                                        padding: 30px; 
+                                        border-radius: 10px;
+                                        margin-bottom: 30px;
+                                        text-align: center;
+                                      }
+                                      .header h1 { font-size: 28px; margin-bottom: 10px; }
+                                      .header p { font-size: 14px; opacity: 0.9; }
+                                      .content { 
+                                        background: #f8fafc; 
+                                        padding: 30px; 
+                                        border-radius: 10px;
+                                        border: 2px solid #e2e8f0;
+                                      }
+                                      .purchase-info { 
+                                        display: grid; 
+                                        grid-template-columns: 1fr 1fr; 
+                                        gap: 20px; 
+                                        margin-bottom: 25px;
+                                      }
+                                      .info-item { 
+                                        background: white; 
+                                        padding: 15px; 
+                                        border-radius: 8px;
+                                        border-right: 4px solid #f59e0b;
+                                      }
+                                      .info-label { 
+                                        font-size: 12px; 
+                                        color: #64748b; 
+                                        font-weight: 600;
+                                        margin-bottom: 5px;
+                                      }
+                                      .info-value { 
+                                        font-size: 16px; 
+                                        font-weight: bold; 
+                                        color: #1e293b;
+                                      }
+                                      .amount-section { 
+                                        background: linear-gradient(135deg, #dc2626, #b91c1c);
+                                        color: white; 
+                                        padding: 20px; 
+                                        border-radius: 10px;
+                                        text-align: center;
+                                        margin: 25px 0;
+                                      }
+                                      .amount-section .amount { 
+                                        font-size: 24px; 
+                                        font-weight: bold; 
+                                        margin-bottom: 5px;
+                                      }
+                                      .status-section { 
+                                        display: grid; 
+                                        grid-template-columns: 1fr 1fr; 
+                                        gap: 15px; 
+                                        margin: 20px 0;
+                                      }
+                                      .status-item { 
+                                        background: white; 
+                                        padding: 15px; 
+                                        border-radius: 8px;
+                                        text-align: center;
+                                        border: 2px solid #e2e8f0;
+                                      }
+                                      .status { 
+                                        display: inline-block; 
+                                        padding: 8px 16px; 
+                                        border-radius: 20px; 
+                                        font-size: 14px; 
+                                        font-weight: bold;
+                                        background: ${order.status === 'معتمد' ? '#dcfce7' : order.status === 'في انتظار الموافقة' ? '#fef3c7' : '#fee2e2'};
+                                        color: ${order.status === 'معتمد' ? '#166534' : order.status === 'في انتظار الموافقة' ? '#92400e' : '#dc2626'};
+                                      }
+                                      .delivery-status { 
+                                        display: inline-block; 
+                                        padding: 8px 16px; 
+                                        border-radius: 20px; 
+                                        font-size: 14px; 
+                                        font-weight: bold;
+                                        background: ${order.delivery_status === 'تم التسليم' ? '#dcfce7' : order.delivery_status === 'قيد التجهيز' ? '#dbeafe' : '#f1f5f9'};
+                                        color: ${order.delivery_status === 'تم التسليم' ? '#166534' : order.delivery_status === 'قيد التجهيز' ? '#1e40af' : '#475569'};
+                                      }
+                                      .footer { 
+                                        text-align: center; 
+                                        margin-top: 30px; 
+                                        padding: 20px;
+                                        border-top: 2px dashed #cbd5e1;
+                                        color: #64748b;
+                                        font-size: 12px;
+                                      }
+                                      @media print { 
+                                        body { margin: 0; } 
+                                        .header { background: #f59e0b !important; }
+                                      }
                                     </style>
                                   </head>
                                   <body>
-                                    <pre>${printContent}</pre>
+                                    <div class="header">
+                                      <h1>🛒 طلب شراء</h1>
+                                      <p>نظام إدارة المشتريات</p>
+                                    </div>
+                                    
+                                    <div class="content">
+                                      <div class="purchase-info">
+                                        <div class="info-item">
+                                          <div class="info-label">رقم الطلب</div>
+                                          <div class="info-value">${order.order_number}</div>
+                                        </div>
+                                        <div class="info-item">
+                                          <div class="info-label">اسم المورد</div>
+                                          <div class="info-value">${order.supplier_name}</div>
+                                        </div>
+                                        <div class="info-item">
+                                          <div class="info-label">المشروع</div>
+                                          <div class="info-value">${order.project_name}</div>
+                                        </div>
+                                        <div class="info-item">
+                                          <div class="info-label">طالب الشراء</div>
+                                          <div class="info-value">${order.requested_by}</div>
+                                        </div>
+                                        <div class="info-item">
+                                          <div class="info-label">تاريخ الطلب</div>
+                                          <div class="info-value">${order.order_date}</div>
+                                        </div>
+                                        <div class="info-item">
+                                          <div class="info-label">تاريخ التسليم المتوقع</div>
+                                          <div class="info-value">${order.expected_delivery}</div>
+                                        </div>
+                                      </div>
+                                      
+                                      <div class="amount-section">
+                                        <div class="info-label" style="color: rgba(255,255,255,0.8); margin-bottom: 10px;">المبلغ الإجمالي</div>
+                                        <div class="amount">${order.total_amount.toLocaleString()} ريال سعودي</div>
+                                      </div>
+                                      
+                                      <div class="status-section">
+                                        <div class="status-item">
+                                          <div class="info-label">حالة الموافقة</div>
+                                          <div class="info-value">
+                                            <span class="status">${order.status}</span>
+                                          </div>
+                                        </div>
+                                        <div class="status-item">
+                                          <div class="info-label">حالة التسليم</div>
+                                          <div class="info-value">
+                                            <span class="delivery-status">${order.delivery_status}</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      
+                                      ${order.approved_by ? `
+                                        <div class="info-item" style="margin-top: 20px;">
+                                          <div class="info-label">المعتمد من</div>
+                                          <div class="info-value">${order.approved_by}</div>
+                                        </div>
+                                      ` : ''}
+                                    </div>
+                                    
+                                    <div class="footer">
+                                      <p>📅 تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</p>
+                                      <p>🏢 شركة رافع للتطوير العقاري</p>
+                                    </div>
                                   </body>
                                 </html>
                               `);

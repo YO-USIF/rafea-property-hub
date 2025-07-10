@@ -84,6 +84,15 @@ const SuppliersPage = () => {
     }
   };
 
+  // تصفية الموردين حسب البحث
+  const filteredSuppliers = suppliers.filter(supplier =>
+    supplier.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    supplier.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    supplier.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    supplier.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    supplier.status?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const totalSuppliers = suppliers.length;
   const activeSuppliers = suppliers.filter(s => s.status === 'نشط').length;
 
@@ -174,8 +183,20 @@ const SuppliersPage = () => {
                 className="pr-10"
               />
             </div>
-            <Button variant="outline">تصفية</Button>
-            <Button variant="outline">تصدير</Button>
+            <Button variant="outline" onClick={() => {
+              const csvContent = "data:text/csv;charset=utf-8," + 
+                "اسم المورد,الفئة,الشخص المسؤول,الهاتف,الحالة\n" +
+                filteredSuppliers.map(supplier => 
+                  `${supplier.name},${supplier.category || ''},${supplier.company || ''},${supplier.phone || ''},${supplier.status}`
+                ).join("\n");
+              const encodedUri = encodeURI(csvContent);
+              const link = document.createElement("a");
+              link.setAttribute("href", encodedUri);
+              link.setAttribute("download", "suppliers.csv");
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}>تصدير</Button>
           </div>
 
           <div className="border rounded-lg overflow-hidden">
@@ -195,7 +216,7 @@ const SuppliersPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {suppliers.map((supplier) => (
+                {filteredSuppliers.map((supplier) => (
                   <TableRow key={supplier.id}>
                     <TableCell className="font-medium">{supplier.name}</TableCell>
                     <TableCell>{supplier.category}</TableCell>

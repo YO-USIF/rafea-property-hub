@@ -50,6 +50,15 @@ const PurchasesPage = () => {
     }
   };
 
+  // تصفية المشتريات حسب البحث
+  const filteredPurchases = purchases.filter(purchase =>
+    purchase.order_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    purchase.supplier_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    purchase.project_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    purchase.requested_by?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    purchase.status?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const totalOrders = purchases.length;
   const approvedOrders = purchases.filter(order => order.status === 'معتمد').length;
   const pendingOrders = purchases.filter(order => order.status === 'في انتظار الموافقة').length;
@@ -138,8 +147,20 @@ const PurchasesPage = () => {
                 className="pr-10"
               />
             </div>
-            <Button variant="outline">تصفية</Button>
-            <Button variant="outline">تصدير</Button>
+            <Button variant="outline" onClick={() => {
+              const csvContent = "data:text/csv;charset=utf-8," + 
+                "رقم الطلب,المورد,المشروع,طالب الشراء,تاريخ الطلب,تاريخ التسليم المتوقع,المبلغ الإجمالي,حالة الموافقة,حالة التسليم\n" +
+                filteredPurchases.map(order => 
+                  `${order.order_number},${order.supplier_name},${order.project_name},${order.requested_by},${order.order_date},${order.expected_delivery},${order.total_amount},${order.status},${order.delivery_status}`
+                ).join("\n");
+              const encodedUri = encodeURI(csvContent);
+              const link = document.createElement("a");
+              link.setAttribute("href", encodedUri);
+              link.setAttribute("download", "purchases.csv");
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}>تصدير</Button>
           </div>
 
           <div className="border rounded-lg overflow-hidden">
@@ -159,7 +180,7 @@ const PurchasesPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {purchases.map((order) => (
+                {filteredPurchases.map((order) => (
                   <TableRow key={order.id}>
                     <TableCell className="font-medium">{order.order_number}</TableCell>
                     <TableCell>{order.supplier_name}</TableCell>

@@ -74,6 +74,15 @@ const ContractorsPage = () => {
     }
   };
 
+  // تصفية المقاولين حسب البحث
+  const filteredContractors = contractors.filter(contractor =>
+    contractor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    contractor.specialization?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    contractor.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    contractor.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    contractor.status?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const totalContractors = contractors.length;
   const activeContractors = contractors.filter(c => c.status === 'نشط').length;
 
@@ -164,8 +173,20 @@ const ContractorsPage = () => {
                 className="pr-10"
               />
             </div>
-            <Button variant="outline">تصفية</Button>
-            <Button variant="outline">تصدير</Button>
+            <Button variant="outline" onClick={() => {
+              const csvContent = "data:text/csv;charset=utf-8," + 
+                "اسم المقاول,التخصص,الشخص المسؤول,الهاتف,الحالة\n" +
+                filteredContractors.map(contractor => 
+                  `${contractor.name},${contractor.specialization || ''},${contractor.email || ''},${contractor.phone || ''},${contractor.status}`
+                ).join("\n");
+              const encodedUri = encodeURI(csvContent);
+              const link = document.createElement("a");
+              link.setAttribute("href", encodedUri);
+              link.setAttribute("download", "contractors.csv");
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}>تصدير</Button>
           </div>
 
           <div className="border rounded-lg overflow-hidden">
@@ -185,7 +206,7 @@ const ContractorsPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {contractors.map((contractor) => (
+                {filteredContractors.map((contractor) => (
                   <TableRow key={contractor.id}>
                     <TableCell className="font-medium">{contractor.name}</TableCell>
                     <TableCell>{contractor.specialization}</TableCell>

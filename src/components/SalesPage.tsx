@@ -35,6 +35,15 @@ const SalesPage = () => {
     }
   };
 
+  // تصفية المبيعات حسب البحث
+  const filteredSales = sales.filter(sale =>
+    sale.project_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    sale.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    sale.unit_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    sale.unit_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    sale.status?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const totalUnits = sales.length;
   const soldUnits = sales.filter(unit => unit.status === 'مباع').length;
   const reservedUnits = sales.filter(unit => unit.status === 'محجوز').length;
@@ -123,8 +132,20 @@ const SalesPage = () => {
                 className="pr-10"
               />
             </div>
-            <Button variant="outline">تصفية</Button>
-            <Button variant="outline">تصدير</Button>
+            <Button variant="outline" onClick={() => {
+              const csvContent = "data:text/csv;charset=utf-8," + 
+                "المشروع,رقم الوحدة,النوع,المساحة,السعر,العميل,الحالة,المبلغ المتبقي,تاريخ البيع\n" +
+                filteredSales.map(sale => 
+                  `${sale.project_name},${sale.unit_number},${sale.unit_type},${sale.area},${sale.price},${sale.customer_name},${sale.status},${sale.remaining_amount || 0},${sale.sale_date || 'غير محدد'}`
+                ).join("\n");
+              const encodedUri = encodeURI(csvContent);
+              const link = document.createElement("a");
+              link.setAttribute("href", encodedUri);
+              link.setAttribute("download", "sales.csv");
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}>تصدير</Button>
           </div>
 
           <div className="border rounded-lg overflow-hidden">
@@ -144,7 +165,7 @@ const SalesPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sales.map((sale) => (
+                {filteredSales.map((sale) => (
                   <TableRow key={sale.id}>
                     <TableCell className="font-medium">{sale.project_name}</TableCell>
                     <TableCell>{sale.unit_number}</TableCell>

@@ -53,6 +53,14 @@ const TasksPage = () => {
     }
   };
 
+  // تصفية المهام حسب البحث
+  const filteredTasks = tasks.filter(task =>
+    task.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    task.assigned_to?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    task.department?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    task.status?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(task => task.status === 'مكتملة').length;
   const inProgressTasks = tasks.filter(task => task.status === 'قيد التنفيذ').length;
@@ -143,8 +151,20 @@ const TasksPage = () => {
             </div>
             {isAdmin && (
               <>
-                <Button variant="outline">تصفية</Button>
-                <Button variant="outline">تصدير</Button>
+                <Button variant="outline" onClick={() => {
+                  const csvContent = "data:text/csv;charset=utf-8," + 
+                    "رقم المهمة,عنوان المهمة,المسؤول,القسم,الأولوية,الحالة,نسبة الإنجاز,تاريخ الاستحقاق\n" +
+                    filteredTasks.map(task => 
+                      `${task.id},${task.title},${task.assigned_to},${task.department},${task.priority},${task.status},${task.progress}%,${task.due_date}`
+                    ).join("\n");
+                  const encodedUri = encodeURI(csvContent);
+                  const link = document.createElement("a");
+                  link.setAttribute("href", encodedUri);
+                  link.setAttribute("download", "tasks.csv");
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}>تصدير</Button>
               </>
             )}
           </div>
@@ -165,7 +185,7 @@ const TasksPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {tasks.map((task) => (
+                {filteredTasks.map((task) => (
                   <TableRow key={task.id}>
                     <TableCell className="font-medium">#{task.id}</TableCell>
                     <TableCell>

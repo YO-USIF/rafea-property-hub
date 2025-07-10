@@ -10,12 +10,12 @@ import { useInvoices } from '@/hooks/useInvoices';
 
 interface Invoice {
   id?: string;
-  invoiceNumber: string;
-  supplierName: string;
+  invoice_number: string;
+  supplier_name: string;
   amount: number;
   description: string;
-  invoiceDate: string;
-  dueDate: string;
+  invoice_date: string;
+  due_date: string;
   status: string;
 }
 
@@ -31,12 +31,12 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
   const { createInvoice, updateInvoice } = useInvoices();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Invoice>({
-    invoiceNumber: invoice?.invoiceNumber || '',
-    supplierName: invoice?.supplierName || '',
+    invoice_number: invoice?.invoice_number || '',
+    supplier_name: invoice?.supplier_name || '',
     amount: invoice?.amount || 0,
     description: invoice?.description || '',
-    invoiceDate: invoice?.invoiceDate || new Date().toISOString().split('T')[0],
-    dueDate: invoice?.dueDate || '',
+    invoice_date: invoice?.invoice_date || new Date().toISOString().split('T')[0],
+    due_date: invoice?.due_date || '',
     status: invoice?.status || 'غير مدفوع'
   });
 
@@ -44,23 +44,23 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
   useEffect(() => {
     if (invoice) {
       setFormData({
-        invoiceNumber: invoice.invoiceNumber || '',
-        supplierName: invoice.supplierName || '',
+        invoice_number: invoice.invoice_number || '',
+        supplier_name: invoice.supplier_name || '',
         amount: invoice.amount || 0,
         description: invoice.description || '',
-        invoiceDate: invoice.invoiceDate || new Date().toISOString().split('T')[0],
-        dueDate: invoice.dueDate || '',
+        invoice_date: invoice.invoice_date || new Date().toISOString().split('T')[0],
+        due_date: invoice.due_date || '',
         status: invoice.status || 'غير مدفوع'
       });
     } else {
       // إعادة تعيين النموذج للإضافة الجديدة
       setFormData({
-        invoiceNumber: '',
-        supplierName: '',
+        invoice_number: '',
+        supplier_name: '',
         amount: 0,
         description: '',
-        invoiceDate: new Date().toISOString().split('T')[0],
-        dueDate: '',
+        invoice_date: new Date().toISOString().split('T')[0],
+        due_date: '',
         status: 'غير مدفوع'
       });
     }
@@ -72,12 +72,12 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
 
     try {
       const invoicePayload = {
-        invoice_number: formData.invoiceNumber,
-        supplier_name: formData.supplierName,
+        invoice_number: formData.invoice_number,
+        supplier_name: formData.supplier_name,
         amount: formData.amount,
         description: formData.description,
-        invoice_date: formData.invoiceDate,
-        due_date: formData.dueDate,
+        invoice_date: formData.invoice_date,
+        due_date: formData.due_date,
         status: formData.status
       };
 
@@ -114,8 +114,8 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
               <Label htmlFor="invoiceNumber">رقم الفاتورة</Label>
               <Input
                 id="invoiceNumber"
-                value={formData.invoiceNumber}
-                onChange={(e) => setFormData(prev => ({ ...prev, invoiceNumber: e.target.value }))}
+                value={formData.invoice_number}
+                onChange={(e) => setFormData(prev => ({ ...prev, invoice_number: e.target.value }))}
                 required
               />
             </div>
@@ -124,8 +124,8 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
               <Label htmlFor="supplierName">اسم المورد</Label>
               <Input
                 id="supplierName"
-                value={formData.supplierName}
-                onChange={(e) => setFormData(prev => ({ ...prev, supplierName: e.target.value }))}
+                value={formData.supplier_name}
+                onChange={(e) => setFormData(prev => ({ ...prev, supplier_name: e.target.value }))}
                 required
               />
             </div>
@@ -147,8 +147,8 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
               <Input
                 id="invoiceDate"
                 type="date"
-                value={formData.invoiceDate}
-                onChange={(e) => setFormData(prev => ({ ...prev, invoiceDate: e.target.value }))}
+                value={formData.invoice_date}
+                onChange={(e) => setFormData(prev => ({ ...prev, invoice_date: e.target.value }))}
                 required
               />
             </div>
@@ -158,8 +158,8 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
               <Input
                 id="dueDate"
                 type="date"
-                value={formData.dueDate}
-                onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+                value={formData.due_date}
+                onChange={(e) => setFormData(prev => ({ ...prev, due_date: e.target.value }))}
                 required
               />
             </div>

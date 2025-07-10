@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useAccounting } from '@/hooks/useAccounting';
 import { useToast } from '@/hooks/use-toast';
+import { useMemo } from 'react';
 
 const AccountingPage = () => {
   const [selectedPeriod, setSelectedPeriod] = useState({
@@ -41,30 +42,40 @@ const AccountingPage = () => {
   
   const { toast } = useToast();
 
-  // إحصائيات سريعة
-  const totalRevenue = journalEntries
-    ?.filter(entry => entry.journal_entry_lines?.some(line => 
-      line.account?.account_code?.startsWith('4') && line.credit_amount > 0
-    ))
-    .reduce((sum, entry) => {
-      const revenueLines = entry.journal_entry_lines?.filter(line => 
-        line.account?.account_code?.startsWith('4')
-      ) || [];
-      return sum + revenueLines.reduce((lineSum, line) => lineSum + (line.credit_amount || 0), 0);
-    }, 0) || 0;
+  // إحصائيات سريعة مع useMemo لمنع إعادة الحساب
+  const { totalRevenue, totalExpenses, netIncome } = useMemo(() => {
+    if (!journalEntries || isLoadingEntries) {
+      return { totalRevenue: 0, totalExpenses: 0, netIncome: 0 };
+    }
 
-  const totalExpenses = journalEntries
-    ?.filter(entry => entry.journal_entry_lines?.some(line => 
-      line.account?.account_code?.startsWith('5') && line.debit_amount > 0
-    ))
-    .reduce((sum, entry) => {
-      const expenseLines = entry.journal_entry_lines?.filter(line => 
-        line.account?.account_code?.startsWith('5')
-      ) || [];
-      return sum + expenseLines.reduce((lineSum, line) => lineSum + (line.debit_amount || 0), 0);
-    }, 0) || 0;
+    const revenue = journalEntries
+      .filter(entry => entry.journal_entry_lines?.some(line => 
+        line.account?.account_code?.startsWith('4') && line.credit_amount > 0
+      ))
+      .reduce((sum, entry) => {
+        const revenueLines = entry.journal_entry_lines?.filter(line => 
+          line.account?.account_code?.startsWith('4')
+        ) || [];
+        return sum + revenueLines.reduce((lineSum, line) => lineSum + (line.credit_amount || 0), 0);
+      }, 0);
 
-  const netIncome = totalRevenue - totalExpenses;
+    const expenses = journalEntries
+      .filter(entry => entry.journal_entry_lines?.some(line => 
+        line.account?.account_code?.startsWith('5') && line.debit_amount > 0
+      ))
+      .reduce((sum, entry) => {
+        const expenseLines = entry.journal_entry_lines?.filter(line => 
+          line.account?.account_code?.startsWith('5')
+        ) || [];
+        return sum + expenseLines.reduce((lineSum, line) => lineSum + (line.debit_amount || 0), 0);
+      }, 0);
+
+    return {
+      totalRevenue: revenue,
+      totalExpenses: expenses,
+      netIncome: revenue - expenses
+    };
+  }, [journalEntries, isLoadingEntries]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('ar-SA', {

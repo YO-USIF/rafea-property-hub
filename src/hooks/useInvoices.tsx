@@ -12,18 +12,28 @@ export const useInvoices = () => {
   const { toast } = useToast();
 
   const { data: invoices = [], isLoading } = useQuery({
-    queryKey: ['invoices', isManagerOrAdmin],
+    queryKey: ['invoices', user?.id, isManagerOrAdmin],
     queryFn: async () => {
+      console.log('Fetching invoices for user:', user?.id, 'isManagerOrAdmin:', isManagerOrAdmin);
+      
       let query = supabase.from('invoices').select('*');
       
       // المديرون ومديرو النظام يمكنهم رؤية جميع الفواتير
       if (!isManagerOrAdmin) {
         query = query.eq('user_id', user?.id);
+        console.log('Adding user filter for:', user?.id);
+      } else {
+        console.log('Manager/Admin view - showing all invoices');
       }
       
       const { data, error } = await query.order('created_at', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching invoices:', error);
+        throw error;
+      }
+      
+      console.log('Fetched invoices:', data?.length, 'invoices');
       return data;
     },
     enabled: !!user?.id,
@@ -59,6 +69,7 @@ export const useInvoices = () => {
       toast({ title: "تم إضافة الفاتورة بنجاح" });
     },
     onError: (error) => {
+      console.error('Error creating invoice:', error);
       toast({ title: "خطأ في إضافة الفاتورة", variant: "destructive" });
     },
   });

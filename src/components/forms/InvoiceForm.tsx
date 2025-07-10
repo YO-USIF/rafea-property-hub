@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { useInvoices } from '@/hooks/useInvoices';
 
 interface Invoice {
   id?: string;
@@ -27,6 +28,7 @@ interface InvoiceFormProps {
 
 const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProps) => {
   const { toast } = useToast();
+  const { createInvoice, updateInvoice } = useInvoices();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Invoice>({
     invoiceNumber: invoice?.invoiceNumber || '',
@@ -69,22 +71,26 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
     setLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "تم الحفظ",
-        description: invoice ? "تم تحديث الفاتورة بنجاح" : "تم إضافة الفاتورة بنجاح"
-      });
+      const invoicePayload = {
+        invoice_number: formData.invoiceNumber,
+        supplier_name: formData.supplierName,
+        amount: formData.amount,
+        description: formData.description,
+        invoice_date: formData.invoiceDate,
+        due_date: formData.dueDate,
+        status: formData.status
+      };
+
+      if (invoice?.id) {
+        await updateInvoice.mutateAsync({ id: invoice.id, ...invoicePayload });
+      } else {
+        await createInvoice.mutateAsync(invoicePayload);
+      }
       
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء حفظ الفاتورة",
-        variant: "destructive"
-      });
+      console.error('Error saving invoice:', error);
     } finally {
       setLoading(false);
     }

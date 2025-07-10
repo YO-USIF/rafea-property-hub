@@ -40,6 +40,20 @@ export const useSales = () => {
         .single();
       
       if (error) throw error;
+
+      // إنشاء قيد محاسبي للمبيعة
+      if (saleData.status === 'مباع' && saleData.price > 0) {
+        try {
+          await supabase.rpc('create_sale_journal_entry', {
+            sale_id: data.id,
+            sale_amount: saleData.price,
+            customer_name: saleData.customer_name
+          });
+        } catch (journalError) {
+          console.warn('Warning: Could not create journal entry for sale:', journalError);
+        }
+      }
+      
       return data;
     },
     onSuccess: () => {

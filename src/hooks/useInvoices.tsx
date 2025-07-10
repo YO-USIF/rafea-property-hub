@@ -38,6 +38,20 @@ export const useInvoices = () => {
         .single();
       
       if (error) throw error;
+
+      // إنشاء قيد محاسبي للفاتورة
+      if (invoiceData.amount > 0) {
+        try {
+          await supabase.rpc('create_invoice_journal_entry', {
+            invoice_id: data.id,
+            invoice_amount: invoiceData.amount,
+            supplier_name: invoiceData.supplier_name
+          });
+        } catch (journalError) {
+          console.warn('Warning: Could not create journal entry for invoice:', journalError);
+        }
+      }
+
       return data;
     },
     onSuccess: () => {

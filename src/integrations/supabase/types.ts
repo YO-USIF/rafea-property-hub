@@ -47,6 +47,50 @@ export type Database = {
         }
         Relationships: []
       }
+      chart_of_accounts: {
+        Row: {
+          account_code: string
+          account_name: string
+          account_type: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          parent_account_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_code: string
+          account_name: string
+          account_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          parent_account_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_code?: string
+          account_name?: string
+          account_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          parent_account_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chart_of_accounts_parent_account_id_fkey"
+            columns: ["parent_account_id"]
+            isOneToOne: false
+            referencedRelation: "chart_of_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_settings: {
         Row: {
           company_address: string | null
@@ -128,6 +172,39 @@ export type Database = {
         }
         Relationships: []
       }
+      financial_reports: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          report_data: Json
+          report_name: string
+          report_period_end: string
+          report_period_start: string
+          report_type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          report_data: Json
+          report_name: string
+          report_period_end: string
+          report_period_start: string
+          report_type: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          report_data?: Json
+          report_name?: string
+          report_period_end?: string
+          report_period_start?: string
+          report_type?: string
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           amount: number
@@ -169,6 +246,96 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      journal_entries: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string
+          entry_number: string
+          id: string
+          reference_id: string | null
+          reference_type: string | null
+          status: string
+          total_credit: number
+          total_debit: number
+          transaction_date: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description: string
+          entry_number: string
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          status?: string
+          total_credit?: number
+          total_debit?: number
+          transaction_date?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string
+          entry_number?: string
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          status?: string
+          total_credit?: number
+          total_debit?: number
+          transaction_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      journal_entry_lines: {
+        Row: {
+          account_id: string
+          created_at: string
+          credit_amount: number
+          debit_amount: number
+          description: string | null
+          id: string
+          journal_entry_id: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          credit_amount?: number
+          debit_amount?: number
+          description?: string | null
+          id?: string
+          journal_entry_id: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          credit_amount?: number
+          debit_amount?: number
+          description?: string | null
+          id?: string
+          journal_entry_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_entry_lines_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "chart_of_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_entry_lines_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       maintenance_requests: {
         Row: {
@@ -669,6 +836,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_invoice_journal_entry: {
+        Args: {
+          invoice_id: string
+          invoice_amount: number
+          supplier_name: string
+        }
+        Returns: string
+      }
+      create_sale_journal_entry: {
+        Args: { sale_id: string; sale_amount: number; customer_name: string }
+        Returns: string
+      }
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean

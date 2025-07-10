@@ -17,6 +17,7 @@ import {
   Filter
 } from 'lucide-react';
 import { useExtracts } from '@/hooks/useExtracts';
+import { useAuth } from '@/hooks/useAuth';
 import ExtractForm from '@/components/forms/ExtractForm';
 
 const ExtractsPage = () => {
@@ -24,6 +25,7 @@ const ExtractsPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingExtract, setEditingExtract] = useState<any>(null);
   
+  const { user } = useAuth();
   const { extracts, isLoading, deleteExtract } = useExtracts();
 
   // تصفية المستخصات بناءً على البحث
@@ -107,6 +109,17 @@ const ExtractsPage = () => {
     }
   ];
 
+  // إضافة تحقق من حالة المستخدم
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p>يجب تسجيل الدخول لعرض المستخلصات</p>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -117,6 +130,11 @@ const ExtractsPage = () => {
       </div>
     );
   }
+
+  // إضافة تسجيل للتشخيص
+  console.log('Extracts data:', extracts);
+  console.log('Loading state:', isLoading);
+  console.log('Current user:', user);
 
   return (
     <div className="space-y-6">

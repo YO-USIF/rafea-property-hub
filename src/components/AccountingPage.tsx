@@ -20,6 +20,9 @@ import {
 } from 'lucide-react';
 import { useAccounting } from '@/hooks/useAccounting';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useMemo } from 'react';
 
 const AccountingPage = () => {
@@ -31,6 +34,7 @@ const AccountingPage = () => {
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [currentReport, setCurrentReport] = useState<any>(null);
   
+  const { user } = useAuth();
   const { 
     chartOfAccounts, 
     journalEntries, 
@@ -42,40 +46,53 @@ const AccountingPage = () => {
   
   const { toast } = useToast();
 
+  // جلب الإيرادات مباشرة من المبيعات
+  const { data: salesData = [], isLoading: isLoadingSales } = useQuery({
+    queryKey: ['sales-revenue'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sales')
+        .select('price, status')
+        .eq('status', 'مباع');
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  // جلب المصروفات مباشرة من الفواتير
+  const { data: invoicesData = [], isLoading: isLoadingInvoices } = useQuery({
+    queryKey: ['invoices-expenses'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('invoices')
+        .select('amount, status');
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
   // إحصائيات سريعة مع useMemo لمنع إعادة الحساب
   const { totalRevenue, totalExpenses, netIncome } = useMemo(() => {
-    if (!journalEntries || isLoadingEntries) {
+    if (isLoadingSales || isLoadingInvoices) {
       return { totalRevenue: 0, totalExpenses: 0, netIncome: 0 };
     }
 
-    const revenue = journalEntries
-      .filter(entry => entry.journal_entry_lines?.some(line => 
-        line.account?.account_code?.startsWith('4') && line.credit_amount > 0
-      ))
-      .reduce((sum, entry) => {
-        const revenueLines = entry.journal_entry_lines?.filter(line => 
-          line.account?.account_code?.startsWith('4')
-        ) || [];
-        return sum + revenueLines.reduce((lineSum, line) => lineSum + (line.credit_amount || 0), 0);
-      }, 0);
-
-    const expenses = journalEntries
-      .filter(entry => entry.journal_entry_lines?.some(line => 
-        line.account?.account_code?.startsWith('5') && line.debit_amount > 0
-      ))
-      .reduce((sum, entry) => {
-        const expenseLines = entry.journal_entry_lines?.filter(line => 
-          line.account?.account_code?.startsWith('5')
-        ) || [];
-        return sum + expenseLines.reduce((lineSum, line) => lineSum + (line.debit_amount || 0), 0);
-      }, 0);
+    // حساب الإيرادات من المبيعات المباعة
+    const revenue = salesData.reduce((sum, sale) => sum + (sale.price || 0), 0);
+    
+    // حساب المصروفات من الفواتير
+    const expenses = invoicesData.reduce((sum, invoice) => sum + (invoice.amount || 0), 0);
 
     return {
       totalRevenue: revenue,
       totalExpenses: expenses,
       netIncome: revenue - expenses
     };
-  }, [journalEntries, isLoadingEntries]);
+  }, [salesData, invoicesData, isLoadingSales, isLoadingInvoices]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('ar-SA', {

@@ -101,49 +101,46 @@ export const useAccounting = () => {
     },
   });
 
-  // جلب التقارير المالية
+  // جلب التقارير المالية مباشرة من المبيعات والفواتير
   const generateIncomeStatement = useMutation({
     mutationFn: async ({ startDate, endDate }: { startDate: string; endDate: string }) => {
-      // جلب الإيرادات
-      const { data: revenues, error: revenueError } = await supabase
-        .from('journal_entry_lines')
-        .select(`
-          credit_amount,
-          journal_entry:journal_entries!inner(transaction_date),
-          account:chart_of_accounts!inner(account_type, account_name)
-        `)
-        .eq('account.account_type', 'إيرادات')
-        .gte('journal_entry.transaction_date', startDate)
-        .lte('journal_entry.transaction_date', endDate)
-        .eq('journal_entry.status', 'posted');
+      // جلب الإيرادات من المبيعات المباعة
+      const { data: salesRevenues, error: revenueError } = await supabase
+        .from('sales')
+        .select('price, customer_name, unit_number, sale_date, created_at')
+        .eq('status', 'مباع')
+        .gte('sale_date', startDate)
+        .lte('sale_date', endDate);
 
       if (revenueError) throw revenueError;
 
-      // جلب المصروفات
-      const { data: expenses, error: expenseError } = await supabase
-        .from('journal_entry_lines')
-        .select(`
-          debit_amount,
-          journal_entry:journal_entries!inner(transaction_date),
-          account:chart_of_accounts!inner(account_type, account_name)
-        `)
-        .eq('account.account_type', 'مصروفات')
-        .gte('journal_entry.transaction_date', startDate)
-        .lte('journal_entry.transaction_date', endDate)
-        .eq('journal_entry.status', 'posted');
+      // جلب المصروفات من الفواتير
+      const { data: invoiceExpenses, error: expenseError } = await supabase
+        .from('invoices')
+        .select('amount, supplier_name, invoice_number, invoice_date')
+        .gte('invoice_date', startDate)
+        .lte('invoice_date', endDate);
 
       if (expenseError) throw expenseError;
 
-      const totalRevenue = revenues.reduce((sum, item) => sum + (item.credit_amount || 0), 0);
-      const totalExpenses = expenses.reduce((sum, item) => sum + (item.debit_amount || 0), 0);
+      const totalRevenue = salesRevenues?.reduce((sum, sale) => sum + (sale.price || 0), 0) || 0;
+      const totalExpenses = invoiceExpenses?.reduce((sum, invoice) => sum + (invoice.amount || 0), 0) || 0;
       const netIncome = totalRevenue - totalExpenses;
 
       return {
         totalRevenue,
         totalExpenses,
         netIncome,
-        revenueDetails: revenues,
-        expenseDetails: expenses
+        revenueDetails: salesRevenues?.map(sale => ({
+          amount: sale.price,
+          description: `مبيعة وحدة ${sale.unit_number} - ${sale.customer_name}`,
+          date: sale.sale_date || sale.created_at
+        })) || [],
+        expenseDetails: invoiceExpenses?.map(invoice => ({
+          amount: invoice.amount,
+          description: `فاتورة ${invoice.invoice_number} - ${invoice.supplier_name}`,
+          date: invoice.invoice_date
+        })) || []
       };
     },
     onError: (error) => {

@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { FileUpload } from '@/components/ui/file-upload';
 import { useToast } from '@/hooks/use-toast';
 import { usePurchases } from '@/hooks/usePurchases';
 
@@ -19,6 +20,8 @@ interface Purchase {
   status: string;
   delivery_status: string;
   approved_by?: string;
+  attached_file_url?: string;
+  attached_file_name?: string;
 }
 
 interface PurchaseFormProps {
@@ -42,7 +45,9 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
     total_amount: purchase?.total_amount || 0,
     status: purchase?.status || 'في انتظار الموافقة',
     delivery_status: purchase?.delivery_status || 'لم يتم التسليم',
-    approved_by: purchase?.approved_by || ''
+    approved_by: purchase?.approved_by || '',
+    attached_file_url: purchase?.attached_file_url || '',
+    attached_file_name: purchase?.attached_file_name || ''
   });
 
   // تحديث البيانات عند تغيير العنصر المرسل للتعديل
@@ -58,7 +63,9 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
         total_amount: purchase.total_amount || 0,
         status: purchase.status || 'في انتظار الموافقة',
         delivery_status: purchase.delivery_status || 'لم يتم التسليم',
-        approved_by: purchase.approved_by || ''
+        approved_by: purchase.approved_by || '',
+        attached_file_url: purchase.attached_file_url || '',
+        attached_file_name: purchase.attached_file_name || ''
       });
     } else {
       // إعادة تعيين النموذج للإضافة الجديدة
@@ -72,7 +79,9 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
         total_amount: 0,
         status: 'في انتظار الموافقة',
         delivery_status: 'لم يتم التسليم',
-        approved_by: ''
+        approved_by: '',
+        attached_file_url: '',
+        attached_file_name: ''
       });
     }
   }, [purchase]);
@@ -234,6 +243,25 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
               />
             </div>
           </div>
+
+          <FileUpload
+            onFileUploaded={(fileUrl, fileName) => {
+              setFormData(prev => ({
+                ...prev,
+                attached_file_url: fileUrl,
+                attached_file_name: fileName
+              }));
+            }}
+            currentFileUrl={formData.attached_file_url}
+            currentFileName={formData.attached_file_name}
+            onFileRemoved={() => {
+              setFormData(prev => ({
+                ...prev,
+                attached_file_url: '',
+                attached_file_name: ''
+              }));
+            }}
+          />
 
           <div className="flex justify-end space-x-2 space-x-reverse pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

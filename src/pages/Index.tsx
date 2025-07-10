@@ -8,6 +8,7 @@ import SalesPage from '../components/SalesPage';
 import ContractorsPage from '../components/ContractorsPage';
 import SuppliersPage from '../components/SuppliersPage';
 import PurchasesPage from '../components/PurchasesPage';
+import ExtractsPage from '../components/ExtractsPage';
 import AccountingPage from '../components/AccountingPage';
 import InvoicesPage from '../components/InvoicesPage';
 import MaintenancePage from '../components/MaintenancePage';
@@ -33,6 +34,8 @@ const Index = () => {
         return <SuppliersPage />;
       case 'purchases':
         return <PurchasesPage />;
+      case 'extracts':
+        return <ExtractsPage />;
       case 'accounting':
         return <AccountingPage />;
       case 'invoices':

@@ -172,6 +172,63 @@ export type Database = {
         }
         Relationships: []
       }
+      extracts: {
+        Row: {
+          amount: number
+          attached_file_name: string | null
+          attached_file_url: string | null
+          contractor_name: string
+          created_at: string
+          current_amount: number | null
+          description: string | null
+          extract_date: string
+          extract_number: string
+          id: string
+          percentage_completed: number | null
+          previous_amount: number | null
+          project_name: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          attached_file_name?: string | null
+          attached_file_url?: string | null
+          contractor_name: string
+          created_at?: string
+          current_amount?: number | null
+          description?: string | null
+          extract_date?: string
+          extract_number: string
+          id?: string
+          percentage_completed?: number | null
+          previous_amount?: number | null
+          project_name: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          attached_file_name?: string | null
+          attached_file_url?: string | null
+          contractor_name?: string
+          created_at?: string
+          current_amount?: number | null
+          description?: string | null
+          extract_date?: string
+          extract_number?: string
+          id?: string
+          percentage_completed?: number | null
+          previous_amount?: number | null
+          project_name?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       financial_reports: {
         Row: {
           created_at: string
@@ -208,6 +265,8 @@ export type Database = {
       invoices: {
         Row: {
           amount: number
+          attached_file_name: string | null
+          attached_file_url: string | null
           created_at: string
           description: string | null
           due_date: string
@@ -221,6 +280,8 @@ export type Database = {
         }
         Insert: {
           amount?: number
+          attached_file_name?: string | null
+          attached_file_url?: string | null
           created_at?: string
           description?: string | null
           due_date: string
@@ -234,6 +295,8 @@ export type Database = {
         }
         Update: {
           amount?: number
+          attached_file_name?: string | null
+          attached_file_url?: string | null
           created_at?: string
           description?: string | null
           due_date?: string
@@ -582,6 +645,8 @@ export type Database = {
       purchases: {
         Row: {
           approved_by: string | null
+          attached_file_name: string | null
+          attached_file_url: string | null
           created_at: string
           delivery_status: string
           expected_delivery: string
@@ -598,6 +663,8 @@ export type Database = {
         }
         Insert: {
           approved_by?: string | null
+          attached_file_name?: string | null
+          attached_file_url?: string | null
           created_at?: string
           delivery_status?: string
           expected_delivery: string
@@ -614,6 +681,8 @@ export type Database = {
         }
         Update: {
           approved_by?: string | null
+          attached_file_name?: string | null
+          attached_file_url?: string | null
           created_at?: string
           delivery_status?: string
           expected_delivery?: string

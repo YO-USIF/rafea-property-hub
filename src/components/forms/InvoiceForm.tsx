@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { FileUpload } from '@/components/ui/file-upload';
 import { useToast } from '@/hooks/use-toast';
 import { useInvoices } from '@/hooks/useInvoices';
 
@@ -17,6 +18,8 @@ interface Invoice {
   invoice_date: string;
   due_date: string;
   status: string;
+  attached_file_url?: string;
+  attached_file_name?: string;
 }
 
 interface InvoiceFormProps {
@@ -37,7 +40,9 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
     description: invoice?.description || '',
     invoice_date: invoice?.invoice_date || new Date().toISOString().split('T')[0],
     due_date: invoice?.due_date || '',
-    status: invoice?.status || 'غير مدفوع'
+    status: invoice?.status || 'غير مدفوع',
+    attached_file_url: invoice?.attached_file_url || '',
+    attached_file_name: invoice?.attached_file_name || ''
   });
 
   // تحديث البيانات عند تغيير العنصر المرسل للتعديل
@@ -50,7 +55,9 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
         description: invoice.description || '',
         invoice_date: invoice.invoice_date || new Date().toISOString().split('T')[0],
         due_date: invoice.due_date || '',
-        status: invoice.status || 'غير مدفوع'
+        status: invoice.status || 'غير مدفوع',
+        attached_file_url: invoice.attached_file_url || '',
+        attached_file_name: invoice.attached_file_name || ''
       });
     } else {
       // إعادة تعيين النموذج للإضافة الجديدة
@@ -61,7 +68,9 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
         description: '',
         invoice_date: new Date().toISOString().split('T')[0],
         due_date: '',
-        status: 'غير مدفوع'
+        status: 'غير مدفوع',
+        attached_file_url: '',
+        attached_file_name: ''
       });
     }
   }, [invoice]);
@@ -78,7 +87,9 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
         description: formData.description,
         invoice_date: formData.invoice_date,
         due_date: formData.due_date,
-        status: formData.status
+        status: formData.status,
+        attached_file_url: formData.attached_file_url,
+        attached_file_name: formData.attached_file_name
       };
 
       if (invoice?.id) {
@@ -193,6 +204,25 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
               required
             />
           </div>
+
+          <FileUpload
+            onFileUploaded={(fileUrl, fileName) => {
+              setFormData(prev => ({
+                ...prev,
+                attached_file_url: fileUrl,
+                attached_file_name: fileName
+              }));
+            }}
+            currentFileUrl={formData.attached_file_url}
+            currentFileName={formData.attached_file_name}
+            onFileRemoved={() => {
+              setFormData(prev => ({
+                ...prev,
+                attached_file_url: '',
+                attached_file_name: ''
+              }));
+            }}
+          />
 
           <div className="flex justify-end space-x-2 space-x-reverse pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

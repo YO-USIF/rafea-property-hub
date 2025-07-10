@@ -50,13 +50,18 @@ export const useAccounting = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!user?.id && isManagerOrAdmin,
+    enabled: !!user?.id,
   });
 
   // إنشاء قيد يومية
   const createJournalEntry = useMutation({
     mutationFn: async (entryData: any) => {
       const { lines, ...journalData } = entryData;
+      
+      // التأكد من وجود entry_number
+      if (!journalData.entry_number) {
+        journalData.entry_number = 'JE-' + Date.now();
+      }
       
       // إنشاء القيد الرئيسي
       const { data: entry, error: entryError } = await supabase
@@ -69,9 +74,17 @@ export const useAccounting = () => {
 
       // إضافة الأسطر
       if (lines && lines.length > 0) {
+        const linesWithEntryId = lines.map((line: any) => ({ 
+          ...line, 
+          journal_entry_id: entry.id,
+          // التأكد من أن المبالغ أرقام
+          debit_amount: Number(line.debit_amount) || 0,
+          credit_amount: Number(line.credit_amount) || 0
+        }));
+        
         const { error: linesError } = await supabase
           .from('journal_entry_lines')
-          .insert(lines.map((line: any) => ({ ...line, journal_entry_id: entry.id })));
+          .insert(linesWithEntryId);
         
         if (linesError) throw linesError;
       }
@@ -83,6 +96,7 @@ export const useAccounting = () => {
       toast({ title: "تم إنشاء القيد بنجاح" });
     },
     onError: (error) => {
+      console.error('Error creating journal entry:', error);
       toast({ title: "خطأ في إنشاء القيد", variant: "destructive" });
     },
   });

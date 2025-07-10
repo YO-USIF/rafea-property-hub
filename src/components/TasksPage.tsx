@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, ClipboardList, User, Calendar, CheckCircle2, Trash2, Edit } from 'lucide-react';
+import { Plus, Search, ClipboardList, User, Calendar, CheckCircle2, Trash2, Edit, Printer } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 import { useUserRole } from '@/hooks/useUserRole';
 
@@ -165,6 +165,10 @@ const TasksPage = () => {
                   link.click();
                   document.body.removeChild(link);
                 }}>تصدير</Button>
+                <Button variant="outline" onClick={() => window.print()}>
+                  <Printer className="w-4 h-4 ml-2" />
+                  طباعة
+                </Button>
               </>
             )}
           </div>

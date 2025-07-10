@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, HardHat, FileText, DollarSign, Clock, Trash2, Edit } from 'lucide-react';
+import { Plus, Search, HardHat, FileText, DollarSign, Clock, Trash2, Edit, Printer } from 'lucide-react';
 import { useContractors } from '@/hooks/useContractors';
 
 const ContractorsPage = () => {
@@ -187,6 +187,10 @@ const ContractorsPage = () => {
               link.click();
               document.body.removeChild(link);
             }}>تصدير</Button>
+            <Button variant="outline" onClick={() => window.print()}>
+              <Printer className="w-4 h-4 ml-2" />
+              طباعة
+            </Button>
           </div>
 
           <div className="border rounded-lg overflow-hidden">

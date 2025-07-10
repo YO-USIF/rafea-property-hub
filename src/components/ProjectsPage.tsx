@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Plus, Search, Building, MapPin, Calendar, TrendingUp, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Building, MapPin, Calendar, TrendingUp, Edit, Trash2, Printer } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -201,8 +201,24 @@ const ProjectsPage = () => {
                 className="pr-10"
               />
             </div>
-            <Button variant="outline">تصفية</Button>
-            <Button variant="outline">تصدير</Button>
+            <Button variant="outline" onClick={() => {
+              const csvContent = "data:text/csv;charset=utf-8," + 
+                "اسم المشروع,النوع,الموقع,الوحدات المباعة,إجمالي الوحدات,نسبة الإنجاز,التكلفة الإجمالية,الحالة,تاريخ الانتهاء المتوقع\n" +
+                filteredProjects.map(project => 
+                  `${project.name},${project.type},${project.location},${project.sold_units},${project.total_units},${project.progress}%,${project.total_cost},${project.status},${project.expected_completion}`
+                ).join("\n");
+              const encodedUri = encodeURI(csvContent);
+              const link = document.createElement("a");
+              link.setAttribute("href", encodedUri);
+              link.setAttribute("download", "projects.csv");
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}>تصدير</Button>
+            <Button variant="outline" onClick={() => window.print()}>
+              <Printer className="w-4 h-4 ml-2" />
+              طباعة
+            </Button>
           </div>
 
           <div className="border rounded-lg overflow-hidden">

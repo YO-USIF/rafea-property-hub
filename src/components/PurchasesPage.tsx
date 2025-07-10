@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, ShoppingCart, CheckCircle, Clock, AlertCircle, Trash2, Edit } from 'lucide-react';
+import { Plus, Search, ShoppingCart, CheckCircle, Clock, AlertCircle, Trash2, Edit, Printer } from 'lucide-react';
 import { usePurchases } from '@/hooks/usePurchases';
 
 const PurchasesPage = () => {
@@ -161,6 +161,10 @@ const PurchasesPage = () => {
               link.click();
               document.body.removeChild(link);
             }}>تصدير</Button>
+            <Button variant="outline" onClick={() => window.print()}>
+              <Printer className="w-4 h-4 ml-2" />
+              طباعة
+            </Button>
           </div>
 
           <div className="border rounded-lg overflow-hidden">

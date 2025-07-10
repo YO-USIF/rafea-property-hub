@@ -202,6 +202,58 @@ const SalesPage = () => {
                         <Button 
                           size="sm" 
                           variant="outline"
+                          onClick={() => {
+                            const printContent = `
+                              عقد بيع / عرض سعر
+                              =====================================
+                              
+                              المشروع: ${sale.project_name}
+                              رقم الوحدة: ${sale.unit_number}
+                              نوع الوحدة: ${sale.unit_type}
+                              المساحة: ${sale.area} متر مربع
+                              السعر: ${sale.price.toLocaleString()} ريال سعودي
+                              
+                              بيانات العميل:
+                              الاسم: ${sale.customer_name}
+                              الهاتف: ${sale.customer_phone || 'غير محدد'}
+                              
+                              تفاصيل الدفع:
+                              الحالة: ${sale.status}
+                              المبلغ المتبقي: ${sale.remaining_amount > 0 ? `${sale.remaining_amount.toLocaleString()} ر.س` : 'مسدد بالكامل'}
+                              تاريخ البيع: ${sale.sale_date || 'غير محدد'}
+                              خطة التقسيط: ${sale.installment_plan || 'غير محددة'}
+                              
+                              =====================================
+                              تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}
+                            `;
+                            
+                            const printWindow = window.open('', '_blank');
+                            if (printWindow) {
+                              printWindow.document.write(`
+                                <html dir="rtl">
+                                  <head>
+                                    <title>عقد بيع - ${sale.project_name} - وحدة ${sale.unit_number}</title>
+                                    <style>
+                                      body { font-family: Arial, sans-serif; direction: rtl; text-align: right; margin: 20px; }
+                                      pre { white-space: pre-wrap; font-family: Arial, sans-serif; }
+                                      @media print { body { margin: 0; } }
+                                    </style>
+                                  </head>
+                                  <body>
+                                    <pre>${printContent}</pre>
+                                  </body>
+                                </html>
+                              `);
+                              printWindow.document.close();
+                              printWindow.print();
+                            }
+                          }}
+                        >
+                          <Printer className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
                           onClick={() => deleteSale.mutate(sale.id)}
                         >
                           <Trash2 className="w-4 h-4" />

@@ -277,6 +277,49 @@ const InvoicesPage = () => {
                         <Button 
                           size="sm" 
                           variant="outline" 
+                          onClick={() => {
+                            const printContent = `
+                              فاتورة رقم: ${invoice.invoice_number}
+                              =====================================
+                              
+                              المورد: ${invoice.supplier_name}
+                              المبلغ: ${formatCurrency(invoice.amount)}
+                              تاريخ الفاتورة: ${invoice.invoice_date}
+                              تاريخ الاستحقاق: ${invoice.due_date}
+                              الحالة: ${invoice.status}
+                              الوصف: ${invoice.description || 'غير محدد'}
+                              
+                              =====================================
+                              تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}
+                            `;
+                            
+                            const printWindow = window.open('', '_blank');
+                            if (printWindow) {
+                              printWindow.document.write(`
+                                <html dir="rtl">
+                                  <head>
+                                    <title>فاتورة ${invoice.invoice_number}</title>
+                                    <style>
+                                      body { font-family: Arial, sans-serif; direction: rtl; text-align: right; margin: 20px; }
+                                      pre { white-space: pre-wrap; font-family: Arial, sans-serif; }
+                                      @media print { body { margin: 0; } }
+                                    </style>
+                                  </head>
+                                  <body>
+                                    <pre>${printContent}</pre>
+                                  </body>
+                                </html>
+                              `);
+                              printWindow.document.close();
+                              printWindow.print();
+                            }
+                          }}
+                        >
+                          <Printer className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
                           onClick={() => handleDelete(invoice.id)}
                           className="text-red-600 hover:text-red-700"
                         >

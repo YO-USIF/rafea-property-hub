@@ -210,6 +210,52 @@ const PurchasesPage = () => {
                         <Button 
                           size="sm" 
                           variant="outline"
+                          onClick={() => {
+                            const printContent = `
+                              طلب شراء رقم: ${order.order_number}
+                              =====================================
+                              
+                              المورد: ${order.supplier_name}
+                              المشروع: ${order.project_name}
+                              طالب الشراء: ${order.requested_by}
+                              تاريخ الطلب: ${order.order_date}
+                              تاريخ التسليم المتوقع: ${order.expected_delivery}
+                              المبلغ الإجمالي: ${order.total_amount.toLocaleString()} ر.س
+                              حالة الموافقة: ${order.status}
+                              حالة التسليم: ${order.delivery_status}
+                              المعتمد من: ${order.approved_by || 'غير محدد'}
+                              
+                              =====================================
+                              تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}
+                            `;
+                            
+                            const printWindow = window.open('', '_blank');
+                            if (printWindow) {
+                              printWindow.document.write(`
+                                <html dir="rtl">
+                                  <head>
+                                    <title>طلب شراء ${order.order_number}</title>
+                                    <style>
+                                      body { font-family: Arial, sans-serif; direction: rtl; text-align: right; margin: 20px; }
+                                      pre { white-space: pre-wrap; font-family: Arial, sans-serif; }
+                                      @media print { body { margin: 0; } }
+                                    </style>
+                                  </head>
+                                  <body>
+                                    <pre>${printContent}</pre>
+                                  </body>
+                                </html>
+                              `);
+                              printWindow.document.close();
+                              printWindow.print();
+                            }
+                          }}
+                        >
+                          <Printer className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
                           onClick={() => deletePurchase.mutate(order.id)}
                         >
                           <Trash2 className="w-4 h-4" />

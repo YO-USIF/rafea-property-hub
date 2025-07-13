@@ -32,6 +32,7 @@ interface InvoiceFormProps {
 }
 
 const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProps) => {
+  console.log('=== INVOICE FORM COMPONENT LOADED ===', { open, invoice });
   const { toast } = useToast();
   const { createInvoice, updateInvoice } = useInvoices();
   const { projects } = useProjects();
@@ -135,6 +136,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
           </DialogDescription>
         </DialogHeader>
 
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">

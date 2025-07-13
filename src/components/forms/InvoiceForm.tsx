@@ -40,7 +40,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
   const [formData, setFormData] = useState<Invoice>({
     invoice_number: invoice?.invoice_number || '',
     supplier_name: invoice?.supplier_name || '',
-    project_id: invoice?.project_id || '',
+    project_id: invoice?.project_id || "none",
     amount: invoice?.amount || 0,
     description: invoice?.description || '',
     invoice_date: invoice?.invoice_date || new Date().toISOString().split('T')[0],
@@ -56,7 +56,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
       setFormData({
         invoice_number: invoice.invoice_number || '',
         supplier_name: invoice.supplier_name || '',
-        project_id: invoice.project_id || '',
+        project_id: invoice.project_id || "none",
         amount: invoice.amount || 0,
         description: invoice.description || '',
         invoice_date: invoice.invoice_date || new Date().toISOString().split('T')[0],
@@ -70,7 +70,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
       setFormData({
         invoice_number: '',
         supplier_name: '',
-        project_id: '',
+        project_id: "none",
         amount: 0,
         description: '',
         invoice_date: new Date().toISOString().split('T')[0],
@@ -92,7 +92,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
       const invoicePayload = {
         invoice_number: formData.invoice_number,
         supplier_name: formData.supplier_name,
-        project_id: formData.project_id || null,
+        project_id: formData.project_id === "none" ? null : formData.project_id,
         amount: formData.amount,
         description: formData.description,
         invoice_date: formData.invoice_date,
@@ -163,13 +163,13 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
               <Label htmlFor="project">المشروع</Label>
               <Select
                 value={formData.project_id}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, project_id: value }))}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, project_id: value === "none" ? "" : value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر المشروع" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">بدون مشروع</SelectItem>
+                  <SelectItem value="none">بدون مشروع</SelectItem>
                   {projects.map((project: any) => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.name}

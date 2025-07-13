@@ -42,7 +42,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
     order_number: purchase?.order_number || `PO-${Date.now()}`,
     supplier_name: purchase?.supplier_name || '',
     project_name: purchase?.project_name || '',
-    project_id: purchase?.project_id || '',
+    project_id: purchase?.project_id || "none",
     requested_by: purchase?.requested_by || '',
     order_date: purchase?.order_date || new Date().toISOString().split('T')[0],
     expected_delivery: purchase?.expected_delivery || '',
@@ -61,7 +61,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
         order_number: purchase.order_number || `PO-${Date.now()}`,
         supplier_name: purchase.supplier_name || '',
         project_name: purchase.project_name || '',
-        project_id: purchase.project_id || '',
+        project_id: purchase.project_id || "none",
         requested_by: purchase.requested_by || '',
         order_date: purchase.order_date || new Date().toISOString().split('T')[0],
         expected_delivery: purchase.expected_delivery || '',
@@ -78,7 +78,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
         order_number: `PO-${Date.now()}`,
         supplier_name: '',
         project_name: '',
-        project_id: '',
+        project_id: "none",
         requested_by: '',
         order_date: new Date().toISOString().split('T')[0],
         expected_delivery: '',
@@ -99,7 +99,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
     try {
       const purchasePayload = {
         ...formData,
-        project_id: formData.project_id || null
+        project_id: formData.project_id === "none" ? null : formData.project_id
       };
       
       if (purchase?.id) {
@@ -163,8 +163,8 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
                   const selectedProject = projects.find((p: any) => p.id === value);
                   setFormData(prev => ({ 
                     ...prev, 
-                    project_id: value,
-                    project_name: selectedProject ? selectedProject.name : ''
+                    project_id: value === "none" ? "" : value,
+                    project_name: value === "none" ? "" : (selectedProject ? selectedProject.name : "")
                   }));
                 }}
               >
@@ -172,7 +172,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
                   <SelectValue placeholder="اختر المشروع" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">بدون مشروع</SelectItem>
+                  <SelectItem value="none">بدون مشروع</SelectItem>
                   {projects.map((project: any) => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.name}

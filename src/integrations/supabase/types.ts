@@ -273,6 +273,7 @@ export type Database = {
           id: string
           invoice_date: string
           invoice_number: string
+          project_id: string | null
           status: string
           supplier_name: string
           updated_at: string
@@ -288,6 +289,7 @@ export type Database = {
           id?: string
           invoice_date?: string
           invoice_number: string
+          project_id?: string | null
           status?: string
           supplier_name: string
           updated_at?: string
@@ -303,12 +305,21 @@ export type Database = {
           id?: string
           invoice_date?: string
           invoice_number?: string
+          project_id?: string | null
           status?: string
           supplier_name?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "invoices_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       journal_entries: {
         Row: {
@@ -653,6 +664,7 @@ export type Database = {
           id: string
           order_date: string
           order_number: string
+          project_id: string | null
           project_name: string
           requested_by: string
           status: string
@@ -671,6 +683,7 @@ export type Database = {
           id?: string
           order_date: string
           order_number: string
+          project_id?: string | null
           project_name: string
           requested_by: string
           status?: string
@@ -689,6 +702,7 @@ export type Database = {
           id?: string
           order_date?: string
           order_number?: string
+          project_id?: string | null
           project_name?: string
           requested_by?: string
           status?: string
@@ -697,7 +711,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "purchases_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sales: {
         Row: {

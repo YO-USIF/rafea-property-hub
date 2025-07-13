@@ -8,11 +8,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { FileUpload } from '@/components/ui/file-upload';
 import { useToast } from '@/hooks/use-toast';
 import { useInvoices } from '@/hooks/useInvoices';
+import { useProjects } from '@/hooks/useProjects';
 
 interface Invoice {
   id?: string;
   invoice_number: string;
   supplier_name: string;
+  project_id?: string;
   amount: number;
   description: string;
   invoice_date: string;
@@ -32,10 +34,12 @@ interface InvoiceFormProps {
 const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProps) => {
   const { toast } = useToast();
   const { createInvoice, updateInvoice } = useInvoices();
+  const { projects } = useProjects();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Invoice>({
     invoice_number: invoice?.invoice_number || '',
     supplier_name: invoice?.supplier_name || '',
+    project_id: invoice?.project_id || '',
     amount: invoice?.amount || 0,
     description: invoice?.description || '',
     invoice_date: invoice?.invoice_date || new Date().toISOString().split('T')[0],
@@ -51,6 +55,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
       setFormData({
         invoice_number: invoice.invoice_number || '',
         supplier_name: invoice.supplier_name || '',
+        project_id: invoice.project_id || '',
         amount: invoice.amount || 0,
         description: invoice.description || '',
         invoice_date: invoice.invoice_date || new Date().toISOString().split('T')[0],
@@ -64,6 +69,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
       setFormData({
         invoice_number: '',
         supplier_name: '',
+        project_id: '',
         amount: 0,
         description: '',
         invoice_date: new Date().toISOString().split('T')[0],
@@ -83,6 +89,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
       const invoicePayload = {
         invoice_number: formData.invoice_number,
         supplier_name: formData.supplier_name,
+        project_id: formData.project_id || null,
         amount: formData.amount,
         description: formData.description,
         invoice_date: formData.invoice_date,
@@ -139,6 +146,26 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
                 onChange={(e) => setFormData(prev => ({ ...prev, supplier_name: e.target.value }))}
                 required
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="project">المشروع</Label>
+              <Select
+                value={formData.project_id}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, project_id: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر المشروع" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">بدون مشروع</SelectItem>
+                  {projects.map((project: any) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

@@ -7,12 +7,14 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { FileUpload } from '@/components/ui/file-upload';
 import { useToast } from '@/hooks/use-toast';
 import { usePurchases } from '@/hooks/usePurchases';
+import { useProjects } from '@/hooks/useProjects';
 
 interface Purchase {
   id?: string;
   order_number: string;
   supplier_name: string;
   project_name: string;
+  project_id?: string;
   requested_by: string;
   order_date: string;
   expected_delivery: string;
@@ -34,11 +36,13 @@ interface PurchaseFormProps {
 const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormProps) => {
   const { createPurchase, updatePurchase } = usePurchases();
   const { toast } = useToast();
+  const { projects } = useProjects();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Purchase>({
     order_number: purchase?.order_number || `PO-${Date.now()}`,
     supplier_name: purchase?.supplier_name || '',
     project_name: purchase?.project_name || '',
+    project_id: purchase?.project_id || '',
     requested_by: purchase?.requested_by || '',
     order_date: purchase?.order_date || new Date().toISOString().split('T')[0],
     expected_delivery: purchase?.expected_delivery || '',
@@ -57,6 +61,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
         order_number: purchase.order_number || `PO-${Date.now()}`,
         supplier_name: purchase.supplier_name || '',
         project_name: purchase.project_name || '',
+        project_id: purchase.project_id || '',
         requested_by: purchase.requested_by || '',
         order_date: purchase.order_date || new Date().toISOString().split('T')[0],
         expected_delivery: purchase.expected_delivery || '',
@@ -73,6 +78,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
         order_number: `PO-${Date.now()}`,
         supplier_name: '',
         project_name: '',
+        project_id: '',
         requested_by: '',
         order_date: new Date().toISOString().split('T')[0],
         expected_delivery: '',
@@ -91,10 +97,15 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
     setLoading(true);
 
     try {
+      const purchasePayload = {
+        ...formData,
+        project_id: formData.project_id || null
+      };
+      
       if (purchase?.id) {
-        await updatePurchase.mutateAsync({ id: purchase.id, ...formData });
+        await updatePurchase.mutateAsync({ id: purchase.id, ...purchasePayload });
       } else {
-        await createPurchase.mutateAsync(formData);
+        await createPurchase.mutateAsync(purchasePayload);
       }
       onSuccess();
       onOpenChange(false);
@@ -145,13 +156,30 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="project_name">اسم المشروع</Label>
-              <Input
-                id="project_name"
-                value={formData.project_name}
-                onChange={(e) => setFormData(prev => ({ ...prev, project_name: e.target.value }))}
-                required
-              />
+              <Label htmlFor="project">المشروع</Label>
+              <Select
+                value={formData.project_id}
+                onValueChange={(value) => {
+                  const selectedProject = projects.find((p: any) => p.id === value);
+                  setFormData(prev => ({ 
+                    ...prev, 
+                    project_id: value,
+                    project_name: selectedProject ? selectedProject.name : ''
+                  }));
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر المشروع" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">بدون مشروع</SelectItem>
+                  {projects.map((project: any) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

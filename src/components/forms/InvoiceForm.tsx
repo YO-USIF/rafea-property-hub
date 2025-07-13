@@ -83,6 +83,8 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('=== INVOICE FORM SUBMIT ===');
+    console.log('Form data:', formData);
     setLoading(true);
 
     try {
@@ -99,16 +101,23 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
         attached_file_name: formData.attached_file_name
       };
 
+      console.log('Invoice payload:', invoicePayload);
+
       if (invoice?.id) {
+        console.log('Updating invoice with ID:', invoice.id);
         await updateInvoice.mutateAsync({ id: invoice.id, ...invoicePayload });
       } else {
+        console.log('Creating new invoice');
         await createInvoice.mutateAsync(invoicePayload);
       }
       
+      console.log('Invoice operation successful');
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
       console.error('Error saving invoice:', error);
+      console.error('Error details:', error.message);
+      console.error('Error stack:', error.stack);
     } finally {
       setLoading(false);
     }

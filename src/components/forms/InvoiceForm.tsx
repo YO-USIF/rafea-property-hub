@@ -92,7 +92,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
       const invoicePayload = {
         invoice_number: formData.invoice_number,
         supplier_name: formData.supplier_name,
-        project_id: formData.project_id === "none" ? null : formData.project_id,
+        project_id: formData.project_id === "none" || formData.project_id === "multiple" ? null : formData.project_id,
         amount: formData.amount,
         description: formData.description,
         invoice_date: formData.invoice_date,
@@ -170,6 +170,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">بدون مشروع</SelectItem>
+                  <SelectItem value="multiple">المشروعين مع بعض</SelectItem>
                   {projects.map((project: any) => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.name}

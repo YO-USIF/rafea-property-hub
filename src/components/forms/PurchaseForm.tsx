@@ -99,7 +99,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
     try {
       const purchasePayload = {
         ...formData,
-        project_id: formData.project_id === "none" ? null : formData.project_id
+        project_id: formData.project_id === "none" || formData.project_id === "multiple" ? null : formData.project_id
       };
       
       if (purchase?.id) {
@@ -164,7 +164,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
                   setFormData(prev => ({ 
                     ...prev, 
                     project_id: value === "none" ? "" : value,
-                    project_name: value === "none" ? "" : (selectedProject ? selectedProject.name : "")
+                    project_name: value === "none" ? "" : value === "multiple" ? "المشروعين مع بعض" : (selectedProject ? selectedProject.name : "")
                   }));
                 }}
               >
@@ -173,6 +173,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">بدون مشروع</SelectItem>
+                  <SelectItem value="multiple">المشروعين مع بعض</SelectItem>
                   {projects.map((project: any) => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.name}

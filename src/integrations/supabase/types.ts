@@ -186,6 +186,7 @@ export type Database = {
           id: string
           percentage_completed: number | null
           previous_amount: number | null
+          project_id: string | null
           project_name: string
           status: string
           updated_at: string
@@ -204,6 +205,7 @@ export type Database = {
           id?: string
           percentage_completed?: number | null
           previous_amount?: number | null
+          project_id?: string | null
           project_name: string
           status?: string
           updated_at?: string
@@ -222,12 +224,21 @@ export type Database = {
           id?: string
           percentage_completed?: number | null
           previous_amount?: number | null
+          project_id?: string | null
           project_name?: string
           status?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "extracts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       financial_reports: {
         Row: {
@@ -927,6 +938,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_extract_journal_entry: {
+        Args: {
+          extract_id: string
+          extract_amount: number
+          contractor_name: string
+          project_id?: string
+        }
+        Returns: string
+      }
       create_invoice_journal_entry: {
         Args: {
           invoice_id: string

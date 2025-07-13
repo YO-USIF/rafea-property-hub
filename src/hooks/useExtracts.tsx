@@ -47,11 +47,27 @@ export const useExtracts = () => {
         .single();
       
       if (error) throw error;
+
+      // إنشاء قيد محاسبي للمستخلص وخصم من المبيعات
+      if (extractData.amount > 0) {
+        try {
+          await supabase.rpc('create_extract_journal_entry', {
+            extract_id: data.id,
+            extract_amount: extractData.amount,
+            contractor_name: extractData.contractor_name,
+            project_id: extractData.project_id
+          });
+        } catch (journalError) {
+          console.warn('Warning: Could not create journal entry for extract:', journalError);
+        }
+      }
+
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['extracts'] });
-      toast({ title: "تم إنشاء المستخص بنجاح" });
+      queryClient.invalidateQueries({ queryKey: ['projects'] }); // لتحديث بيانات المشاريع
+      toast({ title: "تم إنشاء المستخص بنجاح وخصم المبلغ من المبيعات" });
     },
     onError: (error) => {
       console.error('Error creating extract:', error);

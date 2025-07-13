@@ -8,6 +8,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { BarChart3, FileText, Download, Filter, Calendar, TrendingUp, DollarSign, Users, Building2, Eye } from 'lucide-react';
 import CustomReportForm from '@/components/forms/CustomReportForm';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const ReportsPage = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('monthly');
@@ -15,6 +18,7 @@ const ReportsPage = () => {
   const [showReportViewer, setShowReportViewer] = useState(false);
   const [selectedReport, setSelectedReport] = useState<any>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const reportCategories = [
     {
@@ -35,6 +39,7 @@ const ReportsPage = () => {
       icon: Building2,
       reports: [
         { name: 'تقرير تقدم المشاريع', lastGenerated: '2024-01-20' },
+        { name: 'تقرير مركز تكلفة المشاريع', lastGenerated: '2024-01-19' },
         { name: 'تقرير التكاليف حسب المشروع', lastGenerated: '2024-01-19' },
         { name: 'تقرير المشاريع المتأخرة', lastGenerated: '2024-01-17' }
       ]
@@ -94,10 +99,70 @@ const ReportsPage = () => {
     }
   ];
 
+  // جلب تقرير مركز تكلفة المشاريع
+  const { data: projectCostCenter, isLoading: isLoadingProjectCosts } = useQuery({
+    queryKey: ['project-cost-center'],
+    queryFn: async () => {
+      // جلب المشاريع مع إجمالي تكاليفها
+      const { data: projects, error: projectsError } = await supabase
+        .from('projects')
+        .select('id, name, total_cost, total_units, sold_units, status');
+
+      if (projectsError) throw projectsError;
+
+      // جلب الفواتير لكل مشروع
+      const { data: invoices, error: invoicesError } = await supabase
+        .from('invoices')
+        .select('project_id, amount, supplier_name, invoice_number')
+        .not('project_id', 'is', null);
+
+      if (invoicesError) throw invoicesError;
+
+      // جلب المستخلصات لكل مشروع
+      const { data: extracts, error: extractsError } = await supabase
+        .from('extracts')
+        .select('project_id, amount, contractor_name, extract_number')
+        .not('project_id', 'is', null);
+
+      if (extractsError) throw extractsError;
+
+      // حساب التكاليف لكل مشروع
+      return projects?.map(project => {
+        const projectInvoices = invoices?.filter(inv => inv.project_id === project.id) || [];
+        const projectExtracts = extracts?.filter(ext => ext.project_id === project.id) || [];
+        
+        const invoiceCosts = projectInvoices.reduce((sum, inv) => sum + (inv.amount || 0), 0);
+        const extractCosts = projectExtracts.reduce((sum, ext) => sum + (ext.amount || 0), 0);
+        const totalProjectCosts = invoiceCosts + extractCosts;
+
+        return {
+          ...project,
+          invoiceCosts,
+          extractCosts,
+          totalProjectCosts,
+          invoiceDetails: projectInvoices,
+          extractDetails: projectExtracts,
+          profitability: (project.sold_units / project.total_units) * 100
+        };
+      }) || [];
+    },
+    enabled: !!user?.id,
+  });
+
   // وظائف التقارير
-  const handleViewReport = (reportName: string, category?: string) => {
-    setSelectedReport({ name: reportName, category: category || 'تقرير عام' });
-    setShowReportViewer(true);
+  const handleViewReport = async (reportName: string, category?: string) => {
+    if (reportName === 'تقرير مركز تكلفة المشاريع') {
+      setSelectedReport({ 
+        name: reportName, 
+        category: category || 'تقرير عام',
+        data: projectCostCenter,
+        type: 'project-cost-center'
+      });
+      setShowReportViewer(true);
+    } else {
+      setSelectedReport({ name: reportName, category: category || 'تقرير عام' });
+      setShowReportViewer(true);
+    }
   };
 
   const handleDownloadReport = (reportName: string) => {
@@ -322,41 +387,157 @@ const ReportsPage = () => {
           </DialogHeader>
           
           <div className="overflow-y-auto max-h-[60vh] space-y-4">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-semibold mb-2">ملخص التقرير</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">150</div>
-                  <div className="text-sm text-gray-600">إجمالي العمليات</div>
+            {selectedReport?.type === 'project-cost-center' && selectedReport?.data ? (
+              <div className="space-y-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-2">ملخص مراكز التكلفة</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-600">{selectedReport.data.length}</div>
+                      <div className="text-sm text-gray-600">عدد المشاريع</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">
+                        {new Intl.NumberFormat('ar-SA').format(
+                          selectedReport.data.reduce((sum: number, proj: any) => sum + proj.totalProjectCosts, 0)
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-600">إجمالي التكاليف</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-purple-600">
+                        {new Intl.NumberFormat('ar-SA').format(
+                          selectedReport.data.reduce((sum: number, proj: any) => sum + proj.invoiceCosts, 0)
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-600">تكاليف الفواتير</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-orange-600">
+                        {new Intl.NumberFormat('ar-SA').format(
+                          selectedReport.data.reduce((sum: number, proj: any) => sum + proj.extractCosts, 0)
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-600">تكاليف المستخلصات</div>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">500,000</div>
-                  <div className="text-sm text-gray-600">ريال سعودي</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">15%</div>
-                  <div className="text-sm text-gray-600">معدل النمو</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">75</div>
-                  <div className="text-sm text-gray-600">عدد العملاء</div>
+                
+                <div className="space-y-3">
+                  <h3 className="font-semibold">تفاصيل المشاريع</h3>
+                  <div className="space-y-4">
+                    {selectedReport.data.map((project: any) => (
+                      <div key={project.id} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <h4 className="font-medium text-lg">{project.name}</h4>
+                            <div className="text-sm text-gray-500">
+                              الحالة: {project.status} • الوحدات المباعة: {project.sold_units}/{project.total_units}
+                            </div>
+                          </div>
+                          <div className="text-left">
+                            <div className="text-lg font-bold text-red-600">
+                              {new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(project.totalProjectCosts)}
+                            </div>
+                            <div className="text-sm text-gray-500">إجمالي التكاليف</div>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                          <div className="bg-blue-50 p-3 rounded">
+                            <div className="font-medium text-blue-800">تكاليف الفواتير</div>
+                            <div className="text-xl font-bold text-blue-600">
+                              {new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(project.invoiceCosts)}
+                            </div>
+                            <div className="text-sm text-blue-600">عدد الفواتير: {project.invoiceDetails.length}</div>
+                          </div>
+                          
+                          <div className="bg-orange-50 p-3 rounded">
+                            <div className="font-medium text-orange-800">تكاليف المستخلصات</div>
+                            <div className="text-xl font-bold text-orange-600">
+                              {new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(project.extractCosts)}
+                            </div>
+                            <div className="text-sm text-orange-600">عدد المستخلصات: {project.extractDetails.length}</div>
+                          </div>
+                        </div>
+
+                        {project.invoiceDetails.length > 0 && (
+                          <div className="mt-3">
+                            <h5 className="font-medium mb-2">تفاصيل الفواتير:</h5>
+                            <div className="space-y-1 text-sm">
+                              {project.invoiceDetails.slice(0, 3).map((invoice: any, idx: number) => (
+                                <div key={idx} className="flex justify-between">
+                                  <span>{invoice.invoice_number} - {invoice.supplier_name}</span>
+                                  <span>{new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(invoice.amount)}</span>
+                                </div>
+                              ))}
+                              {project.invoiceDetails.length > 3 && (
+                                <div className="text-gray-500">...و {project.invoiceDetails.length - 3} فواتير أخرى</div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {project.extractDetails.length > 0 && (
+                          <div className="mt-3">
+                            <h5 className="font-medium mb-2">تفاصيل المستخلصات:</h5>
+                            <div className="space-y-1 text-sm">
+                              {project.extractDetails.slice(0, 3).map((extract: any, idx: number) => (
+                                <div key={idx} className="flex justify-between">
+                                  <span>{extract.extract_number} - {extract.contractor_name}</span>
+                                  <span>{new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(extract.amount)}</span>
+                                </div>
+                              ))}
+                              {project.extractDetails.length > 3 && (
+                                <div className="text-gray-500">...و {project.extractDetails.length - 3} مستخلصات أخرى</div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <div className="space-y-3">
-              <h3 className="font-semibold">تفاصيل التقرير</h3>
-              <div className="prose prose-sm max-w-none">
-                <p>هذا عرض تفصيلي للتقرير المختار. يمكنك مراجعة البيانات والإحصائيات بالتفصيل.</p>
-                <ul>
-                  <li>تم إنشاء التقرير في: {new Date().toLocaleDateString('ar-SA')}</li>
-                  <li>الفترة الزمنية: {selectedPeriod}</li>
-                  <li>نوع التقرير: {selectedReport?.category}</li>
-                  <li>حالة البيانات: محدثة</li>
-                </ul>
-                <p>لتحميل التقرير كملف، استخدم زر التحميل أعلاه.</p>
+            ) : (
+              <div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-2">ملخص التقرير</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-600">150</div>
+                      <div className="text-sm text-gray-600">إجمالي العمليات</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">500,000</div>
+                      <div className="text-sm text-gray-600">ريال سعودي</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-purple-600">15%</div>
+                      <div className="text-sm text-gray-600">معدل النمو</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-orange-600">75</div>
+                      <div className="text-sm text-gray-600">عدد العملاء</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <h3 className="font-semibold">تفاصيل التقرير</h3>
+                  <div className="prose prose-sm max-w-none">
+                    <p>هذا عرض تفصيلي للتقرير المختار. يمكنك مراجعة البيانات والإحصائيات بالتفصيل.</p>
+                    <ul>
+                      <li>تم إنشاء التقرير في: {new Date().toLocaleDateString('ar-SA')}</li>
+                      <li>الفترة الزمنية: {selectedPeriod}</li>
+                      <li>نوع التقرير: {selectedReport?.category}</li>
+                      <li>حالة البيانات: محدثة</li>
+                    </ul>
+                    <p>لتحميل التقرير كملف، استخدم زر التحميل أعلاه.</p>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
           
           <div className="flex justify-end gap-2 pt-4 border-t">

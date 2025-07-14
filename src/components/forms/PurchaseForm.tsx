@@ -8,6 +8,7 @@ import { FileUpload } from '@/components/ui/file-upload';
 import { useToast } from '@/hooks/use-toast';
 import { usePurchases } from '@/hooks/usePurchases';
 import { useProjects } from '@/hooks/useProjects';
+import { useUserRole } from '@/hooks/useUserRole';
 
 interface Purchase {
   id?: string;
@@ -37,6 +38,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
   const { createPurchase, updatePurchase } = usePurchases();
   const { toast } = useToast();
   const { projects } = useProjects();
+  const { isManager, isAdmin } = useUserRole();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Purchase>({
     order_number: purchase?.order_number || `PO-${Date.now()}`,
@@ -164,7 +166,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
                   setFormData(prev => ({ 
                     ...prev, 
                     project_id: value === "none" ? "" : value,
-                    project_name: value === "none" ? "" : value === "multiple" ? "المشروعين مع بعض" : (selectedProject ? selectedProject.name : "")
+                    project_name: value === "none" ? "" : (selectedProject ? selectedProject.name : "")
                   }));
                 }}
               >
@@ -173,7 +175,6 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">بدون مشروع</SelectItem>
-                  <SelectItem value="multiple">المشروعين مع بعض</SelectItem>
                   {projects.map((project: any) => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.name}

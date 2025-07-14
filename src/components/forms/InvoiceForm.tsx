@@ -9,6 +9,7 @@ import { FileUpload } from '@/components/ui/file-upload';
 import { useToast } from '@/hooks/use-toast';
 import { useInvoices } from '@/hooks/useInvoices';
 import { useProjects } from '@/hooks/useProjects';
+import { useUserRole } from '@/hooks/useUserRole';
 
 interface Invoice {
   id?: string;
@@ -36,6 +37,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
   const { toast } = useToast();
   const { createInvoice, updateInvoice } = useInvoices();
   const { projects } = useProjects();
+  const { isManager, isAdmin } = useUserRole();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Invoice>({
     invoice_number: invoice?.invoice_number || '',
@@ -145,6 +147,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
                 id="invoiceNumber"
                 value={formData.invoice_number}
                 onChange={(e) => setFormData(prev => ({ ...prev, invoice_number: e.target.value }))}
+                disabled={!isManager && !isAdmin && !!invoice}
                 required
               />
             </div>
@@ -164,13 +167,13 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
               <Select
                 value={formData.project_id}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, project_id: value === "none" ? "" : value }))}
+                disabled={!isManager && !isAdmin && !!invoice}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر المشروع" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">بدون مشروع</SelectItem>
-                  <SelectItem value="multiple">المشروعين مع بعض</SelectItem>
                   {projects.map((project: any) => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.name}

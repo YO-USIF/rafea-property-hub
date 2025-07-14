@@ -143,7 +143,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
                 value={formData.order_number}
                 onChange={(e) => setFormData(prev => ({ ...prev, order_number: e.target.value }))}
                 required
-                disabled={!!purchase}
+                disabled={!isManager && !isAdmin && !!purchase}
               />
             </div>
 

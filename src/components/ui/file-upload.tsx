@@ -2,10 +2,8 @@ import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Upload, File, X, Download } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
+import { Upload, File, X, Download, Eye } from 'lucide-react';
+import { useFileHandler } from '@/hooks/useFileHandler';
 
 interface FileUploadProps {
   onFileUploaded?: (fileUrl: string, fileName: string) => void;
@@ -24,67 +22,24 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx',
   maxSizeMB = 10
 }) => {
-  const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { user } = useAuth();
-  const { toast } = useToast();
+  const { uploadFile, downloadFile, viewFile, uploading } = useFileHandler();
 
-  const uploadFile = async (file: File) => {
-    if (!user?.id) {
-      toast({ title: "خطأ", description: "يجب تسجيل الدخول أولاً", variant: "destructive" });
-      return;
-    }
-
+  const handleFileUpload = async (file: File) => {
     // التحقق من حجم الملف
     if (file.size > maxSizeMB * 1024 * 1024) {
-      toast({ 
-        title: "ملف كبير جداً", 
-        description: `حجم الملف يجب أن يكون أقل من ${maxSizeMB}MB`, 
-        variant: "destructive" 
-      });
       return;
     }
 
-    setUploading(true);
-
-    try {
-      // إنشاء مسار فريد للملف
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${user.id}/${fileName}`;
-
-      // رفع الملف
-      const { data, error } = await supabase.storage
-        .from('documents')
-        .upload(filePath, file);
-
-      if (error) throw error;
-
-      // الحصول على URL الملف
-      const { data: urlData } = supabase.storage
-        .from('documents')
-        .getPublicUrl(filePath);
-
-      if (onFileUploaded) {
-        onFileUploaded(urlData.publicUrl, file.name);
-      }
-
-      toast({ title: "تم رفع الملف بنجاح" });
-    } catch (error: any) {
-      console.error('Error uploading file:', error);
-      toast({ 
-        title: "خطأ في رفع الملف", 
-        description: error.message, 
-        variant: "destructive" 
-      });
-    } finally {
-      setUploading(false);
+    const result = await uploadFile(file);
+    if (result && onFileUploaded) {
+      onFileUploaded(result.url, result.fileName);
     }
   };
 
   const handleFileSelect = (file: File) => {
-    uploadFile(file);
+    handleFileUpload(file);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -107,25 +62,15 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     setDragOver(false);
   };
 
-  const downloadFile = async () => {
+  const handleDownload = () => {
+    if (currentFileUrl && currentFileName) {
+      downloadFile(currentFileUrl, currentFileName);
+    }
+  };
+
+  const handleView = () => {
     if (currentFileUrl) {
-      try {
-        const response = await fetch(currentFileUrl);
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = currentFileName || 'document';
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      } catch (error) {
-        toast({ 
-          title: "خطأ في تحميل الملف", 
-          variant: "destructive" 
-        });
-      }
+      viewFile(currentFileUrl);
     }
   };
 
@@ -141,7 +86,17 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             type="button"
             variant="outline"
             size="sm"
-            onClick={downloadFile}
+            onClick={handleView}
+            title="عرض الملف"
+          >
+            <Eye className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleDownload}
+            title="تحميل الملف"
           >
             <Download className="w-4 h-4" />
           </Button>
@@ -150,6 +105,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             variant="outline"
             size="sm"
             onClick={onFileRemoved}
+            title="إزالة الملف"
           >
             <X className="w-4 h-4" />
           </Button>

@@ -7,6 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { BarChart3, FileText, Download, Filter, Calendar, TrendingUp, DollarSign, Users, Building2, Eye } from 'lucide-react';
 import CustomReportForm from '@/components/forms/CustomReportForm';
+import SalesReport from '@/components/reports/SalesReport';
+import PurchasesReport from '@/components/reports/PurchasesReport';
+import InvoicesReport from '@/components/reports/InvoicesReport';
+import ProfitLossReport from '@/components/reports/ProfitLossReport';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -17,6 +21,8 @@ const ReportsPage = () => {
   const [showCustomReportForm, setShowCustomReportForm] = useState(false);
   const [showReportViewer, setShowReportViewer] = useState(false);
   const [selectedReport, setSelectedReport] = useState<any>(null);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -27,9 +33,9 @@ const ReportsPage = () => {
       description: 'تقارير الإيرادات والمصروفات والأرباح',
       icon: DollarSign,
       reports: [
-        { name: 'تقرير الإيرادات الشهرية', lastGenerated: '2024-01-20' },
-        { name: 'تقرير المصروفات التشغيلية', lastGenerated: '2024-01-19' },
-        { name: 'تقرير الأرباح والخسائر', lastGenerated: '2024-01-18' }
+        { name: 'تقرير الأرباح والخسائر', lastGenerated: '2024-01-20' },
+        { name: 'تقرير الفواتير', lastGenerated: '2024-01-19' },
+        { name: 'تقرير المصروفات التشغيلية', lastGenerated: '2024-01-18' }
       ]
     },
     {
@@ -51,7 +57,7 @@ const ReportsPage = () => {
       icon: TrendingUp,
       reports: [
         { name: 'تقرير المبيعات الشهرية', lastGenerated: '2024-01-20' },
-        { name: 'تقرير العملاء الجدد', lastGenerated: '2024-01-19' },
+        { name: 'تقرير المشتريات', lastGenerated: '2024-01-19' },
         { name: 'تقرير معدل التحويل', lastGenerated: '2024-01-18' }
       ]
     },
@@ -68,101 +74,157 @@ const ReportsPage = () => {
     }
   ];
 
-  const quickStats = [
-    {
-      title: 'إجمالي التقارير',
-      value: '48',
-      description: 'تقرير متاح',
-      icon: FileText,
-      color: 'text-blue-600'
-    },
-    {
-      title: 'التقارير الشهرية',
-      value: '12',
-      description: 'تقرير شهري',
-      icon: Calendar,
-      color: 'text-green-600'
-    },
-    {
-      title: 'التقارير المجدولة',
-      value: '8',
-      description: 'تقرير آلي',
-      icon: BarChart3,
-      color: 'text-purple-600'
-    },
-    {
-      title: 'معدل الاستخدام',
-      value: '85%',
-      description: 'من التقارير',
-      icon: TrendingUp,
-      color: 'text-orange-600'
-    }
-  ];
-
-  // جلب تقرير مركز تكلفة المشاريع
-  const { data: projectCostCenter, isLoading: isLoadingProjectCosts } = useQuery({
-    queryKey: ['project-cost-center'],
+  // جلب بيانات المبيعات
+  const { data: salesData = [], isLoading: isLoadingSales } = useQuery({
+    queryKey: ['sales-report', selectedPeriod, startDate, endDate],
     queryFn: async () => {
-      // جلب المشاريع مع إجمالي تكاليفها
-      const { data: projects, error: projectsError } = await supabase
-        .from('projects')
-        .select('id, name, total_cost, total_units, sold_units, status');
-
-      if (projectsError) throw projectsError;
-
-      // جلب الفواتير لكل مشروع
-      const { data: invoices, error: invoicesError } = await supabase
-        .from('invoices')
-        .select('project_id, amount, supplier_name, invoice_number')
-        .not('project_id', 'is', null);
-
-      if (invoicesError) throw invoicesError;
-
-      // جلب المستخلصات لكل مشروع
-      const { data: extracts, error: extractsError } = await supabase
-        .from('extracts')
-        .select('project_id, amount, contractor_name, extract_number')
-        .not('project_id', 'is', null);
-
-      if (extractsError) throw extractsError;
-
-      // حساب التكاليف لكل مشروع
-      return projects?.map(project => {
-        const projectInvoices = invoices?.filter(inv => inv.project_id === project.id) || [];
-        const projectExtracts = extracts?.filter(ext => ext.project_id === project.id) || [];
-        
-        const invoiceCosts = projectInvoices.reduce((sum, inv) => sum + (inv.amount || 0), 0);
-        const extractCosts = projectExtracts.reduce((sum, ext) => sum + (ext.amount || 0), 0);
-        const totalProjectCosts = invoiceCosts + extractCosts;
-
-        return {
-          ...project,
-          invoiceCosts,
-          extractCosts,
-          totalProjectCosts,
-          invoiceDetails: projectInvoices,
-          extractDetails: projectExtracts,
-          profitability: (project.sold_units / project.total_units) * 100
-        };
-      }) || [];
+      let query = supabase.from('sales').select('*');
+      
+      if (startDate && endDate) {
+        query = query.gte('created_at', startDate).lte('created_at', endDate);
+      }
+      
+      const { data, error } = await query.order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
     },
     enabled: !!user?.id,
   });
 
+  // جلب بيانات الفواتير
+  const { data: invoicesData = [], isLoading: isLoadingInvoices } = useQuery({
+    queryKey: ['invoices-report', selectedPeriod, startDate, endDate],
+    queryFn: async () => {
+      let query = supabase.from('invoices').select('*');
+      
+      if (startDate && endDate) {
+        query = query.gte('created_at', startDate).lte('created_at', endDate);
+      }
+      
+      const { data, error } = await query.order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user?.id,
+  });
+
+  // جلب بيانات المشتريات
+  const { data: purchasesData = [], isLoading: isLoadingPurchases } = useQuery({
+    queryKey: ['purchases-report', selectedPeriod, startDate, endDate],
+    queryFn: async () => {
+      let query = supabase.from('purchases').select('*');
+      
+      if (startDate && endDate) {
+        query = query.gte('created_at', startDate).lte('created_at', endDate);
+      }
+      
+      const { data, error } = await query.order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user?.id,
+  });
+
+  // جلب بيانات المستخلصات
+  const { data: extractsData = [], isLoading: isLoadingExtracts } = useQuery({
+    queryKey: ['extracts-report', selectedPeriod, startDate, endDate],
+    queryFn: async () => {
+      let query = supabase.from('extracts').select('*');
+      
+      if (startDate && endDate) {
+        query = query.gte('created_at', startDate).lte('created_at', endDate);
+      }
+      
+      const { data, error } = await query.order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user?.id,
+  });
+
+  const isLoadingData = isLoadingSales || isLoadingInvoices || isLoadingPurchases || isLoadingExtracts;
+
+  const quickStats = [
+    {
+      title: 'إجمالي المبيعات',
+      value: salesData.length.toString(),
+      description: 'عملية بيع',
+      icon: FileText,
+      color: 'text-blue-600'
+    },
+    {
+      title: 'إجمالي الفواتير',
+      value: invoicesData.length.toString(),
+      description: 'فاتورة مسجلة',
+      icon: Calendar,
+      color: 'text-green-600'
+    },
+    {
+      title: 'المشتريات الشهرية',
+      value: purchasesData.length.toString(),
+      description: 'طلب شراء',
+      icon: BarChart3,
+      color: 'text-purple-600'
+    },
+    {
+      title: 'صافي الربح',
+      value: (() => {
+        const totalRevenue = salesData.reduce((sum, sale) => sum + (sale.price || 0), 0);
+        const totalExpenses = invoicesData.reduce((sum, inv) => sum + (inv.amount || 0), 0) + 
+                            purchasesData.reduce((sum, pur) => sum + (pur.total_amount || 0), 0) +
+                            extractsData.reduce((sum, ext) => sum + (ext.amount || 0), 0);
+        const profit = totalRevenue - totalExpenses;
+        return new Intl.NumberFormat('ar-SA', {
+          style: 'currency',
+          currency: 'SAR',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+          notation: 'compact'
+        }).format(profit);
+      })(),
+      description: 'ريال سعودي',
+      icon: TrendingUp,
+      color: 'text-orange-600'
+    }
+  ];
+  if (isLoadingData) {
+    return <div className="flex items-center justify-center h-64">جارٍ تحميل التقارير...</div>;
+  }
+
   // وظائف التقارير
   const handleViewReport = async (reportName: string, category?: string) => {
-    if (reportName === 'تقرير مركز تكلفة المشاريع') {
-      setSelectedReport({ 
-        name: reportName, 
-        category: category || 'تقرير عام',
-        data: projectCostCenter,
-        type: 'project-cost-center'
-      });
-      setShowReportViewer(true);
-    } else {
-      setSelectedReport({ name: reportName, category: category || 'تقرير عام' });
-      setShowReportViewer(true);
+    let reportData = null;
+    let reportType = '';
+
+    switch (reportName) {
+      case 'تقرير المبيعات الشهرية':
+        reportData = salesData;
+        reportType = 'sales';
+        break;
+      case 'تقرير الفواتير':
+        reportData = invoicesData;
+        reportType = 'invoices';
+        break;
+      case 'تقرير المشتريات':
+        reportData = purchasesData;
+        reportType = 'purchases';
+        break;
+      case 'تقرير الأرباح والخسائر':
+        reportData = { salesData, invoicesData, purchasesData, extractsData };
+        reportType = 'profit-loss';
+        break;
+      default:
+        reportData = null;
+        reportType = 'general';
     }
+
+    setSelectedReport({ 
+      name: reportName, 
+      category: category || 'تقرير عام',
+      data: reportData,
+      type: reportType
+    });
+    setShowReportViewer(true);
   };
 
   const handleDownloadReport = (reportName: string) => {
@@ -283,9 +345,21 @@ const ReportsPage = () => {
               </Button>
             </div>
             <div className="flex gap-2 mr-auto">
-              <Input type="date" className="w-40" />
+              <Input 
+                type="date" 
+                className="w-40" 
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                placeholder="من تاريخ"
+              />
               <span className="flex items-center text-gray-500">إلى</span>
-              <Input type="date" className="w-40" />
+              <Input 
+                type="date" 
+                className="w-40" 
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                placeholder="إلى تاريخ"
+              />
             </div>
           </div>
         </CardContent>

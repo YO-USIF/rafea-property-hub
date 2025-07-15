@@ -42,7 +42,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
   const [formData, setFormData] = useState<Invoice>({
     invoice_number: invoice?.invoice_number || '',
     supplier_name: invoice?.supplier_name || '',
-    project_id: invoice?.project_id || "none",
+    project_id: invoice?.project_id || null,
     amount: invoice?.amount || 0,
     description: invoice?.description || '',
     invoice_date: invoice?.invoice_date || new Date().toISOString().split('T')[0],
@@ -58,7 +58,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
       setFormData({
         invoice_number: invoice.invoice_number || '',
         supplier_name: invoice.supplier_name || '',
-        project_id: invoice.project_id || "none",
+        project_id: invoice.project_id || null,
         amount: invoice.amount || 0,
         description: invoice.description || '',
         invoice_date: invoice.invoice_date || new Date().toISOString().split('T')[0],
@@ -72,7 +72,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
       setFormData({
         invoice_number: '',
         supplier_name: '',
-        project_id: "none",
+        project_id: null,
         amount: 0,
         description: '',
         invoice_date: new Date().toISOString().split('T')[0],
@@ -94,7 +94,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
       const invoicePayload = {
         invoice_number: formData.invoice_number,
         supplier_name: formData.supplier_name,
-        project_id: formData.project_id === "none" || formData.project_id === "multiple" ? null : formData.project_id,
+        project_id: formData.project_id === "none" || formData.project_id === "multiple" || !formData.project_id ? null : formData.project_id,
         amount: formData.amount,
         description: formData.description,
         invoice_date: formData.invoice_date,
@@ -165,8 +165,8 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
             <div className="space-y-2">
               <Label htmlFor="project">المشروع</Label>
               <Select
-                value={formData.project_id}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, project_id: value === "none" ? "" : value }))}
+                value={formData.project_id || "none"}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, project_id: value === "none" ? null : value }))}
                 disabled={!isManager && !isAdmin && !!invoice}
               >
                 <SelectTrigger>

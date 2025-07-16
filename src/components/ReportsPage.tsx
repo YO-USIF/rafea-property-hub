@@ -251,22 +251,35 @@ const ReportsPage = () => {
   };
 
   const generateReportContent = (reportName: string) => {
+    const totalOperations = salesData.length + invoicesData.length + purchasesData.length + extractsData.length;
+    const totalRevenue = salesData.reduce((sum, sale) => sum + (sale.price || 0), 0);
+    const totalExpenses = invoicesData.reduce((sum, inv) => sum + (inv.amount || 0), 0) + 
+                        purchasesData.reduce((sum, pur) => sum + (pur.total_amount || 0), 0) +
+                        extractsData.reduce((sum, ext) => sum + (ext.amount || 0), 0);
+    const totalAmount = totalRevenue + totalExpenses;
+    const profit = totalRevenue - totalExpenses;
+    
     return `تقرير: ${reportName}
 تاريخ الإنشاء: ${new Date().toLocaleDateString('ar-SA')}
 الفترة: ${selectedPeriod}
 
 =====================================
 
-هذا تقرير تجريبي يحتوي على بيانات وهمية لأغراض العرض.
+البيانات الفعلية من النظام:
 
 البيانات الرئيسية:
-- إجمالي العمليات: 150
-- المبلغ الإجمالي: 500,000 ريال
-- معدل النمو: 15%
-- عدد العملاء: 75
+- إجمالي العمليات: ${totalOperations}
+- إجمالي المبيعات: ${new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(totalRevenue)}
+- إجمالي المصروفات: ${new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(totalExpenses)}
+- صافي الربح/الخسارة: ${new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(profit)}
+- عدد المبيعات: ${salesData.length}
+- عدد الفواتير: ${invoicesData.length}
+- عدد المشتريات: ${purchasesData.length}
+- عدد المستخلصات: ${extractsData.length}
 
 ملاحظات:
-هذا تقرير تم إنشاؤه تلقائياً من نظام إدارة العقارات.
+هذا تقرير يحتوي على بيانات حقيقية من نظام إدارة العقارات.
+جميع البيانات محدثة حتى تاريخ: ${new Date().toLocaleDateString('ar-SA')}
 `;
   };
 
@@ -575,27 +588,59 @@ const ReportsPage = () => {
               </div>
             ) : (
               <div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">ملخص التقرير</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600">150</div>
-                      <div className="text-sm text-gray-600">إجمالي العمليات</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600">500,000</div>
-                      <div className="text-sm text-gray-600">ريال سعودي</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-purple-600">15%</div>
-                      <div className="text-sm text-gray-600">معدل النمو</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-orange-600">75</div>
-                      <div className="text-sm text-gray-600">عدد العملاء</div>
+                {selectedReport?.type === 'sales' && (
+                  <SalesReport data={selectedReport.data} period={selectedPeriod} />
+                )}
+                {selectedReport?.type === 'invoices' && (
+                  <InvoicesReport data={selectedReport.data} period={selectedPeriod} />
+                )}
+                {selectedReport?.type === 'purchases' && (
+                  <PurchasesReport data={selectedReport.data} period={selectedPeriod} />
+                )}
+                {selectedReport?.type === 'profit-loss' && (
+                  <ProfitLossReport 
+                    salesData={selectedReport.data.salesData}
+                    invoicesData={selectedReport.data.invoicesData}
+                    purchasesData={selectedReport.data.purchasesData}
+                    extractsData={selectedReport.data.extractsData}
+                    period={selectedPeriod}
+                  />
+                )}
+                {!['sales', 'invoices', 'purchases', 'profit-loss'].includes(selectedReport?.type) && (
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="font-semibold mb-2">ملخص التقرير</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">{salesData.length + invoicesData.length + purchasesData.length + extractsData.length}</div>
+                        <div className="text-sm text-gray-600">إجمالي العمليات</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600">
+                          {new Intl.NumberFormat('ar-SA', {
+                            style: 'currency',
+                            currency: 'SAR',
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                          }).format(
+                            salesData.reduce((sum, sale) => sum + (sale.price || 0), 0) +
+                            invoicesData.reduce((sum, inv) => sum + (inv.amount || 0), 0) +
+                            purchasesData.reduce((sum, pur) => sum + (pur.total_amount || 0), 0) +
+                            extractsData.reduce((sum, ext) => sum + (ext.amount || 0), 0)
+                          )}
+                        </div>
+                        <div className="text-sm text-gray-600">إجمالي المبالغ</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-purple-600">{salesData.length}</div>
+                        <div className="text-sm text-gray-600">عدد المبيعات</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-orange-600">{invoicesData.length}</div>
+                        <div className="text-sm text-gray-600">عدد الفواتير</div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
                 
                 <div className="space-y-3">
                   <h3 className="font-semibold">تفاصيل التقرير</h3>

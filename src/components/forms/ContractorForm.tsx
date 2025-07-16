@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,13 +29,36 @@ const ContractorForm = ({ open, onOpenChange, contractor, onSuccess }: Contracto
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Contractor>({
-    name: contractor?.name || '',
-    company: contractor?.company || '',
-    specialization: contractor?.specialization || 'البناء والتشييد',
-    phone: contractor?.phone || '',
-    email: contractor?.email || '',
-    status: contractor?.status || 'نشط'
+    name: '',
+    company: '',
+    specialization: 'البناء والتشييد',
+    phone: '',
+    email: '',
+    status: 'نشط'
   });
+
+  // تحديث البيانات عند تغيير المقاول المحدد
+  useEffect(() => {
+    if (contractor) {
+      setFormData({
+        name: contractor.name || '',
+        company: contractor.company || '',
+        specialization: contractor.specialization || 'البناء والتشييد',
+        phone: contractor.phone || '',
+        email: contractor.email || '',
+        status: contractor.status || 'نشط'
+      });
+    } else {
+      setFormData({
+        name: '',
+        company: '',
+        specialization: 'البناء والتشييد',
+        phone: '',
+        email: '',
+        status: 'نشط'
+      });
+    }
+  }, [contractor]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

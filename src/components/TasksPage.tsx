@@ -1,21 +1,29 @@
 
 import React, { useState } from 'react';
 import TaskForm from '@/components/forms/TaskForm';
+import TaskReportForm from '@/components/forms/TaskReportForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, ClipboardList, User, Calendar, CheckCircle2, Trash2, Edit, Printer } from 'lucide-react';
+import { Plus, Search, ClipboardList, User, Calendar, CheckCircle2, Trash2, Edit, Printer, FileText, Eye } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useTaskReports } from '@/hooks/useTaskReports';
 
 const TasksPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
+  const [showReportForm, setShowReportForm] = useState(false);
+  const [editingReport, setEditingReport] = useState<any>(null);
+  const [showReports, setShowReports] = useState(false);
   const { tasks, isLoading, deleteTask } = useTasks();
-  const { isAdmin } = useUserRole();
+  const { isAdmin, isManager } = useUserRole();
+  const { reports, deleteReport } = useTaskReports();
+  
+  const isManagerOrAdmin = isAdmin || isManager;
 
   if (isLoading) {
     return (
@@ -74,15 +82,35 @@ const TasksPage = () => {
           <h1 className="text-3xl font-bold text-gray-900">المهام اليومية</h1>
           <p className="text-gray-600 mt-2">إدارة وتتبع المهام والأنشطة اليومية</p>
         </div>
-        {isAdmin && (
-          <Button 
-            className="bg-primary hover:bg-primary/90"
-            onClick={() => setShowForm(true)}
-          >
-            <Plus className="w-4 h-4 ml-2" />
-            إضافة مهمة جديدة
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {isManagerOrAdmin && (
+            <>
+              <Button 
+                variant="outline"
+                onClick={() => setShowReports(!showReports)}
+              >
+                <FileText className="w-4 h-4 ml-2" />
+                {showReports ? 'إخفاء التقارير' : 'عرض التقارير'}
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => setShowReportForm(true)}
+              >
+                <Plus className="w-4 h-4 ml-2" />
+                إضافة تقرير
+              </Button>
+            </>
+          )}
+          {isAdmin && (
+            <Button 
+              className="bg-primary hover:bg-primary/90"
+              onClick={() => setShowForm(true)}
+            >
+              <Plus className="w-4 h-4 ml-2" />
+              إضافة مهمة جديدة
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Statistics Cards */}
@@ -247,6 +275,61 @@ const TasksPage = () => {
         </CardContent>
       </Card>
 
+      {/* Task Reports Section */}
+      {showReports && (
+        <Card>
+          <CardHeader>
+            <CardTitle>تقارير المهام</CardTitle>
+            <CardDescription>تقارير المسؤولين حول سير العمل والمهام</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {reports.map((report) => (
+                <div key={report.id} className="border rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-semibold text-lg">{report.title}</h3>
+                    <div className="flex gap-2">
+                      <span className="text-sm text-gray-500">
+                        {new Date(report.report_date).toLocaleDateString('ar-SA')}
+                      </span>
+                      {isManagerOrAdmin && (
+                        <>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              setEditingReport(report);
+                              setShowReportForm(true);
+                            }}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => deleteReport.mutate(report.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-gray-700 whitespace-pre-wrap">
+                    {report.content}
+                  </div>
+                </div>
+              ))}
+              {reports.length === 0 && (
+                <div className="text-center text-gray-500 py-8">
+                  لا توجد تقارير بعد
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {isAdmin && (
         <TaskForm
           open={showForm}
@@ -258,6 +341,21 @@ const TasksPage = () => {
           onSuccess={() => {
             setShowForm(false);
             setEditingTask(null);
+          }}
+        />
+      )}
+
+      {isManagerOrAdmin && (
+        <TaskReportForm
+          open={showReportForm}
+          onOpenChange={(open) => {
+            setShowReportForm(open);
+            if (!open) setEditingReport(null);
+          }}
+          report={editingReport}
+          onSuccess={() => {
+            setShowReportForm(false);
+            setEditingReport(null);
           }}
         />
       )}

@@ -68,8 +68,29 @@ export const useNotifications = () => {
 
   const unreadCount = notifications?.filter(n => !n.read).length || 0;
 
-  // Helper function to create common notifications
+  // Helper function to create common notifications based on real data
   const createNotification = {
+    taskCompleted: (taskTitle: string, assignedTo: string) => {
+      createNotificationMutation.mutate({
+        title: 'مهمة مكتملة',
+        message: `تم إنجاز المهمة "${taskTitle}" بواسطة ${assignedTo}`,
+        type: 'success'
+      });
+    },
+    taskAssigned: (taskTitle: string, assignedTo: string) => {
+      createNotificationMutation.mutate({
+        title: 'مهمة جديدة',
+        message: `تم تعيين مهمة جديدة "${taskTitle}" إلى ${assignedTo}`,
+        type: 'info'
+      });
+    },
+    taskOverdue: (taskTitle: string) => {
+      createNotificationMutation.mutate({
+        title: 'مهمة متأخرة',
+        message: `المهمة "${taskTitle}" متأخرة عن موعدها المحدد`,
+        type: 'warning'
+      });
+    },
     projectAdded: (projectName: string) => {
       createNotificationMutation.mutate({
         title: 'مشروع جديد',
@@ -102,6 +123,13 @@ export const useNotifications = () => {
       createNotificationMutation.mutate({
         title: 'مقاول جديد',
         message: `تم إضافة مقاول جديد: ${contractorName}`,
+        type: 'info'
+      });
+    },
+    reportCreated: (reportTitle: string) => {
+      createNotificationMutation.mutate({
+        title: 'تقرير جديد',
+        message: `تم إنشاء تقرير جديد: ${reportTitle}`,
         type: 'info'
       });
     }

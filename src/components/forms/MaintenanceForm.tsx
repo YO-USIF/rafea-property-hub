@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,16 +34,44 @@ const MaintenanceForm = ({ open, onOpenChange, request, onSuccess }: Maintenance
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<MaintenanceRequest>({
-    building_name: request?.building_name || '',
-    unit: request?.unit || '',
-    issue_type: request?.issue_type || 'سباكة',
-    description: request?.description || '',
-    priority: request?.priority || 'متوسطة',
-    status: request?.status || 'جديد',
-    reported_date: request?.reported_date || new Date().toISOString().split('T')[0],
-    assigned_to: request?.assigned_to || '',
-    estimated_cost: request?.estimated_cost || 0
+    building_name: '',
+    unit: '',
+    issue_type: 'سباكة',
+    description: '',
+    priority: 'متوسطة',
+    status: 'جديد',
+    reported_date: new Date().toISOString().split('T')[0],
+    assigned_to: '',
+    estimated_cost: 0
   });
+
+  useEffect(() => {
+    if (request) {
+      setFormData({
+        building_name: request.building_name || '',
+        unit: request.unit || '',
+        issue_type: request.issue_type || 'سباكة',
+        description: request.description || '',
+        priority: request.priority || 'متوسطة',
+        status: request.status || 'جديد',
+        reported_date: request.reported_date || new Date().toISOString().split('T')[0],
+        assigned_to: request.assigned_to || '',
+        estimated_cost: request.estimated_cost || 0
+      });
+    } else {
+      setFormData({
+        building_name: '',
+        unit: '',
+        issue_type: 'سباكة',
+        description: '',
+        priority: 'متوسطة',
+        status: 'جديد',
+        reported_date: new Date().toISOString().split('T')[0],
+        assigned_to: '',
+        estimated_cost: 0
+      });
+    }
+  }, [request]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -9,6 +9,7 @@ import { FileUpload } from '@/components/ui/file-upload';
 import { useToast } from '@/hooks/use-toast';
 import { useExtracts } from '@/hooks/useExtracts';
 import { useProjects } from '@/hooks/useProjects';
+import { useContractors } from '@/hooks/useContractors';
 
 interface Extract {
   id?: string;
@@ -38,6 +39,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess }: ExtractFormProp
   const { toast } = useToast();
   const { createExtract, updateExtract } = useExtracts();
   const { projects } = useProjects();
+  const { contractors } = useContractors();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Extract>({
     extract_number: extract?.extract_number || '',
@@ -154,12 +156,21 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess }: ExtractFormProp
 
             <div className="space-y-2">
               <Label htmlFor="contractor_name">اسم المقاول</Label>
-              <Input
-                id="contractor_name"
+              <Select
                 value={formData.contractor_name}
-                onChange={(e) => setFormData(prev => ({ ...prev, contractor_name: e.target.value }))}
-                required
-              />
+                onValueChange={(value) => setFormData(prev => ({ ...prev, contractor_name: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر المقاول" />
+                </SelectTrigger>
+                <SelectContent>
+                  {contractors.map((contractor: any) => (
+                    <SelectItem key={contractor.id} value={contractor.name}>
+                      {contractor.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

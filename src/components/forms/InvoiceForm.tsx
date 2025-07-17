@@ -9,6 +9,7 @@ import { FileUpload } from '@/components/ui/file-upload';
 import { useToast } from '@/hooks/use-toast';
 import { useInvoices } from '@/hooks/useInvoices';
 import { useProjects } from '@/hooks/useProjects';
+import { useSuppliers } from '@/hooks/useSuppliers';
 import { useUserRole } from '@/hooks/useUserRole';
 
 interface Invoice {
@@ -37,6 +38,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
   const { toast } = useToast();
   const { createInvoice, updateInvoice } = useInvoices();
   const { projects } = useProjects();
+  const { suppliers } = useSuppliers();
   const { isManager, isAdmin } = useUserRole();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Invoice>({
@@ -154,12 +156,21 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
 
             <div className="space-y-2">
               <Label htmlFor="supplierName">اسم المورد</Label>
-              <Input
-                id="supplierName"
+              <Select
                 value={formData.supplier_name}
-                onChange={(e) => setFormData(prev => ({ ...prev, supplier_name: e.target.value }))}
-                required
-              />
+                onValueChange={(value) => setFormData(prev => ({ ...prev, supplier_name: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر المورد" />
+                </SelectTrigger>
+                <SelectContent>
+                  {suppliers.map((supplier: any) => (
+                    <SelectItem key={supplier.id} value={supplier.name}>
+                      {supplier.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

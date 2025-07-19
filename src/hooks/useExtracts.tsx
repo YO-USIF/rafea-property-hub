@@ -13,9 +13,10 @@ export const useExtracts = () => {
 
   // جلب المستخصات
   const { data: extracts = [], isLoading } = useQuery({
-    queryKey: ['extracts'],
+    queryKey: ['extracts', user?.id, isManagerOrAdmin],
     queryFn: async () => {
       console.log('Fetching extracts for user:', user?.id);
+      console.log('isManager:', isManager, 'isAdmin:', isAdmin, 'isManagerOrAdmin:', isManagerOrAdmin);
       let query = supabase.from('extracts').select('*');
       
       if (!isManagerOrAdmin) {

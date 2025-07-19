@@ -123,8 +123,19 @@ export const useAccounting = () => {
 
       if (expenseError) throw expenseError;
 
+      // جلب المصروفات من المستخلصات
+      const { data: extractExpenses, error: extractError } = await supabase
+        .from('extracts')
+        .select('amount, contractor_name, extract_number, extract_date')
+        .gte('extract_date', startDate)
+        .lte('extract_date', endDate);
+
+      if (extractError) throw extractError;
+
       const totalRevenue = salesRevenues?.reduce((sum, sale) => sum + (sale.price || 0), 0) || 0;
-      const totalExpenses = invoiceExpenses?.reduce((sum, invoice) => sum + (invoice.amount || 0), 0) || 0;
+      const invoiceTotal = invoiceExpenses?.reduce((sum, invoice) => sum + (invoice.amount || 0), 0) || 0;
+      const extractTotal = extractExpenses?.reduce((sum, extract) => sum + (extract.amount || 0), 0) || 0;
+      const totalExpenses = invoiceTotal + extractTotal;
       const netIncome = totalRevenue - totalExpenses;
 
       return {
@@ -136,11 +147,18 @@ export const useAccounting = () => {
           description: `مبيعة وحدة ${sale.unit_number} - ${sale.customer_name}`,
           date: sale.sale_date || sale.created_at
         })) || [],
-        expenseDetails: invoiceExpenses?.map(invoice => ({
-          amount: invoice.amount,
-          description: `فاتورة ${invoice.invoice_number} - ${invoice.supplier_name}`,
-          date: invoice.invoice_date
-        })) || []
+        expenseDetails: [
+          ...(invoiceExpenses?.map(invoice => ({
+            amount: invoice.amount,
+            description: `فاتورة ${invoice.invoice_number} - ${invoice.supplier_name}`,
+            date: invoice.invoice_date
+          })) || []),
+          ...(extractExpenses?.map(extract => ({
+            amount: extract.amount,
+            description: `مستخلص ${extract.extract_number} - ${extract.contractor_name}`,
+            date: extract.extract_date
+          })) || [])
+        ]
       };
     },
     onError: (error) => {

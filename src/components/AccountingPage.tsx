@@ -75,24 +75,40 @@ const AccountingPage = () => {
     enabled: !!user?.id,
   });
 
+  // جلب المستخلصات كمصروفات
+  const { data: extractsData = [], isLoading: isLoadingExtracts } = useQuery({
+    queryKey: ['extracts-expenses'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('extracts')
+        .select('amount, status');
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
   // إحصائيات سريعة مع useMemo لمنع إعادة الحساب
   const { totalRevenue, totalExpenses, netIncome } = useMemo(() => {
-    if (isLoadingSales || isLoadingInvoices) {
+    if (isLoadingSales || isLoadingInvoices || isLoadingExtracts) {
       return { totalRevenue: 0, totalExpenses: 0, netIncome: 0 };
     }
 
     // حساب الإيرادات من المبيعات المباعة
     const revenue = salesData.reduce((sum, sale) => sum + (sale.price || 0), 0);
     
-    // حساب المصروفات من الفواتير
-    const expenses = invoicesData.reduce((sum, invoice) => sum + (invoice.amount || 0), 0);
+    // حساب المصروفات من الفواتير والمستخلصات
+    const invoiceExpenses = invoicesData.reduce((sum, invoice) => sum + (invoice.amount || 0), 0);
+    const extractExpenses = extractsData.reduce((sum, extract) => sum + (extract.amount || 0), 0);
+    const expenses = invoiceExpenses + extractExpenses;
 
     return {
       totalRevenue: revenue,
       totalExpenses: expenses,
       netIncome: revenue - expenses
     };
-  }, [salesData, invoicesData, isLoadingSales, isLoadingInvoices]);
+  }, [salesData, invoicesData, extractsData, isLoadingSales, isLoadingInvoices, isLoadingExtracts]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('ar-SA', {

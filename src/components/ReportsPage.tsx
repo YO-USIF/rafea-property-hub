@@ -142,7 +142,22 @@ const ReportsPage = () => {
     enabled: !!user?.id,
   });
 
-  const isLoadingData = isLoadingSales || isLoadingInvoices || isLoadingPurchases || isLoadingExtracts;
+  // جلب بيانات المشاريع لتقرير مركز التكلفة
+  const { data: projectsData = [], isLoading: isLoadingProjects } = useQuery({
+    queryKey: ['projects-report', selectedPeriod, startDate, endDate],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user?.id,
+  });
+
+  const isLoadingData = isLoadingSales || isLoadingInvoices || isLoadingPurchases || isLoadingExtracts || isLoadingProjects;
 
   const quickStats = [
     {
@@ -213,6 +228,12 @@ const ReportsPage = () => {
         reportData = { salesData, invoicesData, purchasesData, extractsData };
         reportType = 'profit-loss';
         break;
+      case 'تقرير مركز تكلفة المشاريع':
+      case 'تقرير التكاليف حسب المشروع':
+        // إنشاء تقرير مركز التكلفة
+        reportData = await generateProjectCostCenterReport();
+        reportType = 'project-cost-center';
+        break;
       default:
         reportData = null;
         reportType = 'general';
@@ -225,6 +246,48 @@ const ReportsPage = () => {
       type: reportType
     });
     setShowReportViewer(true);
+  };
+
+  // دالة إنشاء تقرير مركز التكلفة للمشاريع
+  const generateProjectCostCenterReport = async () => {
+    try {
+      // إنشاء تقرير مفصل لكل مشروع مع تكاليفه
+      const projectsCostReport = projectsData.map(project => {
+        // فلترة الفواتير المرتبطة بهذا المشروع
+        const projectInvoices = invoicesData.filter(invoice => 
+          invoice.project_id === project.id
+        );
+        
+        // فلترة المستخلصات المرتبطة بهذا المشروع
+        const projectExtracts = extractsData.filter(extract => 
+          extract.project_id === project.id
+        );
+        
+        // حساب التكاليف
+        const invoiceCosts = projectInvoices.reduce((sum, invoice) => sum + (invoice.amount || 0), 0);
+        const extractCosts = projectExtracts.reduce((sum, extract) => sum + (extract.amount || 0), 0);
+        const totalProjectCosts = invoiceCosts + extractCosts;
+        
+        return {
+          ...project,
+          invoiceDetails: projectInvoices,
+          extractDetails: projectExtracts,
+          invoiceCosts,
+          extractCosts,
+          totalProjectCosts
+        };
+      });
+
+      return projectsCostReport;
+    } catch (error) {
+      console.error('Error generating project cost center report:', error);
+      toast({ 
+        title: "خطأ في إنشاء التقرير", 
+        description: "حدث خطأ أثناء إنشاء تقرير مركز التكلفة",
+        variant: "destructive"
+      });
+      return [];
+    }
   };
 
   const handleDownloadReport = (reportName: string) => {

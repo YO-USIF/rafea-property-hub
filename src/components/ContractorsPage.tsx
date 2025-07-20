@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ContractorForm from '@/components/forms/ContractorForm';
 import ExtractForm from '@/components/forms/ExtractForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,13 +8,64 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, Search, HardHat, FileText, DollarSign, Clock, Trash2, Edit, Printer } from 'lucide-react';
 import { useContractors } from '@/hooks/useContractors';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 const ContractorsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingContractor, setEditingContractor] = useState<any>(null);
   const [showExtractForm, setShowExtractForm] = useState(false);
+  const [extracts, setExtracts] = useState<any[]>([]);
+  const [contractorStats, setContractorStats] = useState<any>({});
   const { contractors, isLoading, deleteContractor } = useContractors();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      fetchExtractsData();
+    }
+  }, [user, contractors]);
+
+  const fetchExtractsData = async () => {
+    try {
+      // جلب بيانات المستخلصات
+      const { data: extractsData, error: extractsError } = await supabase
+        .from('extracts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (extractsError) throw extractsError;
+      setExtracts(extractsData || []);
+
+      // حساب إحصائيات كل مقاول
+      const stats: any = {};
+      
+      for (const contractor of contractors) {
+        const contractorExtracts = extractsData?.filter(extract => 
+          extract.contractor_name?.trim() === contractor.name?.trim()
+        ) || [];
+
+        const totalContracts = contractorExtracts.reduce((sum, extract) => sum + (Number(extract.amount) || 0), 0);
+        const pendingPayments = contractorExtracts
+          .filter(extract => extract.status !== 'مدفوع')
+          .reduce((sum, extract) => sum + (Number(extract.amount) || 0), 0);
+        
+        const projects = [...new Set(contractorExtracts.map(extract => extract.project_name))];
+
+        stats[contractor.id] = {
+          projects: projects.length,
+          totalContracts,
+          pendingPayments,
+          projectNames: projects
+        };
+      }
+
+      setContractorStats(stats);
+    } catch (error) {
+      console.error('Error fetching extracts data:', error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -23,33 +74,6 @@ const ContractorsPage = () => {
       </div>
     );
   }
-
-  const extracts = [
-    {
-      id: 1,
-      extractNumber: 'EXT-2024-001',
-      contractorName: 'شركة البناء المتقدم',
-      projectName: 'مجمع النخيل السكني',
-      extractAmount: 450000,
-      workDescription: 'أعمال الخرسانة - الدور الثالث',
-      submissionDate: '2024-01-15',
-      approvalDate: '2024-01-18',
-      paymentDate: null,
-      status: 'معتمد - في انتظار الدفع'
-    },
-    {
-      id: 2,
-      extractNumber: 'EXT-2024-002',
-      contractorName: 'مؤسسة الأعمال الكهربائية',
-      projectName: 'برج الياسمين التجاري',
-      extractAmount: 180000,
-      workDescription: 'تركيب الكابلات الكهربائية',
-      submissionDate: '2024-01-10',
-      approvalDate: '2024-01-12',
-      paymentDate: '2024-01-20',
-      status: 'مدفوع'
-    }
-  ];
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -85,6 +109,8 @@ const ContractorsPage = () => {
 
   const totalContractors = contractors.length;
   const activeContractors = contractors.filter(c => c.status === 'نشط').length;
+  const totalContracts = Object.values(contractorStats).reduce((sum: number, stats: any) => sum + Number(stats.totalContracts || 0), 0);
+  const totalPendingPayments = Object.values(contractorStats).reduce((sum: number, stats: any) => sum + Number(stats.pendingPayments || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -139,7 +165,7 @@ const ContractorsPage = () => {
             <FileText className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">-</div>
+            <div className="text-2xl font-bold">{Number(totalContracts) > 0 ? (Number(totalContracts) / 1000000).toFixed(1) + 'م' : '0'}</div>
             <p className="text-xs text-muted-foreground">ريال سعودي</p>
           </CardContent>
         </Card>
@@ -150,7 +176,7 @@ const ContractorsPage = () => {
             <DollarSign className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">-</div>
+            <div className="text-2xl font-bold text-red-600">{Number(totalPendingPayments) > 0 ? (Number(totalPendingPayments) / 1000000).toFixed(1) + 'م' : '0'}</div>
             <p className="text-xs text-muted-foreground">ريال سعودي</p>
           </CardContent>
         </Card>
@@ -216,10 +242,12 @@ const ContractorsPage = () => {
                     <TableCell>{contractor.specialization}</TableCell>
                     <TableCell>{contractor.email}</TableCell>
                     <TableCell>{contractor.phone}</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell>-</TableCell>
+                    <TableCell>{contractorStats[contractor.id]?.projects || 0} مشروع</TableCell>
+                    <TableCell>{(contractorStats[contractor.id]?.totalContracts || 0).toLocaleString()} ر.س</TableCell>
+                    <TableCell className="text-red-600">{(contractorStats[contractor.id]?.pendingPayments || 0).toLocaleString()} ر.س</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">ممتاز</Badge>
+                    </TableCell>
                     <TableCell>{getStatusBadge(contractor.status)}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
@@ -257,10 +285,39 @@ const ContractorsPage = () => {
           <CardDescription>آخر المستخلصات المقدمة من المقاولين</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-gray-500">
-            <p>لا توجد مستخلصات حديثة</p>
-            <p className="text-xs mt-1">سيتم عرض المستخلصات عند إضافتها</p>
-          </div>
+          {extracts && extracts.length > 0 ? (
+            <div className="border rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-right">رقم المستخلص</TableHead>
+                    <TableHead className="text-right">اسم المقاول</TableHead>
+                    <TableHead className="text-right">المشروع</TableHead>
+                    <TableHead className="text-right">المبلغ</TableHead>
+                    <TableHead className="text-right">تاريخ التقديم</TableHead>
+                    <TableHead className="text-right">الحالة</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {extracts.slice(0, 5).map((extract) => (
+                    <TableRow key={extract.id}>
+                      <TableCell className="font-medium">{extract.extract_number}</TableCell>
+                      <TableCell>{extract.contractor_name}</TableCell>
+                      <TableCell>{extract.project_name}</TableCell>
+                      <TableCell>{Number(extract.amount).toLocaleString()} ر.س</TableCell>
+                      <TableCell>{extract.extract_date}</TableCell>
+                      <TableCell>{getExtractStatusBadge(extract.status)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <p>لا توجد مستخلصات حديثة</p>
+              <p className="text-xs mt-1">سيتم عرض المستخلصات عند إضافتها</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SupplierForm from '@/components/forms/SupplierForm';
 import InvoiceForm from '@/components/forms/InvoiceForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,13 +8,62 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, Search, Truck, FileText, DollarSign, Calendar, Trash2, Edit, Printer } from 'lucide-react';
 import { useSuppliers } from '@/hooks/useSuppliers';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 const SuppliersPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<any>(null);
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [supplierStats, setSupplierStats] = useState<any>({});
   const { suppliers, isLoading, deleteSupplier } = useSuppliers();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      fetchInvoicesData();
+    }
+  }, [user, suppliers]);
+
+  const fetchInvoicesData = async () => {
+    try {
+      // جلب بيانات الفواتير
+      const { data: invoicesData, error: invoicesError } = await supabase
+        .from('invoices')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (invoicesError) throw invoicesError;
+      setInvoices(invoicesData || []);
+
+      // حساب إحصائيات كل مورد
+      const stats: any = {};
+      
+      for (const supplier of suppliers) {
+        const supplierInvoices = invoicesData?.filter(invoice => 
+          invoice.supplier_name?.trim() === supplier.name?.trim()
+        ) || [];
+
+        const totalPurchases = supplierInvoices.reduce((sum, invoice) => sum + (Number(invoice.amount) || 0), 0);
+        const outstandingBalance = supplierInvoices
+          .filter(invoice => invoice.status !== 'مدفوع')
+          .reduce((sum, invoice) => sum + (Number(invoice.amount) || 0), 0);
+
+        stats[supplier.id] = {
+          totalPurchases,
+          outstandingBalance,
+          paymentTerms: '30 يوم', // يمكن إضافة هذا لاحقاً للموردين
+          rating: 'ممتاز' // يمكن إضافة نظام تقييم لاحقاً
+        };
+      }
+
+      setSupplierStats(stats);
+    } catch (error) {
+      console.error('Error fetching invoices data:', error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -23,42 +72,6 @@ const SuppliersPage = () => {
       </div>
     );
   }
-
-  const invoices = [
-    {
-      id: 1,
-      invoiceNumber: 'INV-2024-001',
-      supplierName: 'شركة مواد البناء المتحدة',
-      amount: 185000,
-      description: 'أسمنت وحديد تسليح',
-      issueDate: '2024-01-15',
-      dueDate: '2024-02-14',
-      paymentDate: null,
-      status: 'مستحق'
-    },
-    {
-      id: 2,
-      invoiceNumber: 'INV-2024-002',
-      supplierName: 'مؤسسة الأدوات الكهربائية',
-      amount: 75000,
-      description: 'كابلات وأدوات كهربائية',
-      issueDate: '2024-01-10',
-      dueDate: '2024-01-25',
-      paymentDate: '2024-01-24',
-      status: 'مدفوع'
-    },
-    {
-      id: 3,
-      invoiceNumber: 'INV-2024-003',
-      supplierName: 'شركة الحديد والصلب',
-      amount: 320000,
-      description: 'حديد تسليح مختلف الأقطار',
-      issueDate: '2024-01-12',
-      dueDate: '2024-02-26',
-      paymentDate: null,
-      status: 'قيد المراجعة'
-    }
-  ];
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -95,6 +108,8 @@ const SuppliersPage = () => {
 
   const totalSuppliers = suppliers.length;
   const activeSuppliers = suppliers.filter(s => s.status === 'نشط').length;
+  const totalPurchases = Object.values(supplierStats).reduce((sum: number, stats: any) => sum + Number(stats.totalPurchases || 0), 0);
+  const totalOutstandingBalance = Object.values(supplierStats).reduce((sum: number, stats: any) => sum + Number(stats.outstandingBalance || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -149,7 +164,7 @@ const SuppliersPage = () => {
             <DollarSign className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">-</div>
+            <div className="text-2xl font-bold">{Number(totalPurchases) > 0 ? (Number(totalPurchases) / 1000000).toFixed(1) + 'م' : '0'}</div>
             <p className="text-xs text-muted-foreground">ريال سعودي</p>
           </CardContent>
         </Card>
@@ -160,7 +175,7 @@ const SuppliersPage = () => {
             <FileText className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">-</div>
+            <div className="text-2xl font-bold text-red-600">{Number(totalOutstandingBalance) > 0 ? (Number(totalOutstandingBalance) / 1000000).toFixed(1) + 'م' : '0'}</div>
             <p className="text-xs text-muted-foreground">ريال سعودي</p>
           </CardContent>
         </Card>
@@ -226,10 +241,12 @@ const SuppliersPage = () => {
                     <TableCell>{supplier.category}</TableCell>
                     <TableCell>{supplier.company}</TableCell>
                     <TableCell>{supplier.phone}</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell>-</TableCell>
+                    <TableCell>{(supplierStats[supplier.id]?.totalPurchases || 0).toLocaleString()} ر.س</TableCell>
+                    <TableCell className="text-red-600">{(supplierStats[supplier.id]?.outstandingBalance || 0).toLocaleString()} ر.س</TableCell>
+                    <TableCell>{supplierStats[supplier.id]?.paymentTerms || '30 يوم'}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{supplierStats[supplier.id]?.rating || 'ممتاز'}</Badge>
+                    </TableCell>
                     <TableCell>{getStatusBadge(supplier.status)}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
@@ -267,10 +284,39 @@ const SuppliersPage = () => {
           <CardDescription>آخر الفواتير الواردة من الموردين</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-gray-500">
-            <p>لا توجد فواتير حديثة</p>
-            <p className="text-xs mt-1">سيتم عرض الفواتير عند إضافتها</p>
-          </div>
+          {invoices && invoices.length > 0 ? (
+            <div className="border rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-right">رقم الفاتورة</TableHead>
+                    <TableHead className="text-right">اسم المورد</TableHead>
+                    <TableHead className="text-right">المبلغ</TableHead>
+                    <TableHead className="text-right">تاريخ الإصدار</TableHead>
+                    <TableHead className="text-right">تاريخ الاستحقاق</TableHead>
+                    <TableHead className="text-right">الحالة</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {invoices.slice(0, 5).map((invoice) => (
+                    <TableRow key={invoice.id}>
+                      <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
+                      <TableCell>{invoice.supplier_name}</TableCell>
+                      <TableCell>{Number(invoice.amount).toLocaleString()} ر.س</TableCell>
+                      <TableCell>{invoice.invoice_date}</TableCell>
+                      <TableCell>{invoice.due_date}</TableCell>
+                      <TableCell>{getInvoiceStatusBadge(invoice.status)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <p>لا توجد فواتير حديثة</p>
+              <p className="text-xs mt-1">سيتم عرض الفواتير عند إضافتها</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

@@ -11,6 +11,7 @@ import SalesReport from '@/components/reports/SalesReport';
 import PurchasesReport from '@/components/reports/PurchasesReport';
 import InvoicesReport from '@/components/reports/InvoicesReport';
 import ProfitLossReport from '@/components/reports/ProfitLossReport';
+import { ProjectCostCenterReport } from '@/components/reports/ProjectCostCenterReport';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -578,117 +579,7 @@ const ReportsPage = () => {
           
           <div className="overflow-y-auto max-h-[60vh] space-y-4">
             {selectedReport?.type === 'project-cost-center' && selectedReport?.data ? (
-              <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">ملخص مراكز التكلفة</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600">{selectedReport.data.length}</div>
-                      <div className="text-sm text-gray-600">عدد المشاريع</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600">
-                        {new Intl.NumberFormat('ar-SA').format(
-                          selectedReport.data.reduce((sum: number, proj: any) => sum + proj.totalProjectCosts, 0)
-                        )}
-                      </div>
-                      <div className="text-sm text-gray-600">إجمالي التكاليف</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-purple-600">
-                        {new Intl.NumberFormat('ar-SA').format(
-                          selectedReport.data.reduce((sum: number, proj: any) => sum + proj.invoiceCosts, 0)
-                        )}
-                      </div>
-                      <div className="text-sm text-gray-600">تكاليف الفواتير</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-orange-600">
-                        {new Intl.NumberFormat('ar-SA').format(
-                          selectedReport.data.reduce((sum: number, proj: any) => sum + proj.extractCosts, 0)
-                        )}
-                      </div>
-                      <div className="text-sm text-gray-600">تكاليف المستخلصات</div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="space-y-3">
-                  <h3 className="font-semibold">تفاصيل المشاريع</h3>
-                  <div className="space-y-4">
-                    {selectedReport.data.map((project: any) => (
-                      <div key={project.id} className="border rounded-lg p-4">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <h4 className="font-medium text-lg">{project.name}</h4>
-                            <div className="text-sm text-gray-500">
-                              الحالة: {project.status} • الوحدات المباعة: {project.sold_units}/{project.total_units}
-                            </div>
-                          </div>
-                          <div className="text-left">
-                            <div className="text-lg font-bold text-red-600">
-                              {new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(project.totalProjectCosts)}
-                            </div>
-                            <div className="text-sm text-gray-500">إجمالي التكاليف</div>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-                          <div className="bg-blue-50 p-3 rounded">
-                            <div className="font-medium text-blue-800">تكاليف الفواتير</div>
-                            <div className="text-xl font-bold text-blue-600">
-                              {new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(project.invoiceCosts)}
-                            </div>
-                            <div className="text-sm text-blue-600">عدد الفواتير: {project.invoiceDetails.length}</div>
-                          </div>
-                          
-                          <div className="bg-orange-50 p-3 rounded">
-                            <div className="font-medium text-orange-800">تكاليف المستخلصات</div>
-                            <div className="text-xl font-bold text-orange-600">
-                              {new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(project.extractCosts)}
-                            </div>
-                            <div className="text-sm text-orange-600">عدد المستخلصات: {project.extractDetails.length}</div>
-                          </div>
-                        </div>
-
-                        {project.invoiceDetails.length > 0 && (
-                          <div className="mt-3">
-                            <h5 className="font-medium mb-2">تفاصيل الفواتير:</h5>
-                            <div className="space-y-1 text-sm">
-                              {project.invoiceDetails.slice(0, 3).map((invoice: any, idx: number) => (
-                                <div key={idx} className="flex justify-between">
-                                  <span>{invoice.invoice_number} - {invoice.supplier_name}</span>
-                                  <span>{new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(invoice.amount)}</span>
-                                </div>
-                              ))}
-                              {project.invoiceDetails.length > 3 && (
-                                <div className="text-gray-500">...و {project.invoiceDetails.length - 3} فواتير أخرى</div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-
-                        {project.extractDetails.length > 0 && (
-                          <div className="mt-3">
-                            <h5 className="font-medium mb-2">تفاصيل المستخلصات:</h5>
-                            <div className="space-y-1 text-sm">
-                              {project.extractDetails.slice(0, 3).map((extract: any, idx: number) => (
-                                <div key={idx} className="flex justify-between">
-                                  <span>{extract.extract_number} - {extract.contractor_name}</span>
-                                  <span>{new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(extract.amount)}</span>
-                                </div>
-                              ))}
-                              {project.extractDetails.length > 3 && (
-                                <div className="text-gray-500">...و {project.extractDetails.length - 3} مستخلصات أخرى</div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <ProjectCostCenterReport data={selectedReport.data} period={selectedPeriod} />
             ) : (
               <div>
                 {selectedReport?.type === 'sales' && (

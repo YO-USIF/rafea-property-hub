@@ -42,13 +42,40 @@ const ProjectsPage = () => {
 
   const fetchProjects = async () => {
     try {
-      const { data, error } = await supabase
+      // جلب بيانات المشاريع
+      const { data: projectsData, error: projectsError } = await supabase
         .from('projects')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setProjects(data || []);
+      if (projectsError) throw projectsError;
+
+      // جلب بيانات المبيعات لحساب التكلفة من المبيعات
+      const { data: salesData, error: salesError } = await supabase
+        .from('sales')
+        .select('project_name, price, status');
+
+      if (salesError) throw salesError;
+
+      // حساب إجمالي مبيعات كل مشروع
+      const salesByProject = salesData?.reduce((acc: any, sale: any) => {
+        if (sale.status === 'مباع') {
+          const projectName = sale.project_name?.trim();
+          if (!acc[projectName]) {
+            acc[projectName] = 0;
+          }
+          acc[projectName] += Number(sale.price) || 0;
+        }
+        return acc;
+      }, {});
+
+      // تحديث تكلفة كل مشروع بناءً على المبيعات
+      const updatedProjects = projectsData?.map((project: Project) => ({
+        ...project,
+        total_cost: salesByProject?.[project.name?.trim()] || 0
+      }));
+
+      setProjects(updatedProjects || []);
     } catch (error: any) {
       toast({
         title: "خطأ في تحميل المشاريع",

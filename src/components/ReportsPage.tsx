@@ -254,14 +254,49 @@ const ReportsPage = () => {
       // إنشاء تقرير مفصل لكل مشروع مع تكاليفه
       const projectsCostReport = projectsData.map(project => {
         // فلترة الفواتير المرتبطة بهذا المشروع
-        const projectInvoices = invoicesData.filter(invoice => 
-          invoice.project_id === project.id
-        );
+        // البحث بـ project_id أو بالاسم في الوصف
+        const projectInvoices = invoicesData.filter(invoice => {
+          // ربط مباشر بـ project_id
+          if (invoice.project_id === project.id) {
+            return true;
+          }
+          
+          // البحث في الوصف عن اسم المشروع أو كلمات مثل "سهيل A" أو "سهيل B"
+          const description = (invoice.description || '').toLowerCase();
+          const projectName = (project.name || '').toLowerCase();
+          
+          // إذا كان اسم المشروع يحتوي على "سهيل A"
+          if (projectName.includes('سهيل a') || projectName.includes('سهيل أ')) {
+            return description.includes('سهيل a') || description.includes('سهيل أ') || description.includes('سهيل a/b');
+          }
+          
+          // إذا كان اسم المشروع يحتوي على "سهيل B" 
+          if (projectName.includes('سهيل b') || projectName.includes('سهيل ب')) {
+            return description.includes('سهيل b') || description.includes('سهيل ب') || description.includes('سهيل a/b');
+          }
+          
+          // بحث عام عن اسم المشروع في الوصف
+          return projectName && description.includes(projectName);
+        });
         
         // فلترة المستخلصات المرتبطة بهذا المشروع
-        const projectExtracts = extractsData.filter(extract => 
-          extract.project_id === project.id
-        );
+        const projectExtracts = extractsData.filter(extract => {
+          // ربط مباشر بـ project_id
+          if (extract.project_id === project.id) {
+            return true;
+          }
+          
+          // البحث في أسماء المشاريع أو أوصاف المستخلصات
+          const extractDescription = (extract.description || '').toLowerCase();
+          const contractorName = (extract.contractor_name || '').toLowerCase();
+          const projectName = (project.name || '').toLowerCase();
+          
+          // البحث في الوصف أو اسم المقاول
+          return projectName && (
+            extractDescription.includes(projectName) ||
+            contractorName.includes(projectName)
+          );
+        });
         
         // حساب التكاليف
         const invoiceCosts = projectInvoices.reduce((sum, invoice) => sum + (invoice.amount || 0), 0);
@@ -274,11 +309,16 @@ const ReportsPage = () => {
           extractDetails: projectExtracts,
           invoiceCosts,
           extractCosts,
-          totalProjectCosts
+          totalProjectCosts,
+          invoiceCount: projectInvoices.length,
+          extractCount: projectExtracts.length
         };
       });
 
-      return projectsCostReport;
+      // فلترة المشاريع التي لها تكاليف فقط
+      return projectsCostReport.filter(project => 
+        project.totalProjectCosts > 0 || project.invoiceCount > 0 || project.extractCount > 0
+      );
     } catch (error) {
       console.error('Error generating project cost center report:', error);
       toast({ 

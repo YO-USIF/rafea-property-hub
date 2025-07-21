@@ -159,6 +159,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
               <Select
                 value={formData.supplier_name}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, supplier_name: value }))}
+                disabled={!isManager && !isAdmin && !!invoice}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر المورد" />
@@ -234,6 +235,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
               <Select
                 value={formData.status}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
+                disabled={!isManager && !isAdmin && !!invoice}
               >
                 <SelectTrigger>
                   <SelectValue />

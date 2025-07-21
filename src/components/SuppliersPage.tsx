@@ -48,7 +48,7 @@ const SuppliersPage = () => {
 
         const totalPurchases = supplierInvoices.reduce((sum, invoice) => sum + (Number(invoice.amount) || 0), 0);
         const outstandingBalance = supplierInvoices
-          .filter(invoice => invoice.status !== 'مدفوع')
+          .filter(invoice => invoice.status === 'غير مدفوع' || invoice.status === 'متأخر')
           .reduce((sum, invoice) => sum + (Number(invoice.amount) || 0), 0);
 
         stats[supplier.id] = {

@@ -199,18 +199,19 @@ const SuppliersPage = () => {
               />
             </div>
             <Button variant="outline" onClick={() => {
-              const csvContent = "data:text/csv;charset=utf-8," + 
-                "اسم المورد,الفئة,الشخص المسؤول,الهاتف,الحالة\n" +
+              const headers = "اسم المورد,الفئة,الشركة,الهاتف,الحالة\n";
+              const csvContent = headers + 
                 filteredSuppliers.map(supplier => 
                   `${supplier.name},${supplier.category || ''},${supplier.company || ''},${supplier.phone || ''},${supplier.status}`
                 ).join("\n");
-              const encodedUri = encodeURI(csvContent);
-              const link = document.createElement("a");
-              link.setAttribute("href", encodedUri);
-              link.setAttribute("download", "suppliers.csv");
-              document.body.appendChild(link);
+              
+              // إضافة BOM للتعامل مع الترميز العربي بشكل صحيح
+              const BOM = '\uFEFF';
+              const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+              const link = document.createElement('a');
+              link.href = URL.createObjectURL(blob);
+              link.download = 'suppliers.csv';
               link.click();
-              document.body.removeChild(link);
             }}>تصدير</Button>
             <Button variant="outline" onClick={() => window.print()}>
               <Printer className="w-4 h-4 ml-2" />

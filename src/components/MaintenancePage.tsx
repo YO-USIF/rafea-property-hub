@@ -214,18 +214,19 @@ const MaintenancePage = () => {
               />
             </div>
             <Button variant="outline" onClick={() => {
-              const csvContent = "data:text/csv;charset=utf-8," + 
-                "رقم الطلب,المبنى,الوحدة,نوع العطل,الأولوية,الحالة,المسؤول,التكلفة المقدرة,تاريخ الإبلاغ\n" +
+              const headers = "رقم الطلب,المبنى,الوحدة,نوع العطل,الأولوية,الحالة,المسؤول,التكلفة المقدرة,تاريخ الإبلاغ\n";
+              const csvContent = headers + 
                 requests.map(request => 
                   `${request.id.slice(0,8)},${request.building_name},${request.unit},${request.issue_type},${request.priority},${request.status},${request.assigned_to || 'غير محدد'},${request.estimated_cost},${request.reported_date}`
                 ).join("\n");
-              const encodedUri = encodeURI(csvContent);
-              const link = document.createElement("a");
-              link.setAttribute("href", encodedUri);
-              link.setAttribute("download", "maintenance.csv");
-              document.body.appendChild(link);
+              
+              // إضافة BOM للتعامل مع الترميز العربي بشكل صحيح
+              const BOM = '\uFEFF';
+              const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+              const link = document.createElement('a');
+              link.href = URL.createObjectURL(blob);
+              link.download = 'maintenance.csv';
               link.click();
-              document.body.removeChild(link);
             }}>تصدير</Button>
             <Button variant="outline" onClick={() => window.print()}>
               <Printer className="w-4 h-4 ml-2" />

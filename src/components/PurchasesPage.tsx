@@ -148,18 +148,19 @@ const PurchasesPage = () => {
               />
             </div>
             <Button variant="outline" onClick={() => {
-              const csvContent = "data:text/csv;charset=utf-8," + 
-                "رقم الطلب,المورد,المشروع,طالب الشراء,تاريخ الطلب,تاريخ التسليم المتوقع,المبلغ الإجمالي,حالة الموافقة,حالة التسليم\n" +
+              const headers = "رقم الطلب,المورد,المشروع,طالب الشراء,تاريخ الطلب,تاريخ التسليم المتوقع,المبلغ الإجمالي,حالة الموافقة,حالة التسليم\n";
+              const csvContent = headers + 
                 filteredPurchases.map(order => 
                   `${order.order_number},${order.supplier_name},${order.project_name},${order.requested_by},${order.order_date},${order.expected_delivery},${order.total_amount},${order.status},${order.delivery_status}`
                 ).join("\n");
-              const encodedUri = encodeURI(csvContent);
-              const link = document.createElement("a");
-              link.setAttribute("href", encodedUri);
-              link.setAttribute("download", "purchases.csv");
-              document.body.appendChild(link);
+              
+              // إضافة BOM للتعامل مع الترميز العربي بشكل صحيح
+              const BOM = '\uFEFF';
+              const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+              const link = document.createElement('a');
+              link.href = URL.createObjectURL(blob);
+              link.download = 'purchases.csv';
               link.click();
-              document.body.removeChild(link);
             }}>تصدير</Button>
             <Button variant="outline" onClick={() => window.print()}>
               <Printer className="w-4 h-4 ml-2" />

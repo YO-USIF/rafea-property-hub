@@ -200,18 +200,19 @@ const ContractorsPage = () => {
               />
             </div>
             <Button variant="outline" onClick={() => {
-              const csvContent = "data:text/csv;charset=utf-8," + 
-                "اسم المقاول,التخصص,الشخص المسؤول,الهاتف,الحالة\n" +
+              const headers = "اسم المقاول,التخصص,الشخة المسؤول,الهاتف,الحالة\n";
+              const csvContent = headers + 
                 filteredContractors.map(contractor => 
                   `${contractor.name},${contractor.specialization || ''},${contractor.email || ''},${contractor.phone || ''},${contractor.status}`
                 ).join("\n");
-              const encodedUri = encodeURI(csvContent);
-              const link = document.createElement("a");
-              link.setAttribute("href", encodedUri);
-              link.setAttribute("download", "contractors.csv");
-              document.body.appendChild(link);
+              
+              // إضافة BOM للتعامل مع الترميز العربي بشكل صحيح
+              const BOM = '\uFEFF';
+              const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+              const link = document.createElement('a');
+              link.href = URL.createObjectURL(blob);
+              link.download = 'contractors.csv';
               link.click();
-              document.body.removeChild(link);
             }}>تصدير</Button>
             <Button variant="outline" onClick={() => window.print()}>
               <Printer className="w-4 h-4 ml-2" />

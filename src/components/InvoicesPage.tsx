@@ -26,16 +26,23 @@ const InvoicesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [statusFilter, setStatusFilter] = useState('الكل');
+  const [showFilters, setShowFilters] = useState(false);
   
   const { invoices, isLoading, deleteInvoice } = useInvoices();
   const { toast } = useToast();
 
-  // تصفية الفواتير حسب البحث
-  const filteredInvoices = invoices.filter(invoice =>
-    invoice.supplier_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    invoice.invoice_number?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    invoice.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // تصفية الفواتير حسب البحث والحالة
+  const filteredInvoices = invoices.filter(invoice => {
+    const matchesSearch = 
+      invoice.supplier_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      invoice.invoice_number?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      invoice.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'الكل' || invoice.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  });
 
   const totalInvoices = invoices.length;
   const paidInvoices = invoices.filter(inv => inv.status === 'مدفوع').length;
@@ -116,7 +123,9 @@ const InvoicesPage = () => {
       ].join(','))
     ].join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    // إضافة BOM للتعامل مع الترميز العربي بشكل صحيح
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = 'invoices.csv';
@@ -234,11 +243,43 @@ const InvoicesPage = () => {
                 className="pr-10"
               />
             </div>
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
               <Filter className="w-4 h-4 ml-2" />
               تصفية
             </Button>
           </div>
+          
+          {showFilters && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">الحالة</label>
+                  <select 
+                    value={statusFilter} 
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  >
+                    <option value="الكل">الكل</option>
+                    <option value="مدفوع">مدفوع</option>
+                    <option value="غير مدفوع">غير مدفوع</option>
+                    <option value="متأخر">متأخر</option>
+                    <option value="ملغي">ملغي</option>
+                  </select>
+                </div>
+                <div className="flex items-end">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setStatusFilter('الكل');
+                      setSearchQuery('');
+                    }}
+                  >
+                    إزالة التصفية
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

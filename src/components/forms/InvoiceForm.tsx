@@ -90,6 +90,8 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
     e.preventDefault();
     console.log('=== INVOICE FORM SUBMIT ===');
     console.log('Form data:', formData);
+    console.log('User permissions:', { isManager, isAdmin });
+    console.log('Invoice being updated:', invoice);
     setLoading(true);
 
     try {
@@ -110,10 +112,13 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
 
       if (invoice?.id) {
         console.log('Updating invoice with ID:', invoice.id);
-        await updateInvoice.mutateAsync({ id: invoice.id, ...invoicePayload });
+        console.log('Update permissions check:', { isManager, isAdmin, canUpdate: isManager || isAdmin });
+        const result = await updateInvoice.mutateAsync({ id: invoice.id, ...invoicePayload });
+        console.log('Update result:', result);
       } else {
         console.log('Creating new invoice');
-        await createInvoice.mutateAsync(invoicePayload);
+        const result = await createInvoice.mutateAsync(invoicePayload);
+        console.log('Create result:', result);
       }
       
       console.log('Invoice operation successful');
@@ -123,6 +128,11 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
       console.error('Error saving invoice:', error);
       console.error('Error details:', error.message);
       console.error('Error stack:', error.stack);
+      toast({ 
+        title: "خطأ في حفظ الفاتورة", 
+        description: error.message || "حدث خطأ غير متوقع",
+        variant: "destructive" 
+      });
     } finally {
       setLoading(false);
     }

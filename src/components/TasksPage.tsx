@@ -84,22 +84,22 @@ const TasksPage = () => {
         </div>
         <div className="flex gap-2">
           {isManagerOrAdmin && (
-            <>
-              <Button 
-                variant="outline"
-                onClick={() => setShowReports(!showReports)}
-              >
-                <FileText className="w-4 h-4 ml-2" />
-                {showReports ? 'إخفاء التقارير' : 'عرض التقارير'}
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={() => setShowReportForm(true)}
-              >
-                <Plus className="w-4 h-4 ml-2" />
-                إضافة تقرير
-              </Button>
-            </>
+            <Button 
+              variant="outline"
+              onClick={() => setShowReports(!showReports)}
+            >
+              <FileText className="w-4 h-4 ml-2" />
+              {showReports ? 'إخفاء التقارير' : 'عرض التقارير'}
+            </Button>
+          )}
+          {isAdmin && (
+            <Button 
+              variant="outline"
+              onClick={() => setShowReportForm(true)}
+            >
+              <Plus className="w-4 h-4 ml-2" />
+              إضافة تقرير
+            </Button>
           )}
           {isAdmin && (
             <Button 
@@ -293,7 +293,7 @@ const TasksPage = () => {
                       <span className="text-sm text-gray-500">
                         {new Date(report.report_date).toLocaleDateString('ar-SA')}
                       </span>
-                      {isManagerOrAdmin && (
+                      {isAdmin && (
                         <>
                           <Button 
                             size="sm" 
@@ -346,7 +346,7 @@ const TasksPage = () => {
         />
       )}
 
-      {isManagerOrAdmin && (
+      {isAdmin && (
         <TaskReportForm
           open={showReportForm}
           onOpenChange={(open) => {

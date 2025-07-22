@@ -92,7 +92,7 @@ const TasksPage = () => {
               {showReports ? 'إخفاء التقارير' : 'عرض التقارير'}
             </Button>
           )}
-          {isAdmin && (
+          {isManagerOrAdmin && (
             <Button 
               variant="outline"
               onClick={() => setShowReportForm(true)}
@@ -346,7 +346,7 @@ const TasksPage = () => {
         />
       )}
 
-      {isAdmin && (
+      {isManagerOrAdmin && (
         <TaskReportForm
           open={showReportForm}
           onOpenChange={(open) => {

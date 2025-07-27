@@ -178,63 +178,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">إجراءات سريعة</h2>
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-          <button 
-            onClick={() => createNotification.projectAdded('مشروع تجريبي')}
-            className="flex flex-col items-center p-4 hover:bg-gray-50 rounded-lg transition-colors"
-          >
-            <div className="w-12 h-12 gradient-real-estate rounded-lg flex items-center justify-center mb-3">
-              <Building className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-sm font-medium text-gray-900">مشروع جديد</span>
-          </button>
-          <button 
-            onClick={() => createNotification.saleCompleted('A101', 'مشروع النخيل')}
-            className="flex flex-col items-center p-4 hover:bg-gray-50 rounded-lg transition-colors"
-          >
-            <div className="w-12 h-12 gradient-gold rounded-lg flex items-center justify-center mb-3">
-              <Home className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-sm font-medium text-gray-900">بيع شقة</span>
-          </button>
-          <button 
-            onClick={() => createNotification.contractorAdded('مقاول جديد')}
-            className="flex flex-col items-center p-4 hover:bg-gray-50 rounded-lg transition-colors"
-          >
-            <div className="w-12 h-12 gradient-navy rounded-lg flex items-center justify-center mb-3">
-              <Users className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-sm font-medium text-gray-900">مقاول جديد</span>
-          </button>
-          <button 
-            onClick={() => createNotification.maintenanceRequest('إصلاح المصعد', 'مبنى الورود')}
-            className="flex flex-col items-center p-4 hover:bg-gray-50 rounded-lg transition-colors"
-          >
-            <div className="w-12 h-12 gradient-real-estate rounded-lg flex items-center justify-center mb-3">
-              <Wrench className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-sm font-medium text-gray-900">طلب صيانة</span>
-          </button>
-          <button 
-            onClick={() => createNotification.invoiceDue('شركة الكهرباء', 5000)}
-            className="flex flex-col items-center p-4 hover:bg-gray-50 rounded-lg transition-colors"
-          >
-            <div className="w-12 h-12 gradient-gold rounded-lg flex items-center justify-center mb-3">
-              <FileText className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-sm font-medium text-gray-900">فاتورة جديدة</span>
-          </button>
-          <button className="flex flex-col items-center p-4 hover:bg-gray-50 rounded-lg transition-colors">
-            <div className="w-12 h-12 gradient-navy rounded-lg flex items-center justify-center mb-3">
-              <Plus className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-sm font-medium text-gray-900">إضافة عامة</span>
-          </button>
-        </div>
-      </div>
     </div>
   );
 };

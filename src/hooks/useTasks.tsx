@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useUserRole } from './useUserRole';
 import { useToast } from './use-toast';
+import { useNotifications } from './useNotifications';
 
 export const useTasks = () => {
   const { user } = useAuth();
@@ -10,6 +11,7 @@ export const useTasks = () => {
   const isManagerOrAdmin = isManager || isAdmin;
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { createNotification } = useNotifications();
 
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ['tasks', isManagerOrAdmin],
@@ -42,9 +44,12 @@ export const useTasks = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (newTask) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({ title: "تم إضافة المهمة بنجاح" });
+      
+      // إنشاء إشعار عند إضافة مهمة جديدة
+      createNotification.taskAssigned(newTask.title, newTask.assigned_to);
     },
     onError: (error) => {
       toast({ title: "خطأ في إضافة المهمة", variant: "destructive" });
@@ -68,9 +73,14 @@ export const useTasks = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (updatedTask) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({ title: "تم تحديث المهمة بنجاح" });
+      
+      // إنشاء إشعار عند اكتمال المهمة
+      if (updatedTask.status === 'مكتملة') {
+        createNotification.taskCompleted(updatedTask.title, updatedTask.assigned_to);
+      }
     },
     onError: (error) => {
       toast({ title: "خطأ في تحديث المهمة", variant: "destructive" });

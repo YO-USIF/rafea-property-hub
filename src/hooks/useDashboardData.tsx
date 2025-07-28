@@ -78,7 +78,28 @@ export const useDashboardData = () => {
     enabled: !!user?.id,
   });
 
-  const isLoading = projectsLoading || maintenanceLoading || contractorsLoading || suppliersLoading;
+  const { data: tasks, isLoading: tasksLoading } = useQuery({
+    queryKey: ['dashboard-tasks', isManagerOrAdmin],
+    queryFn: async () => {
+      let query = supabase
+        .from('tasks')
+        .select('*');
+      
+      // إذا لم يكن المستخدم مديراً أو مدير نظام، اجلب فقط مهامه
+      if (!isManagerOrAdmin) {
+        query = query.eq('user_id', user?.id);
+      }
+      
+      const { data, error } = await query
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  const isLoading = projectsLoading || maintenanceLoading || contractorsLoading || suppliersLoading || tasksLoading;
 
   // Calculate statistics
   const totalProjects = projects?.length || 0;
@@ -97,29 +118,47 @@ export const useDashboardData = () => {
 
   // Recent activities based on creation dates
   const recentActivities = [
-    ...(projects?.slice(0, 3).map(project => ({
+    ...(projects?.slice(0, 2).map(project => ({
       id: project.id,
       title: `إضافة مشروع جديد: ${project.name}`,
       time: new Date(project.created_at).toLocaleDateString('ar-SA'),
       type: 'project'
     })) || []),
-    ...(maintenanceRequests?.slice(0, 3).map(request => ({
+    ...(maintenanceRequests?.slice(0, 2).map(request => ({
       id: request.id,
       title: `طلب صيانة جديد: ${request.issue_type} - ${request.building_name}`,
       time: new Date(request.created_at).toLocaleDateString('ar-SA'),
       type: 'maintenance'
+    })) || []),
+    ...(tasks?.slice(0, 2).map(task => ({
+      id: task.id,
+      title: `إضافة مهمة جديدة: ${task.title}`,
+      time: new Date(task.created_at).toLocaleDateString('ar-SA'),
+      type: 'task'
     })) || [])
-  ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 4);
+  ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 5);
 
-  // High priority maintenance requests as tasks
-  const upcomingTasks = maintenanceRequests?.filter(req => 
+  // Get upcoming tasks from tasks table and high priority maintenance requests
+  const upcomingTasksFromTasks = tasks?.filter(task => 
+    task.status !== 'مكتملة' && task.status !== 'ملغية'
+  ).slice(0, 3).map(task => ({
+    id: task.id,
+    title: task.title,
+    due: task.due_date ? new Date(task.due_date).toLocaleDateString('ar-SA') : 'غير محدد',
+    priority: task.priority === 'عالية' || task.priority === 'عاجلة' ? 'high' : 
+              task.priority === 'متوسطة' ? 'medium' : 'low'
+  })) || [];
+
+  const upcomingTasksFromMaintenance = maintenanceRequests?.filter(req => 
     req.priority === 'عالية' || req.priority === 'عاجلة'
-  ).slice(0, 4).map(req => ({
-    id: req.id,
+  ).slice(0, 2).map(req => ({
+    id: `maintenance-${req.id}`,
     title: `صيانة ${req.issue_type} - ${req.building_name}`,
     due: new Date(req.reported_date).toLocaleDateString('ar-SA'),
     priority: req.priority === 'عالية' || req.priority === 'عاجلة' ? 'high' : 'medium'
   })) || [];
+
+  const upcomingTasks = [...upcomingTasksFromTasks, ...upcomingTasksFromMaintenance].slice(0, 4);
 
   return {
     isLoading,

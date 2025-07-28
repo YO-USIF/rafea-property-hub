@@ -42,25 +42,33 @@ const ContractorsPage = () => {
       const stats: any = {};
       
       for (const contractor of contractors) {
-        const contractorExtracts = extractsData?.filter(extract => 
-          extract.contractor_name?.trim() === contractor.name?.trim()
-        ) || [];
+        // تحسين مطابقة الأسماء - إزالة المسافات الزائدة وتوحيد الحالة
+        const contractorNameNormalized = contractor.name?.trim().toLowerCase().replace(/\s+/g, ' ') || '';
+        
+        const contractorExtracts = extractsData?.filter(extract => {
+          const extractNameNormalized = extract.contractor_name?.trim().toLowerCase().replace(/\s+/g, ' ') || '';
+          return extractNameNormalized === contractorNameNormalized;
+        }) || [];
+
+        console.log(`Contractor: ${contractor.name}, Normalized: ${contractorNameNormalized}, Extracts found: ${contractorExtracts.length}`);
 
         const totalContracts = contractorExtracts.reduce((sum, extract) => sum + (Number(extract.amount) || 0), 0);
         const pendingPayments = contractorExtracts
-          .filter(extract => extract.status !== 'مدفوع')
+          .filter(extract => extract.status !== 'مدفوع' && extract.status !== 'مكتمل')
           .reduce((sum, extract) => sum + (Number(extract.amount) || 0), 0);
         
-        const projects = [...new Set(contractorExtracts.map(extract => extract.project_name))];
+        const projects = [...new Set(contractorExtracts.map(extract => extract.project_name).filter(Boolean))];
 
         stats[contractor.id] = {
           projects: projects.length,
           totalContracts,
           pendingPayments,
-          projectNames: projects
+          projectNames: projects,
+          extractsCount: contractorExtracts.length
         };
       }
 
+      console.log('Contractor Stats:', stats);
       setContractorStats(stats);
     } catch (error) {
       console.error('Error fetching extracts data:', error);

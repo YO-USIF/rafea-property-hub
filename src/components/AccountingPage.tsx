@@ -33,6 +33,7 @@ const AccountingPage = () => {
   const [showNewEntryDialog, setShowNewEntryDialog] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [currentReport, setCurrentReport] = useState<any>(null);
+  const [selectedReportType, setSelectedReportType] = useState<'income' | 'balance' | 'cashflow'>('income');
   
   const { user } = useAuth();
   const { 
@@ -119,14 +120,130 @@ const AccountingPage = () => {
     }).format(amount);
   };
 
-  const handleGenerateReport = async () => {
+  const handleGenerateIncomeReport = () => handleGenerateReport('income');
+  const handleGenerateBalanceReport = () => handleGenerateReport('balance');
+  const handleGenerateCashFlowReport = () => handleGenerateReport('cashflow');
+
+  const handleGenerateReport = async (reportType: 'income' | 'balance' | 'cashflow' = 'income') => {
     try {
-      const result = await generateIncomeStatement.mutateAsync(selectedPeriod);
-      setCurrentReport(result);
+      setSelectedReportType(reportType);
+      
+      if (reportType === 'income') {
+        const result = await generateIncomeStatement.mutateAsync(selectedPeriod);
+        setCurrentReport(result);
+      } else if (reportType === 'balance') {
+        const balanceSheet = await generateBalanceSheet();
+        setCurrentReport(balanceSheet);
+      } else if (reportType === 'cashflow') {
+        const cashFlow = await generateCashFlowStatement();
+        setCurrentReport(cashFlow);
+      }
+      
       setShowReportDialog(true);
     } catch (error) {
       console.error('Error generating report:', error);
+      toast({ title: "خطأ في إنشاء التقرير", variant: "destructive" });
     }
+  };
+
+  const generateBalanceSheet = async () => {
+    // جلب بيانات الأصول من المبيعات والنقد
+    const { data: salesAssets } = await supabase
+      .from('sales')
+      .select('price, remaining_amount, status')
+      .eq('status', 'مباع');
+
+    // جلب الخصوم من الفواتير والمستخلصات المستحقة
+    const { data: invoiceLiabilities } = await supabase
+      .from('invoices')
+      .select('amount, status')
+      .eq('status', 'غير مدفوع');
+
+    const { data: extractLiabilities } = await supabase
+      .from('extracts')
+      .select('amount, status');
+
+    // حساب الأصول
+    const totalCash = salesAssets?.reduce((sum, sale) => sum + ((sale.price || 0) - (sale.remaining_amount || 0)), 0) || 0;
+    const accountsReceivable = salesAssets?.reduce((sum, sale) => sum + (sale.remaining_amount || 0), 0) || 0;
+    const totalAssets = totalCash + accountsReceivable;
+
+    // حساب الخصوم
+    const accountsPayable = invoiceLiabilities?.reduce((sum, invoice) => sum + (invoice.amount || 0), 0) || 0;
+    const contractorPayables = extractLiabilities?.reduce((sum, extract) => sum + (extract.amount || 0), 0) || 0;
+    const totalLiabilities = accountsPayable + contractorPayables;
+
+    // حقوق الملكية
+    const equity = totalAssets - totalLiabilities;
+
+    return {
+      assets: {
+        cash: totalCash,
+        accountsReceivable: accountsReceivable,
+        total: totalAssets
+      },
+      liabilities: {
+        accountsPayable: accountsPayable,
+        contractorPayables: contractorPayables,
+        total: totalLiabilities
+      },
+      equity: equity,
+      totalLiabilitiesAndEquity: totalLiabilities + equity
+    };
+  };
+
+  const generateCashFlowStatement = async () => {
+    // التدفقات النقدية من الأنشطة التشغيلية
+    const { data: salesCashFlow } = await supabase
+      .from('sales')
+      .select('price, remaining_amount, sale_date, status')
+      .eq('status', 'مباع')
+      .gte('sale_date', selectedPeriod.startDate)
+      .lte('sale_date', selectedPeriod.endDate);
+
+    const { data: invoicePayments } = await supabase
+      .from('invoices')
+      .select('amount, invoice_date, status')
+      .gte('invoice_date', selectedPeriod.startDate)
+      .lte('invoice_date', selectedPeriod.endDate);
+
+    const { data: extractPayments } = await supabase
+      .from('extracts')
+      .select('amount, extract_date')
+      .gte('extract_date', selectedPeriod.startDate)
+      .lte('extract_date', selectedPeriod.endDate);
+
+    // التدفقات النقدية الداخلة
+    const cashInflows = salesCashFlow?.reduce((sum, sale) => sum + ((sale.price || 0) - (sale.remaining_amount || 0)), 0) || 0;
+
+    // التدفقات النقدية الخارجة
+    const invoiceOutflows = invoicePayments?.reduce((sum, invoice) => sum + (invoice.amount || 0), 0) || 0;
+    const extractOutflows = extractPayments?.reduce((sum, extract) => sum + (extract.amount || 0), 0) || 0;
+    const cashOutflows = invoiceOutflows + extractOutflows;
+
+    // صافي التدفق النقدي
+    const netCashFlow = cashInflows - cashOutflows;
+
+    return {
+      operatingActivities: {
+        cashInflows: cashInflows,
+        cashOutflows: cashOutflows,
+        netOperatingCashFlow: netCashFlow
+      },
+      investingActivities: {
+        cashInflows: 0,
+        cashOutflows: 0,
+        netInvestingCashFlow: 0
+      },
+      financingActivities: {
+        cashInflows: 0,
+        cashOutflows: 0,
+        netFinancingCashFlow: 0
+      },
+      netCashFlow: netCashFlow,
+      beginningCash: 0,
+      endingCash: netCashFlow
+    };
   };
 
   const quickStats = [
@@ -177,7 +294,7 @@ const AccountingPage = () => {
           <p className="text-gray-600 mt-2">إدارة الحسابات والتقارير المالية</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={handleGenerateReport}>
+          <Button variant="outline" onClick={handleGenerateIncomeReport}>
             <BarChart3 className="w-4 h-4 ml-2" />
             إنشاء تقرير
           </Button>
@@ -231,7 +348,7 @@ const AccountingPage = () => {
                 onChange={(e) => setSelectedPeriod(prev => ({ ...prev, endDate: e.target.value }))}
               />
             </div>
-            <Button onClick={handleGenerateReport} className="mt-6">
+            <Button onClick={handleGenerateIncomeReport} className="mt-6">
               تحديث التقرير
             </Button>
           </div>
@@ -328,7 +445,7 @@ const AccountingPage = () => {
         {/* Reports Tab */}
         <TabsContent value="reports" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={handleGenerateReport}>
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={handleGenerateIncomeReport}>
               <CardHeader>
                 <div className="flex items-center gap-3">
                   <TrendingUp className="w-8 h-8 text-green-600" />
@@ -344,7 +461,7 @@ const AccountingPage = () => {
               </CardContent>
             </Card>
 
-            <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={handleGenerateBalanceReport}>
               <CardHeader>
                 <div className="flex items-center gap-3">
                   <BookOpen className="w-8 h-8 text-blue-600" />
@@ -355,12 +472,12 @@ const AccountingPage = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-blue-600">قريباً</div>
-                <p className="text-sm text-gray-500">قيد التطوير</p>
+                <div className="text-2xl font-bold text-blue-600">{formatCurrency(totalRevenue - totalExpenses)}</div>
+                <p className="text-sm text-gray-500">صافي حقوق الملكية</p>
               </CardContent>
             </Card>
 
-            <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={handleGenerateCashFlowReport}>
               <CardHeader>
                 <div className="flex items-center gap-3">
                   <DollarSign className="w-8 h-8 text-purple-600" />
@@ -371,8 +488,8 @@ const AccountingPage = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-purple-600">قريباً</div>
-                <p className="text-sm text-gray-500">قيد التطوير</p>
+                <div className="text-2xl font-bold text-purple-600">{formatCurrency(totalRevenue - totalExpenses)}</div>
+                <p className="text-sm text-gray-500">صافي التدفق النقدي</p>
               </CardContent>
             </Card>
           </div>
@@ -383,13 +500,17 @@ const AccountingPage = () => {
       <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>قائمة الدخل</DialogTitle>
+            <DialogTitle>
+              {selectedReportType === 'income' && 'قائمة الدخل'}
+              {selectedReportType === 'balance' && 'الميزانية العمومية'}
+              {selectedReportType === 'cashflow' && 'قائمة التدفقات النقدية'}
+            </DialogTitle>
             <DialogDescription>
               من {selectedPeriod.startDate} إلى {selectedPeriod.endDate}
             </DialogDescription>
           </DialogHeader>
           
-          {currentReport && (
+          {currentReport && selectedReportType === 'income' && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="text-center p-4 bg-green-50 rounded-lg">
@@ -411,18 +532,121 @@ const AccountingPage = () => {
                   <div className="text-sm text-gray-600">صافي الربح/الخسارة</div>
                 </div>
               </div>
-              
-              <div className="flex justify-end gap-2 pt-4 border-t">
-                <Button variant="outline" onClick={() => setShowReportDialog(false)}>
-                  إغلاق
-                </Button>
-                <Button onClick={() => toast({ title: "جاري التحميل", description: "سيتم إضافة خاصية التحميل قريباً" })}>
-                  <Download className="w-4 h-4 ml-2" />
-                  تحميل PDF
-                </Button>
+            </div>
+          )}
+
+          {currentReport && selectedReportType === 'balance' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* الأصول */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-green-600">الأصول</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex justify-between">
+                      <span>النقد والنقد المعادل</span>
+                      <span className="font-bold">{formatCurrency(currentReport.assets.cash)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>العملاء والمدينون</span>
+                      <span className="font-bold">{formatCurrency(currentReport.assets.accountsReceivable)}</span>
+                    </div>
+                    <div className="border-t pt-2 flex justify-between font-bold text-lg">
+                      <span>إجمالي الأصول</span>
+                      <span className="text-green-600">{formatCurrency(currentReport.assets.total)}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* الخصوم وحقوق الملكية */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-red-600">الخصوم وحقوق الملكية</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex justify-between">
+                      <span>الموردون والدائنون</span>
+                      <span className="font-bold">{formatCurrency(currentReport.liabilities.accountsPayable)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>مستحقات المقاولين</span>
+                      <span className="font-bold">{formatCurrency(currentReport.liabilities.contractorPayables)}</span>
+                    </div>
+                    <div className="flex justify-between text-red-600 font-bold">
+                      <span>إجمالي الخصوم</span>
+                      <span>{formatCurrency(currentReport.liabilities.total)}</span>
+                    </div>
+                    <div className="flex justify-between text-blue-600 font-bold">
+                      <span>حقوق الملكية</span>
+                      <span>{formatCurrency(currentReport.equity)}</span>
+                    </div>
+                    <div className="border-t pt-2 flex justify-between font-bold text-lg">
+                      <span>إجمالي الخصوم وحقوق الملكية</span>
+                      <span>{formatCurrency(currentReport.totalLiabilitiesAndEquity)}</span>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           )}
+
+          {currentReport && selectedReportType === 'cashflow' && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>الأنشطة التشغيلية</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>التدفقات النقدية الداخلة</span>
+                    <span className="font-bold text-green-600">{formatCurrency(currentReport.operatingActivities.cashInflows)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>التدفقات النقدية الخارجة</span>
+                    <span className="font-bold text-red-600">({formatCurrency(currentReport.operatingActivities.cashOutflows)})</span>
+                  </div>
+                  <div className="border-t pt-2 flex justify-between font-bold">
+                    <span>صافي التدفق النقدي من الأنشطة التشغيلية</span>
+                    <span className={currentReport.operatingActivities.netOperatingCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}>
+                      {formatCurrency(currentReport.operatingActivities.netOperatingCashFlow)}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-blue-50 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {formatCurrency(currentReport.beginningCash)}
+                  </div>
+                  <div className="text-sm text-gray-600">الرصيد في بداية الفترة</div>
+                </div>
+                <div className="text-center p-4 bg-purple-50 rounded-lg">
+                  <div className={`text-2xl font-bold ${currentReport.netCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {formatCurrency(currentReport.netCashFlow)}
+                  </div>
+                  <div className="text-sm text-gray-600">صافي التدفق النقدي</div>
+                </div>
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">
+                    {formatCurrency(currentReport.endingCash)}
+                  </div>
+                  <div className="text-sm text-gray-600">الرصيد في نهاية الفترة</div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button variant="outline" onClick={() => setShowReportDialog(false)}>
+              إغلاق
+            </Button>
+            <Button onClick={() => toast({ title: "جاري التحميل", description: "سيتم إضافة خاصية التحميل قريباً" })}>
+              <Download className="w-4 h-4 ml-2" />
+              تحميل PDF
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

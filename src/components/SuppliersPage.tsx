@@ -264,6 +264,83 @@ const SuppliersPage = () => {
                         <Button 
                           size="sm" 
                           variant="outline"
+                          onClick={() => {
+                            const printWindow = window.open('', '_blank');
+                            const supplierData = supplierStats[supplier.id] || {};
+                            const printContent = `
+                              <!DOCTYPE html>
+                              <html dir="rtl" lang="ar">
+                              <head>
+                                <meta charset="UTF-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>بيانات المورد - ${supplier.name}</title>
+                                <style>
+                                  body { font-family: Arial, sans-serif; margin: 20px; direction: rtl; }
+                                  .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+                                  .info-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+                                  .label { font-weight: bold; }
+                                  .section { margin-bottom: 30px; }
+                                  .section-title { font-size: 18px; font-weight: bold; color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 15px; }
+                                  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                                  th, td { border: 1px solid #ddd; padding: 8px; text-align: right; }
+                                  th { background-color: #f5f5f5; }
+                                  @media print { body { margin: 0; } }
+                                </style>
+                              </head>
+                              <body>
+                                <div class="header">
+                                  <h1>بيانات المورد</h1>
+                                  <p>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</p>
+                                </div>
+                                
+                                <div class="section">
+                                  <div class="section-title">المعلومات الأساسية</div>
+                                  <div class="info-row">
+                                    <span><span class="label">اسم المورد:</span> ${supplier.name || 'غير محدد'}</span>
+                                    <span><span class="label">الفئة:</span> ${supplier.category || 'غير محدد'}</span>
+                                  </div>
+                                  <div class="info-row">
+                                    <span><span class="label">الشركة:</span> ${supplier.company || 'غير محدد'}</span>
+                                    <span><span class="label">الهاتف:</span> ${supplier.phone || 'غير محدد'}</span>
+                                  </div>
+                                  <div class="info-row">
+                                    <span><span class="label">البريد الإلكتروني:</span> ${supplier.email || 'غير محدد'}</span>
+                                    <span><span class="label">الحالة:</span> ${supplier.status || 'غير محدد'}</span>
+                                  </div>
+                                  <div class="info-row">
+                                    <span><span class="label">العنوان:</span> ${(supplier as any).address || 'غير محدد'}</span>
+                                  </div>
+                                </div>
+
+                                <div class="section">
+                                  <div class="section-title">الإحصائيات المالية</div>
+                                  <div class="info-row">
+                                    <span><span class="label">إجمالي المشتريات:</span> ${(supplierData.totalPurchases || 0).toLocaleString()} ريال سعودي</span>
+                                    <span><span class="label">الرصيد المستحق:</span> ${(supplierData.outstandingBalance || 0).toLocaleString()} ريال سعودي</span>
+                                  </div>
+                                  <div class="info-row">
+                                    <span><span class="label">شروط الدفع:</span> ${supplierData.paymentTerms || '30 يوم'}</span>
+                                    <span><span class="label">التقييم:</span> ${supplierData.rating || 'ممتاز'}</span>
+                                  </div>
+                                </div>
+
+                                <div class="section">
+                                  <div class="section-title">ملاحظات إضافية</div>
+                                  <p>${(supplier as any).notes || 'لا توجد ملاحظات'}</p>
+                                </div>
+                              </body>
+                              </html>
+                            `;
+                            printWindow?.document.write(printContent);
+                            printWindow?.document.close();
+                            printWindow?.print();
+                          }}
+                        >
+                          <Printer className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
                           onClick={() => deleteSupplier.mutate(supplier.id)}
                         >
                           <Trash2 className="w-4 h-4" />

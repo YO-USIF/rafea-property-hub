@@ -275,58 +275,296 @@ const SuppliersPage = () => {
                                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                                 <title>بيانات المورد - ${supplier.name}</title>
                                 <style>
-                                  body { font-family: Arial, sans-serif; margin: 20px; direction: rtl; }
-                                  .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
-                                  .info-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
-                                  .label { font-weight: bold; }
-                                  .section { margin-bottom: 30px; }
-                                  .section-title { font-size: 18px; font-weight: bold; color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 15px; }
-                                  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                                  th, td { border: 1px solid #ddd; padding: 8px; text-align: right; }
-                                  th { background-color: #f5f5f5; }
-                                  @media print { body { margin: 0; } }
+                                  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
+                                  
+                                  * { margin: 0; padding: 0; box-sizing: border-box; }
+                                  
+                                  body { 
+                                    font-family: 'Tajawal', Arial, sans-serif; 
+                                    line-height: 1.6; 
+                                    color: #2c3e50; 
+                                    direction: rtl;
+                                    background: #f8f9fa;
+                                    padding: 40px;
+                                  }
+                                  
+                                  .container {
+                                    max-width: 800px;
+                                    margin: 0 auto;
+                                    background: white;
+                                    border-radius: 12px;
+                                    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                                    overflow: hidden;
+                                  }
+                                  
+                                  .header { 
+                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                    color: white;
+                                    padding: 40px 30px;
+                                    text-align: center;
+                                    position: relative;
+                                  }
+                                  
+                                  .header::before {
+                                    content: '';
+                                    position: absolute;
+                                    top: 0;
+                                    left: 0;
+                                    right: 0;
+                                    bottom: 0;
+                                    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+                                    opacity: 0.3;
+                                  }
+                                  
+                                  .header h1 { 
+                                    font-size: 2.5em; 
+                                    font-weight: 700; 
+                                    margin-bottom: 10px;
+                                    position: relative;
+                                    z-index: 1;
+                                  }
+                                  
+                                  .header .subtitle {
+                                    font-size: 1.1em;
+                                    opacity: 0.9;
+                                    font-weight: 300;
+                                    position: relative;
+                                    z-index: 1;
+                                  }
+                                  
+                                  .print-date {
+                                    position: absolute;
+                                    top: 20px;
+                                    left: 30px;
+                                    font-size: 0.9em;
+                                    opacity: 0.8;
+                                    z-index: 1;
+                                  }
+                                  
+                                  .content {
+                                    padding: 40px 30px;
+                                  }
+                                  
+                                  .section { 
+                                    margin-bottom: 35px;
+                                    background: #f8f9fa;
+                                    border-radius: 8px;
+                                    padding: 25px;
+                                    border-right: 4px solid #667eea;
+                                  }
+                                  
+                                  .section-title { 
+                                    font-size: 1.4em; 
+                                    font-weight: 600; 
+                                    color: #2c3e50;
+                                    margin-bottom: 20px;
+                                    display: flex;
+                                    align-items: center;
+                                  }
+                                  
+                                  .section-title::before {
+                                    content: '●';
+                                    color: #667eea;
+                                    font-size: 1.2em;
+                                    margin-left: 10px;
+                                  }
+                                  
+                                  .info-grid {
+                                    display: grid;
+                                    grid-template-columns: 1fr 1fr;
+                                    gap: 20px;
+                                    margin-bottom: 15px;
+                                  }
+                                  
+                                  .info-item {
+                                    background: white;
+                                    padding: 15px;
+                                    border-radius: 6px;
+                                    border: 1px solid #e9ecef;
+                                    transition: transform 0.2s ease;
+                                  }
+                                  
+                                  .info-item:hover {
+                                    transform: translateY(-2px);
+                                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                                  }
+                                  
+                                  .label { 
+                                    font-weight: 600; 
+                                    color: #495057;
+                                    display: block;
+                                    margin-bottom: 5px;
+                                    font-size: 0.9em;
+                                  }
+                                  
+                                  .value {
+                                    color: #2c3e50;
+                                    font-weight: 500;
+                                    font-size: 1.1em;
+                                  }
+                                  
+                                  .financial-highlights {
+                                    display: grid;
+                                    grid-template-columns: 1fr 1fr;
+                                    gap: 20px;
+                                  }
+                                  
+                                  .highlight-card {
+                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                    color: white;
+                                    padding: 20px;
+                                    border-radius: 8px;
+                                    text-align: center;
+                                  }
+                                  
+                                  .highlight-amount {
+                                    font-size: 1.8em;
+                                    font-weight: 700;
+                                    margin-bottom: 5px;
+                                  }
+                                  
+                                  .highlight-label {
+                                    font-size: 0.9em;
+                                    opacity: 0.9;
+                                  }
+                                  
+                                  .notes-section {
+                                    background: #fff3cd;
+                                    border: 1px solid #ffeaa7;
+                                    border-radius: 6px;
+                                    padding: 20px;
+                                    color: #856404;
+                                  }
+                                  
+                                  .footer {
+                                    background: #f8f9fa;
+                                    padding: 20px 30px;
+                                    text-align: center;
+                                    color: #6c757d;
+                                    font-size: 0.9em;
+                                    border-top: 1px solid #dee2e6;
+                                  }
+                                  
+                                  .status-badge {
+                                    display: inline-block;
+                                    padding: 6px 12px;
+                                    border-radius: 20px;
+                                    font-size: 0.85em;
+                                    font-weight: 500;
+                                    text-transform: uppercase;
+                                    letter-spacing: 0.5px;
+                                  }
+                                  
+                                  .status-active {
+                                    background: #d4edda;
+                                    color: #155724;
+                                    border: 1px solid #c3e6cb;
+                                  }
+                                  
+                                  .status-inactive {
+                                    background: #f8d7da;
+                                    color: #721c24;
+                                    border: 1px solid #f5c6cb;
+                                  }
+                                  
+                                  @media print { 
+                                    body { 
+                                      padding: 0;
+                                      background: white;
+                                    }
+                                    .container {
+                                      box-shadow: none;
+                                      border-radius: 0;
+                                    }
+                                    .info-item:hover {
+                                      transform: none;
+                                      box-shadow: none;
+                                    }
+                                  }
                                 </style>
                               </head>
                               <body>
-                                <div class="header">
-                                  <h1>بيانات المورد</h1>
-                                  <p>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</p>
-                                </div>
-                                
-                                <div class="section">
-                                  <div class="section-title">المعلومات الأساسية</div>
-                                  <div class="info-row">
-                                    <span><span class="label">اسم المورد:</span> ${supplier.name || 'غير محدد'}</span>
-                                    <span><span class="label">الفئة:</span> ${supplier.category || 'غير محدد'}</span>
+                                <div class="container">
+                                  <div class="header">
+                                    <div class="print-date">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</div>
+                                    <h1>بيانات المورد</h1>
+                                    <div class="subtitle">تقرير شامل لبيانات المورد والإحصائيات المالية</div>
                                   </div>
-                                  <div class="info-row">
-                                    <span><span class="label">الشركة:</span> ${supplier.company || 'غير محدد'}</span>
-                                    <span><span class="label">الهاتف:</span> ${supplier.phone || 'غير محدد'}</span>
-                                  </div>
-                                  <div class="info-row">
-                                    <span><span class="label">البريد الإلكتروني:</span> ${supplier.email || 'غير محدد'}</span>
-                                    <span><span class="label">الحالة:</span> ${supplier.status || 'غير محدد'}</span>
-                                  </div>
-                                  <div class="info-row">
-                                    <span><span class="label">العنوان:</span> ${(supplier as any).address || 'غير محدد'}</span>
-                                  </div>
-                                </div>
+                                  
+                                  <div class="content">
+                                    <div class="section">
+                                      <div class="section-title">المعلومات الأساسية</div>
+                                      <div class="info-grid">
+                                        <div class="info-item">
+                                          <span class="label">اسم المورد</span>
+                                          <span class="value">${supplier.name || 'غير محدد'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                          <span class="label">الفئة</span>
+                                          <span class="value">${supplier.category || 'غير محدد'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                          <span class="label">اسم الشركة</span>
+                                          <span class="value">${supplier.company || 'غير محدد'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                          <span class="label">رقم الهاتف</span>
+                                          <span class="value">${supplier.phone || 'غير محدد'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                          <span class="label">البريد الإلكتروني</span>
+                                          <span class="value">${supplier.email || 'غير محدد'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                          <span class="label">حالة المورد</span>
+                                          <span class="value">
+                                            <span class="status-badge ${supplier.status === 'نشط' ? 'status-active' : 'status-inactive'}">
+                                              ${supplier.status || 'غير محدد'}
+                                            </span>
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <div class="info-item">
+                                        <span class="label">العنوان</span>
+                                        <span class="value">${(supplier as any).address || 'غير محدد'}</span>
+                                      </div>
+                                    </div>
 
-                                <div class="section">
-                                  <div class="section-title">الإحصائيات المالية</div>
-                                  <div class="info-row">
-                                    <span><span class="label">إجمالي المشتريات:</span> ${(supplierData.totalPurchases || 0).toLocaleString()} ريال سعودي</span>
-                                    <span><span class="label">الرصيد المستحق:</span> ${(supplierData.outstandingBalance || 0).toLocaleString()} ريال سعودي</span>
-                                  </div>
-                                  <div class="info-row">
-                                    <span><span class="label">شروط الدفع:</span> ${supplierData.paymentTerms || '30 يوم'}</span>
-                                    <span><span class="label">التقييم:</span> ${supplierData.rating || 'ممتاز'}</span>
-                                  </div>
-                                </div>
+                                    <div class="section">
+                                      <div class="section-title">الإحصائيات المالية</div>
+                                      <div class="financial-highlights">
+                                        <div class="highlight-card">
+                                          <div class="highlight-amount">${(supplierData.totalPurchases || 0).toLocaleString()}</div>
+                                          <div class="highlight-label">إجمالي المشتريات (ريال سعودي)</div>
+                                        </div>
+                                        <div class="highlight-card">
+                                          <div class="highlight-amount">${(supplierData.outstandingBalance || 0).toLocaleString()}</div>
+                                          <div class="highlight-label">الرصيد المستحق (ريال سعودي)</div>
+                                        </div>
+                                      </div>
+                                      <div class="info-grid" style="margin-top: 20px;">
+                                        <div class="info-item">
+                                          <span class="label">شروط الدفع</span>
+                                          <span class="value">${supplierData.paymentTerms || '30 يوم'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                          <span class="label">التقييم</span>
+                                          <span class="value">${supplierData.rating || 'ممتاز'}</span>
+                                        </div>
+                                      </div>
+                                    </div>
 
-                                <div class="section">
-                                  <div class="section-title">ملاحظات إضافية</div>
-                                  <p>${(supplier as any).notes || 'لا توجد ملاحظات'}</p>
+                                    <div class="section">
+                                      <div class="section-title">ملاحظات إضافية</div>
+                                      <div class="notes-section">
+                                        ${(supplier as any).notes || 'لا توجد ملاحظات إضافية لهذا المورد'}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div class="footer">
+                                    تم إنشاء هذا التقرير بواسطة نظام إدارة الموردين • ${new Date().toLocaleDateString('ar-SA')}
+                                  </div>
                                 </div>
                               </body>
                               </html>

@@ -220,16 +220,24 @@ const SalesPage = () => {
                                         background: #fff;
                                         color: #333;
                                       }
-                                      .header { 
-                                        background: linear-gradient(135deg, #10b981, #059669);
-                                        color: white; 
-                                        padding: 30px; 
-                                        border-radius: 10px;
-                                        margin-bottom: 30px;
-                                        text-align: center;
-                                      }
-                                      .header h1 { font-size: 28px; margin-bottom: 10px; }
-                                      .header p { font-size: 14px; opacity: 0.9; }
+                                       .header { 
+                                         background: linear-gradient(135deg, #10b981, #059669);
+                                         color: white; 
+                                         padding: 30px; 
+                                         border-radius: 10px;
+                                         margin-bottom: 30px;
+                                         text-align: center;
+                                         position: relative;
+                                       }
+                                       .header .logo-section { 
+                                         display: flex; 
+                                         align-items: center; 
+                                         justify-content: space-between; 
+                                         margin-bottom: 20px; 
+                                       }
+                                       .header .logo { height: 60px; object-fit: contain; }
+                                       .header h1 { font-size: 28px; margin-bottom: 10px; }
+                                       .header p { font-size: 14px; opacity: 0.9; }
                                       .content { 
                                         background: #f8fafc; 
                                         padding: 30px; 
@@ -324,11 +332,15 @@ const SalesPage = () => {
                                       }
                                     </style>
                                   </head>
-                                  <body>
-                                    <div class="header">
-                                      <h1>🏠 عقد بيع / عرض سعر</h1>
-                                      <p>نظام إدارة المبيعات العقارية</p>
-                                    </div>
+                                   <body>
+                                     <div class="header">
+                                       <div class="logo-section">
+                                         <img src="/lovable-uploads/c6fbcf40-7e64-42f0-b1da-d735b0b632c8.png" alt="شعار الشركة" class="logo" />
+                                         <div></div>
+                                       </div>
+                                       <h1>🏠 عقد بيع / عرض سعر</h1>
+                                       <p>نظام إدارة المبيعات العقارية</p>
+                                     </div>
                                     
                                     <div class="content">
                                       <div class="sale-info">

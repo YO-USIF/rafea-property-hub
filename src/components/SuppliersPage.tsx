@@ -351,7 +351,10 @@ const SuppliersPage = () => {
       <body>
         <div class="container">
           <div class="header">
-            <div class="print-date">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+              <img src="/lovable-uploads/c6fbcf40-7e64-42f0-b1da-d735b0b632c8.png" alt="شعار الشركة" style="height: 60px; object-fit: contain;" />
+              <div class="print-date">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</div>
+            </div>
             <h1>كشف حساب المورد</h1>
             <div class="subtitle">تقرير مفصل للمعاملات المالية</div>
           </div>

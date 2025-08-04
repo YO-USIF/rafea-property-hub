@@ -97,8 +97,19 @@ const InvoicesPage = () => {
     if (printWindow) {
       printWindow.document.write(`
         <html dir="rtl">
-          <head><title>تقرير الفواتير</title></head>
-          <body style="font-family: Arial, sans-serif; direction: rtl; text-align: right;">
+          <head>
+            <title>تقرير الفواتير</title>
+            <style>
+              body { font-family: Arial, sans-serif; direction: rtl; text-align: right; }
+              .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #333; }
+              .logo { height: 60px; object-fit: contain; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <img src="/lovable-uploads/c6fbcf40-7e64-42f0-b1da-d735b0b632c8.png" alt="شعار الشركة" class="logo" />
+              <h1>تقرير الفواتير</h1>
+            </div>
             <pre style="white-space: pre-wrap; font-family: Arial, sans-serif;">${printContent}</pre>
           </body>
         </html>

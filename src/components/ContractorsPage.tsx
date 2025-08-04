@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, HardHat, FileText, DollarSign, Clock, Trash2, Edit, Printer } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Plus, Search, HardHat, FileText, DollarSign, Clock, Trash2, Edit, Printer, Receipt } from 'lucide-react';
 import { useContractors } from '@/hooks/useContractors';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -18,6 +20,10 @@ const ContractorsPage = () => {
   const [showExtractForm, setShowExtractForm] = useState(false);
   const [extracts, setExtracts] = useState<any[]>([]);
   const [contractorStats, setContractorStats] = useState<any>({});
+  const [showAccountStatement, setShowAccountStatement] = useState(false);
+  const [selectedContractor, setSelectedContractor] = useState<any>(null);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const { contractors, isLoading, deleteContractor } = useContractors();
   const { user } = useAuth();
 
@@ -103,6 +109,351 @@ const ContractorsPage = () => {
       return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">معتمد</Badge>;
     } else {
       return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">قيد المراجعة</Badge>;
+    }
+  };
+
+  const generateAccountStatement = async (contractor: any) => {
+    try {
+      // جلب المستخلصات للمقاول في الفترة المحددة
+      let query = supabase
+        .from('extracts')
+        .select('*')
+        .eq('contractor_name', contractor.name)
+        .order('extract_date', { ascending: true });
+
+      if (startDate) {
+        query = query.gte('extract_date', startDate);
+      }
+      if (endDate) {
+        query = query.lte('extract_date', endDate);
+      }
+
+      const { data: contractorExtracts, error } = await query;
+      
+      if (error) throw error;
+
+      return contractorExtracts || [];
+    } catch (error) {
+      console.error('Error generating account statement:', error);
+      return [];
+    }
+  };
+
+  const printAccountStatement = async (contractor: any) => {
+    const contractorExtracts = await generateAccountStatement(contractor);
+    
+    const printWindow = window.open('', '_blank');
+    const totalAmount = contractorExtracts.reduce((sum, extract) => sum + (Number(extract.amount) || 0), 0);
+    const paidAmount = contractorExtracts.filter(ext => ext.status === 'مدفوع' || ext.status === 'مكتمل').reduce((sum, extract) => sum + (Number(extract.amount) || 0), 0);
+    const remainingAmount = totalAmount - paidAmount;
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ar">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>كشف حساب المقاول - ${contractor.name}</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
+          
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          
+          body { 
+            font-family: 'Tajawal', Arial, sans-serif; 
+            line-height: 1.6; 
+            color: #2c3e50; 
+            direction: rtl;
+            background: #f8f9fa;
+            padding: 20px;
+          }
+          
+          .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+          }
+          
+          .header { 
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+          }
+          
+          .header h1 { 
+            font-size: 2.2em; 
+            font-weight: 700; 
+            margin-bottom: 10px;
+          }
+          
+          .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+            font-weight: 300;
+          }
+          
+          .print-date {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            font-size: 0.9em;
+            opacity: 0.8;
+          }
+          
+          .content {
+            padding: 30px;
+          }
+          
+          .contractor-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-right: 4px solid #28a745;
+          }
+          
+          .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+          }
+          
+          .info-row:last-child {
+            border-bottom: none;
+          }
+          
+          .label {
+            font-weight: 600;
+            color: #495057;
+          }
+          
+          .value {
+            color: #212529;
+          }
+          
+          .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+          }
+          
+          .summary-card {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+          }
+          
+          .summary-card.total {
+            border-color: #007bff;
+          }
+          
+          .summary-card.paid {
+            border-color: #28a745;
+          }
+          
+          .summary-card.remaining {
+            border-color: #dc3545;
+          }
+          
+          .summary-card h3 {
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            color: #6c757d;
+          }
+          
+          .summary-card .amount {
+            font-size: 1.5em;
+            font-weight: 700;
+          }
+          
+          .total .amount { color: #007bff; }
+          .paid .amount { color: #28a745; }
+          .remaining .amount { color: #dc3545; }
+          
+          .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+          }
+          
+          .transactions-table th {
+            background: #f8f9fa;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+          }
+          
+          .transactions-table td {
+            padding: 12px 10px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+          }
+          
+          .transactions-table tr:last-child td {
+            border-bottom: none;
+          }
+          
+          .transactions-table tr:nth-child(even) {
+            background: #f8f9fa;
+          }
+          
+          .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+          }
+          
+          .status-paid {
+            background: #d4edda;
+            color: #155724;
+          }
+          
+          .status-unpaid {
+            background: #f8d7da;
+            color: #721c24;
+          }
+          
+          .status-review {
+            background: #fff3cd;
+            color: #856404;
+          }
+          
+          .period-info {
+            background: #e8f5e8;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+            color: #155724;
+          }
+          
+          @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <div class="print-date">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</div>
+            <h1>كشف حساب المقاول</h1>
+            <div class="subtitle">تقرير مفصل للمستخلصات والمدفوعات</div>
+          </div>
+          
+          <div class="content">
+            <div class="contractor-info">
+              <h2 style="margin-bottom: 20px; color: #2c3e50;">بيانات المقاول</h2>
+              <div class="info-row">
+                <span class="label">اسم المقاول:</span>
+                <span class="value">${contractor.name || 'غير محدد'}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">الشركة:</span>
+                <span class="value">${contractor.company || 'غير محدد'}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">التخصص:</span>
+                <span class="value">${contractor.specialization || 'غير محدد'}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">الهاتف:</span>
+                <span class="value">${contractor.phone || 'غير محدد'}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">البريد الإلكتروني:</span>
+                <span class="value">${contractor.email || 'غير محدد'}</span>
+              </div>
+            </div>
+
+            ${startDate || endDate ? `
+              <div class="period-info">
+                فترة الكشف: ${startDate ? `من ${startDate}` : 'من البداية'} ${endDate ? `إلى ${endDate}` : 'حتى اليوم'}
+              </div>
+            ` : ''}
+            
+            <div class="summary-cards">
+              <div class="summary-card total">
+                <h3>إجمالي المستخلصات</h3>
+                <div class="amount">${totalAmount.toLocaleString()} ر.س</div>
+              </div>
+              <div class="summary-card paid">
+                <h3>المبلغ المدفوع</h3>
+                <div class="amount">${paidAmount.toLocaleString()} ر.س</div>
+              </div>
+              <div class="summary-card remaining">
+                <h3>الرصيد المتبقي</h3>
+                <div class="amount">${remainingAmount.toLocaleString()} ر.س</div>
+              </div>
+            </div>
+            
+            <h3 style="margin-bottom: 15px; color: #2c3e50;">تفاصيل المستخلصات</h3>
+            <table class="transactions-table">
+              <thead>
+                <tr>
+                  <th>رقم المستخلص</th>
+                  <th>التاريخ</th>
+                  <th>المشروع</th>
+                  <th>المبلغ</th>
+                  <th>نسبة الإنجاز</th>
+                  <th>الحالة</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${contractorExtracts.length > 0 ? contractorExtracts.map(extract => `
+                  <tr>
+                    <td>${extract.extract_number || 'غير محدد'}</td>
+                    <td>${new Date(extract.extract_date).toLocaleDateString('ar-SA')}</td>
+                    <td>${extract.project_name || 'غير محدد'}</td>
+                    <td>${Number(extract.amount).toLocaleString()} ر.س</td>
+                    <td>${extract.percentage_completed || 0}%</td>
+                    <td>
+                      <span class="status-badge ${extract.status === 'مدفوع' || extract.status === 'مكتمل' ? 'status-paid' : extract.status === 'قيد المراجعة' ? 'status-review' : 'status-unpaid'}">
+                        ${extract.status || 'غير محدد'}
+                      </span>
+                    </td>
+                  </tr>
+                `).join('') : `
+                  <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px; color: #6c757d;">
+                      لا توجد مستخلصات في الفترة المحددة
+                    </td>
+                  </tr>
+                `}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <script>
+          window.onload = function() {
+            window.print();
+            window.onafterprint = function() {
+              window.close();
+            };
+          };
+        </script>
+      </body>
+      </html>
+    `;
+
+    if (printWindow) {
+      printWindow.document.write(printContent);
+      printWindow.document.close();
     }
   };
 
@@ -264,6 +615,16 @@ const ContractorsPage = () => {
                           size="sm" 
                           variant="outline"
                           onClick={() => {
+                            setSelectedContractor(contractor);
+                            setShowAccountStatement(true);
+                          }}
+                        >
+                          <Receipt className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
                             setEditingContractor(contractor);
                             setShowForm(true);
                           }}
@@ -351,6 +712,55 @@ const ContractorsPage = () => {
           // Refresh data if needed
         }}
       />
+
+      {/* Account Statement Dialog */}
+      <Dialog open={showAccountStatement} onOpenChange={setShowAccountStatement}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>كشف حساب المقاول</DialogTitle>
+            <DialogDescription>
+              كشف حساب تفصيلي للمقاول: {selectedContractor?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="start-date">من تاريخ</Label>
+                <Input
+                  id="start-date"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="end-date">إلى تاريخ</Label>
+                <Input
+                  id="end-date"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button 
+                onClick={() => selectedContractor && printAccountStatement(selectedContractor)}
+                className="flex-1"
+              >
+                <Printer className="w-4 h-4 ml-2" />
+                طباعة الكشف
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowAccountStatement(false)}
+              >
+                إلغاء
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

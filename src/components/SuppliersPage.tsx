@@ -49,12 +49,16 @@ const SuppliersPage = () => {
       
       for (const supplier of suppliers) {
         const supplierInvoices = invoicesData?.filter(invoice => 
-          invoice.supplier_name?.trim() === supplier.name?.trim()
+          invoice.supplier_name?.trim().toLowerCase() === supplier.name?.trim().toLowerCase() ||
+          invoice.supplier_name?.includes(supplier.name) ||
+          supplier.name?.includes(invoice.supplier_name)
         ) || [];
+
+        console.log(`Supplier: ${supplier.name}, Invoices found: ${supplierInvoices.length}`);
 
         const totalPurchases = supplierInvoices.reduce((sum, invoice) => sum + (Number(invoice.amount) || 0), 0);
         const outstandingBalance = supplierInvoices
-          .filter(invoice => invoice.status === 'غير مدفوع' || invoice.status === 'متأخر')
+          .filter(invoice => invoice.status === 'غير مدفوع' || invoice.status === 'متأخر' || invoice.status === 'مستحق')
           .reduce((sum, invoice) => sum + (Number(invoice.amount) || 0), 0);
 
         stats[supplier.id] = {

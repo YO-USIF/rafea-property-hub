@@ -53,7 +53,9 @@ const ContractorsPage = () => {
         
         const contractorExtracts = extractsData?.filter(extract => {
           const extractNameNormalized = extract.contractor_name?.trim().toLowerCase().replace(/\s+/g, ' ') || '';
-          return extractNameNormalized === contractorNameNormalized;
+          return extractNameNormalized === contractorNameNormalized ||
+                 extract.contractor_name?.includes(contractor.name) ||
+                 contractor.name?.includes(extract.contractor_name);
         }) || [];
 
         console.log(`Contractor: ${contractor.name}, Normalized: ${contractorNameNormalized}, Extracts found: ${contractorExtracts.length}`);

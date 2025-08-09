@@ -69,6 +69,9 @@ const SuppliersPage = () => {
         };
       }
 
+      console.log('Supplier Stats:', stats);
+      console.log('Total purchases calculation:', Object.values(stats).reduce((sum: number, st: any) => sum + Number(st.totalPurchases || 0), 0));
+      console.log('Total outstanding balance calculation:', Object.values(stats).reduce((sum: number, st: any) => sum + Number(st.outstandingBalance || 0), 0));
       setSupplierStats(stats);
     } catch (error) {
       console.error('Error fetching invoices data:', error);
@@ -522,7 +525,7 @@ const SuppliersPage = () => {
             <DollarSign className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{Number(totalPurchases) > 0 ? (Number(totalPurchases) / 1000000).toFixed(1) + 'م' : '0'}</div>
+            <div className="text-2xl font-bold">{Number(totalPurchases) > 0 ? Number(totalPurchases).toLocaleString() : '0'}</div>
             <p className="text-xs text-muted-foreground">ريال سعودي</p>
           </CardContent>
         </Card>
@@ -533,7 +536,7 @@ const SuppliersPage = () => {
             <FileText className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{Number(totalOutstandingBalance) > 0 ? (Number(totalOutstandingBalance) / 1000000).toFixed(1) + 'م' : '0'}</div>
+            <div className="text-2xl font-bold text-red-600">{Number(totalOutstandingBalance) > 0 ? Number(totalOutstandingBalance).toLocaleString() : '0'}</div>
             <p className="text-xs text-muted-foreground">ريال سعودي</p>
           </CardContent>
         </Card>

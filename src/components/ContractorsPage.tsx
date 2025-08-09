@@ -77,6 +77,8 @@ const ContractorsPage = () => {
       }
 
       console.log('Contractor Stats:', stats);
+      console.log('Total contracts calculation:', Object.values(stats).reduce((sum: number, st: any) => sum + Number(st.totalContracts || 0), 0));
+      console.log('Total pending payments calculation:', Object.values(stats).reduce((sum: number, st: any) => sum + Number(st.pendingPayments || 0), 0));
       setContractorStats(stats);
     } catch (error) {
       console.error('Error fetching extracts data:', error);
@@ -529,7 +531,7 @@ const ContractorsPage = () => {
             <FileText className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{Number(totalContracts) > 0 ? (Number(totalContracts) / 1000000).toFixed(1) + 'م' : '0'}</div>
+            <div className="text-2xl font-bold">{Number(totalContracts) > 0 ? Number(totalContracts).toLocaleString() : '0'}</div>
             <p className="text-xs text-muted-foreground">ريال سعودي</p>
           </CardContent>
         </Card>
@@ -540,7 +542,7 @@ const ContractorsPage = () => {
             <DollarSign className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{Number(totalPendingPayments) > 0 ? (Number(totalPendingPayments) / 1000000).toFixed(1) + 'م' : '0'}</div>
+            <div className="text-2xl font-bold text-red-600">{Number(totalPendingPayments) > 0 ? Number(totalPendingPayments).toLocaleString() : '0'}</div>
             <p className="text-xs text-muted-foreground">ريال سعودي</p>
           </CardContent>
         </Card>

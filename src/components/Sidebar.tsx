@@ -44,8 +44,17 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
     { id: 'maintenance', name: 'الصيانة', icon: Wrench },
     { id: 'tasks', name: 'المهام اليومية', icon: ClipboardList },
     { id: 'reports', name: 'التقارير', icon: BarChart3 },
+    { id: 'notifications', name: 'إدارة الإشعارات', icon: Bell, adminOnly: true },
     { id: 'settings', name: 'الإعدادات', icon: Settings },
   ];
+
+  // تصفية العناصر بناءً على الصلاحيات
+  const filteredMenuItems = menuItems.filter(item => {
+    if (item.adminOnly) {
+      return isAdmin;
+    }
+    return true;
+  });
 
   return (
     <div 
@@ -79,14 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
       {/* Navigation */}
       <nav className="mt-6 px-3">
         <ul className="space-y-2">
-          {menuItems
-            .filter(item => {
-              // إخفاء الإعدادات عن غير مديري النظام
-              if (item.id === 'settings' && !isAdmin) {
-                return false;
-              }
-              return true;
-            })
+          {filteredMenuItems
             .map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;

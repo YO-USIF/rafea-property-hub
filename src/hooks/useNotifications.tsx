@@ -52,6 +52,48 @@ export const useNotifications = () => {
     },
   });
 
+  const sendBulkNotificationsMutation = useMutation({
+    mutationFn: async ({ 
+      title, 
+      message, 
+      type = 'info', 
+      sendToAll,
+      selectedUsers 
+    }: {
+      title: string;
+      message: string;
+      type?: string;
+      sendToAll: boolean;
+      selectedUsers?: string[];
+    }) => {
+      // استخدام Edge Function لإرسال الإشعارات المتعددة
+      const response = await fetch(`https://dwinqajspowvbkvzbbbn.supabase.co/functions/v1/send-notifications`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3aW5xYWpzcG93dmJrdnpiYmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4MTE2MTAsImV4cCI6MjA2NzM4NzYxMH0.dhj2iMZ5IfZUzOW5gAUWyGsnmnTJqMDeA1Rzzh7XXjc`
+        },
+        body: JSON.stringify({
+          title,
+          message,
+          type,
+          sendToAll,
+          selectedUsers: sendToAll ? [] : selectedUsers
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'فشل في إرسال الإشعارات');
+      }
+
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+
   const markAsReadMutation = useMutation({
     mutationFn: async (notificationId: string) => {
       const { error } = await supabase
@@ -141,6 +183,8 @@ export const useNotifications = () => {
     unreadCount,
     markAsRead: markAsReadMutation.mutate,
     createNotification,
-    createCustomNotification: createNotificationMutation.mutate
+    createCustomNotification: createNotificationMutation.mutate,
+    sendBulkNotifications: sendBulkNotificationsMutation.mutate,
+    isSendingBulk: sendBulkNotificationsMutation.isPending
   };
 };

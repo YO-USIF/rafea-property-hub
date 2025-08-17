@@ -36,9 +36,11 @@ serve(async (req) => {
       );
     }
 
-    // استخدام JWT للتحقق من المستخدم - استخدام service role client
-    const userClient = createClient(supabaseUrl, authHeader.replace('Bearer ', ''));
-    const { data: { user }, error: userError } = await userClient.auth.getUser();
+    // استخدام service role client للتحقق من المستخدم
+    const token = authHeader.replace('Bearer ', '');
+    
+    // التحقق من صحة التوكن باستخدام service role client
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
     
     if (userError || !user) {
       console.error('User authentication error:', userError);

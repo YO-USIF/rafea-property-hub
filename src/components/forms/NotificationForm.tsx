@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useProfiles } from '@/hooks/useProfiles';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Send, Users, User } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface NotificationFormProps {
   open: boolean;
@@ -54,24 +55,24 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
     setIsSubmitting(true);
 
     try {
-      // استخدام Edge Function لإرسال الإشعارات
-      const response = await fetch(`https://dwinqajspowvbkvzbbbn.supabase.co/functions/v1/send-notifications`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3aW5xYWpzcG93dmJrdnpiYmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4MTE2MTAsImV4cCI6MjA2NzM4NzYxMH0.dhj2iMZ5IfZUzOW5gAUWyGsnmnTJqMDeA1Rzzh7XXjc`
-        },
-        body: JSON.stringify({
+      // استخدام Supabase client بدلاً من fetch مباشر
+      const { data: userToken } = await supabase.auth.getSession();
+      if (!userToken.session) {
+        throw new Error('المستخدم غير مسجل الدخول');
+      }
+
+      const response = await supabase.functions.invoke('send-notifications', {
+        body: {
           title,
           message,
           type,
           sendToAll,
           selectedUsers: sendToAll ? [] : selectedUsers
-        })
+        }
       });
 
-      if (!response.ok) {
-        throw new Error('فشل في إرسال الإشعارات');
+      if (response.error) {
+        throw new Error(response.error.message || 'فشل في إرسال الإشعارات');
       }
 
       toast({

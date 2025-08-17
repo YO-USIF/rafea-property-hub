@@ -13,12 +13,21 @@ serve(async (req) => {
   }
 
   try {
-    // إنشاء عميل Supabase
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    // إنشاء عميل Supabase مع service role key
+    const supabaseUrl = "https://dwinqajspowvbkvzbbbn.supabase.co";
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!supabaseServiceKey) {
+      console.error('SUPABASE_SERVICE_ROLE_KEY is not configured');
+      return new Response(
+        JSON.stringify({ error: 'إعداد الخادم غير صحيح' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    // التحقق من المصادقة
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // التحقق من المصادقة والحصول على المستخدم
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return new Response(
@@ -27,11 +36,12 @@ serve(async (req) => {
       );
     }
 
-    // التحقق من صلاحية المستخدم (مدير نظام فقط)
+    // استخدام JWT للتحقق من المستخدم
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
     
     if (userError || !user) {
+      console.error('User authentication error:', userError);
       return new Response(
         JSON.stringify({ error: 'مستخدم غير صحيح' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -39,13 +49,14 @@ serve(async (req) => {
     }
 
     // التحقق من أن المستخدم مدير نظام
-    const { data: userRole } = await supabase
+    const { data: userRole, error: roleError } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
       .single();
 
-    if (!userRole || userRole.role !== 'مدير النظام') {
+    if (roleError || !userRole || userRole.role !== 'مدير النظام') {
+      console.error('Role check failed:', roleError, userRole);
       return new Response(
         JSON.stringify({ error: 'غير مسموح - صلاحية مدير النظام مطلوبة' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

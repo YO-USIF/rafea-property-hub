@@ -66,28 +66,22 @@ export const useNotifications = () => {
       sendToAll: boolean;
       selectedUsers?: string[];
     }) => {
-      // استخدام Edge Function لإرسال الإشعارات المتعددة
-      const response = await fetch(`https://dwinqajspowvbkvzbbbn.supabase.co/functions/v1/send-notifications`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3aW5xYWpzcG93dmJrdnpiYmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4MTE2MTAsImV4cCI6MjA2NzM4NzYxMH0.dhj2iMZ5IfZUzOW5gAUWyGsnmnTJqMDeA1Rzzh7XXjc`
-        },
-        body: JSON.stringify({
+      // استخدام Supabase functions.invoke بدلاً من fetch
+      const response = await supabase.functions.invoke('send-notifications', {
+        body: {
           title,
           message,
           type,
           sendToAll,
           selectedUsers: sendToAll ? [] : selectedUsers
-        })
+        }
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'فشل في إرسال الإشعارات');
+      if (response.error) {
+        throw new Error(response.error.message || 'فشل في إرسال الإشعارات');
       }
 
-      return await response.json();
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });

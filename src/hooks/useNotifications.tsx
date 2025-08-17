@@ -107,66 +107,93 @@ export const useNotifications = () => {
   // Helper function to create common notifications based on real data
   const createNotification = {
     taskCompleted: (taskTitle: string, assignedTo: string) => {
-      createNotificationMutation.mutate({
+      // إرسال إشعار لجميع المدراء
+      sendBulkNotificationsMutation.mutate({
         title: 'مهمة مكتملة',
         message: `تم إنجاز المهمة "${taskTitle}" بواسطة ${assignedTo}`,
-        type: 'success'
+        type: 'success',
+        sendToAll: false,
+        selectedUsers: [] // سيتم تحديد المدراء في edge function
       });
     },
     taskAssigned: (taskTitle: string, assignedTo: string) => {
-      createNotificationMutation.mutate({
+      // إرسال إشعار لجميع المدراء
+      sendBulkNotificationsMutation.mutate({
         title: 'مهمة جديدة',
         message: `تم تعيين مهمة جديدة "${taskTitle}" إلى ${assignedTo}`,
-        type: 'info'
+        type: 'info',
+        sendToAll: false,
+        selectedUsers: [] // سيتم تحديد المدراء في edge function
       });
     },
     taskOverdue: (taskTitle: string) => {
-      createNotificationMutation.mutate({
+      // إرسال إشعار لجميع المدراء
+      sendBulkNotificationsMutation.mutate({
         title: 'مهمة متأخرة',
         message: `المهمة "${taskTitle}" متأخرة عن موعدها المحدد`,
-        type: 'warning'
+        type: 'warning',
+        sendToAll: false,
+        selectedUsers: [] // سيتم تحديد المدراء في edge function
       });
     },
     projectAdded: (projectName: string) => {
-      createNotificationMutation.mutate({
+      // إرسال إشعار لجميع المدراء
+      sendBulkNotificationsMutation.mutate({
         title: 'مشروع جديد',
         message: `تم إضافة مشروع جديد: ${projectName}`,
-        type: 'success'
+        type: 'success',
+        sendToAll: false,
+        selectedUsers: [] // سيتم تحديد المدراء في edge function
       });
     },
     saleCompleted: (unitNumber: string, projectName: string) => {
-      createNotificationMutation.mutate({
+      // إرسال إشعار لجميع المدراء
+      sendBulkNotificationsMutation.mutate({
         title: 'عملية بيع جديدة',
         message: `تم بيع الوحدة ${unitNumber} في مشروع ${projectName}`,
-        type: 'success'
+        type: 'success',
+        sendToAll: false,
+        selectedUsers: [] // سيتم تحديد المدراء في edge function
       });
     },
     maintenanceRequest: (issueType: string, buildingName: string) => {
-      createNotificationMutation.mutate({
+      // إرسال إشعار لجميع المدراء
+      sendBulkNotificationsMutation.mutate({
         title: 'طلب صيانة جديد',
         message: `طلب صيانة ${issueType} في ${buildingName}`,
-        type: 'warning'
+        type: 'warning',
+        sendToAll: false,
+        selectedUsers: [] // سيتم تحديد المدراء في edge function
       });
     },
     invoiceDue: (supplierName: string, amount: number) => {
-      createNotificationMutation.mutate({
+      // إرسال إشعار لجميع المدراء
+      sendBulkNotificationsMutation.mutate({
         title: 'فاتورة مستحقة',
         message: `فاتورة من ${supplierName} بقيمة ${amount} ريال مستحقة الدفع`,
-        type: 'warning'
+        type: 'warning',
+        sendToAll: false,
+        selectedUsers: [] // سيتم تحديد المدراء في edge function
       });
     },
     contractorAdded: (contractorName: string) => {
-      createNotificationMutation.mutate({
+      // إرسال إشعار لجميع المدراء
+      sendBulkNotificationsMutation.mutate({
         title: 'مقاول جديد',
         message: `تم إضافة مقاول جديد: ${contractorName}`,
-        type: 'info'
+        type: 'info',
+        sendToAll: false,
+        selectedUsers: [] // سيتم تحديد المدراء في edge function
       });
     },
     reportCreated: (reportTitle: string) => {
-      createNotificationMutation.mutate({
+      // إرسال إشعار لجميع المدراء
+      sendBulkNotificationsMutation.mutate({
         title: 'تقرير جديد',
         message: `تم إنشاء تقرير جديد: ${reportTitle}`,
-        type: 'info'
+        type: 'info',
+        sendToAll: false,
+        selectedUsers: [] // سيتم تحديد المدراء في edge function
       });
     }
   };

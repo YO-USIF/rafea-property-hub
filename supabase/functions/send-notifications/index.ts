@@ -91,8 +91,24 @@ serve(async (req) => {
       }
 
       targetUsers = profiles?.map(profile => profile.user_id) || [];
+    } else if (selectedUsers && selectedUsers.length > 0) {
+      targetUsers = selectedUsers;
     } else {
-      targetUsers = selectedUsers || [];
+      // إذا لم يتم تحديد مستخدمين، أرسل للمدراء فقط
+      const { data: managers, error: managersError } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .in('role', ['مدير النظام', 'مدير']);
+
+      if (managersError) {
+        console.error('Error fetching managers:', managersError);
+        return new Response(
+          JSON.stringify({ error: 'خطأ في جلب بيانات المدراء' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      targetUsers = managers?.map(manager => manager.user_id) || [];
     }
 
     if (targetUsers.length === 0) {

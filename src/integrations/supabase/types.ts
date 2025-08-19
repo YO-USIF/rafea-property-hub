@@ -971,60 +971,7 @@ export type Database = {
       }
     }
     Views: {
-      sales_secure: {
-        Row: {
-          area: number | null
-          created_at: string | null
-          customer_name: string | null
-          customer_phone: string | null
-          id: string | null
-          installment_plan: string | null
-          price: number | null
-          project_name: string | null
-          remaining_amount: number | null
-          sale_date: string | null
-          status: string | null
-          unit_number: string | null
-          unit_type: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          area?: number | null
-          created_at?: string | null
-          customer_name?: never
-          customer_phone?: never
-          id?: string | null
-          installment_plan?: string | null
-          price?: number | null
-          project_name?: string | null
-          remaining_amount?: number | null
-          sale_date?: string | null
-          status?: string | null
-          unit_number?: string | null
-          unit_type?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          area?: number | null
-          created_at?: string | null
-          customer_name?: never
-          customer_phone?: never
-          id?: string | null
-          installment_plan?: string | null
-          price?: number | null
-          project_name?: string | null
-          remaining_amount?: number | null
-          sale_date?: string | null
-          status?: string | null
-          unit_number?: string | null
-          unit_type?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       can_access_customer_data: {

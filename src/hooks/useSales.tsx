@@ -12,34 +12,12 @@ export const useSales = () => {
   const { toast } = useToast();
 
   const { data: sales = [], isLoading } = useQuery({
-    queryKey: ['sales', isManagerOrAdmin, isAdmin],
+    queryKey: ['sales'],
     queryFn: async () => {
-      // للمستخدمين العاديين: جلب مبيعاتهم فقط من الجدول الأصلي
-      if (!isManagerOrAdmin) {
-        const { data, error } = await supabase
-          .from('sales')
-          .select('*')
-          .eq('user_id', user?.id)
-          .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        return data;
-      }
-      
-      // لمديري النظام: جلب جميع البيانات بدون إخفاء المعلومات الشخصية
-      if (isAdmin) {
-        const { data, error } = await supabase
-          .from('sales')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        return data;
-      }
-      
-      // للمديرين العاديين: استخدام العرض الآمن لإخفاء بيانات العملاء الشخصية
+      // الآن نستخدم الجدول الأصلي فقط مع الاعتماد على RLS policies
+      // لضمان أن كل مستخدم يرى البيانات المناسبة له
       const { data, error } = await supabase
-        .from('sales_secure')
+        .from('sales')
         .select('*')
         .order('created_at', { ascending: false });
       

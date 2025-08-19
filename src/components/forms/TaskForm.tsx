@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { FileUpload } from '@/components/ui/file-upload';
 import { useToast } from '@/hooks/use-toast';
 import { useTasks } from '@/hooks/useTasks';
 
@@ -18,6 +19,8 @@ interface Task {
   status: string;
   progress: number;
   due_date: string;
+  file_url?: string;
+  file_name?: string;
 }
 
 interface TaskFormProps {
@@ -39,7 +42,9 @@ const TaskForm = ({ open, onOpenChange, task, onSuccess }: TaskFormProps) => {
     priority: 'متوسطة',
     status: 'جديدة',
     progress: 0,
-    due_date: ''
+    due_date: '',
+    file_url: '',
+    file_name: ''
   });
 
   useEffect(() => {
@@ -52,7 +57,9 @@ const TaskForm = ({ open, onOpenChange, task, onSuccess }: TaskFormProps) => {
         priority: task.priority || 'متوسطة',
         status: task.status || 'جديدة',
         progress: task.progress || 0,
-        due_date: task.due_date || ''
+        due_date: task.due_date || '',
+        file_url: task.file_url || '',
+        file_name: task.file_name || ''
       });
     } else {
       setFormData({
@@ -63,7 +70,9 @@ const TaskForm = ({ open, onOpenChange, task, onSuccess }: TaskFormProps) => {
         priority: 'متوسطة',
         status: 'جديدة',
         progress: 0,
-        due_date: ''
+        due_date: '',
+        file_url: '',
+        file_name: ''
       });
     }
   }, [task]);
@@ -214,6 +223,19 @@ const TaskForm = ({ open, onOpenChange, task, onSuccess }: TaskFormProps) => {
               rows={3}
             />
           </div>
+
+          <FileUpload
+            onFileUploaded={(fileUrl, fileName) => 
+              setFormData(prev => ({ ...prev, file_url: fileUrl, file_name: fileName }))
+            }
+            currentFileUrl={formData.file_url}
+            currentFileName={formData.file_name}
+            onFileRemoved={() => 
+              setFormData(prev => ({ ...prev, file_url: '', file_name: '' }))
+            }
+            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx,.txt"
+            maxSizeMB={5}
+          />
 
           <div className="flex justify-end space-x-2 space-x-reverse pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

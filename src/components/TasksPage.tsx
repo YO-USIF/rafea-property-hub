@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, ClipboardList, User, Calendar, CheckCircle2, Trash2, Edit, Printer, FileText, Eye } from 'lucide-react';
+import { Plus, Search, ClipboardList, User, Calendar, CheckCircle2, Trash2, Edit, Printer, FileText, Eye, File, ExternalLink } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useTaskReports } from '@/hooks/useTaskReports';
@@ -214,6 +214,7 @@ const TasksPage = () => {
                   <TableHead className="text-right">الحالة</TableHead>
                   <TableHead className="text-right">نسبة الإنجاز</TableHead>
                   <TableHead className="text-right">تاريخ الاستحقاق</TableHead>
+                  <TableHead className="text-right">الملف المرفق</TableHead>
                   {isAdmin && <TableHead className="text-right">الإجراءات</TableHead>}
                 </TableRow>
               </TableHeader>
@@ -245,6 +246,22 @@ const TasksPage = () => {
                       </div>
                     </TableCell>
                     <TableCell>{task.due_date}</TableCell>
+                    <TableCell>
+                      {task.file_url && task.file_name ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => window.open(task.file_url, '_blank')}
+                          className="flex items-center gap-2"
+                        >
+                          <File className="w-4 h-4" />
+                          <span className="max-w-20 truncate">{task.file_name}</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </Button>
+                      ) : (
+                        <span className="text-gray-400 text-sm">لا يوجد ملف</span>
+                      )}
+                    </TableCell>
                     {isAdmin && (
                       <TableCell>
                         <div className="flex gap-2">

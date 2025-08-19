@@ -12,18 +12,36 @@ export const useSales = () => {
   const { toast } = useToast();
 
   const { data: sales = [], isLoading } = useQuery({
-    queryKey: ['sales', isManagerOrAdmin],
+    queryKey: ['sales', isManagerOrAdmin, isAdmin],
     queryFn: async () => {
-      let query = supabase
-        .from('sales')
-        .select('*');
-      
-      // إذا لم يكن المستخدم مديراً أو مدير نظام، اجلب فقط مبيعاته
+      // للمستخدمين العاديين: جلب مبيعاتهم فقط من الجدول الأصلي
       if (!isManagerOrAdmin) {
-        query = query.eq('user_id', user?.id);
+        const { data, error } = await supabase
+          .from('sales')
+          .select('*')
+          .eq('user_id', user?.id)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        return data;
       }
       
-      const { data, error } = await query.order('created_at', { ascending: false });
+      // لمديري النظام: جلب جميع البيانات بدون إخفاء المعلومات الشخصية
+      if (isAdmin) {
+        const { data, error } = await supabase
+          .from('sales')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        return data;
+      }
+      
+      // للمديرين العاديين: استخدام العرض الآمن لإخفاء بيانات العملاء الشخصية
+      const { data, error } = await supabase
+        .from('sales_secure')
+        .select('*')
+        .order('created_at', { ascending: false });
       
       if (error) throw error;
       return data;

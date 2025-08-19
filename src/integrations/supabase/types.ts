@@ -965,9 +965,66 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      sales_secure: {
+        Row: {
+          area: number | null
+          created_at: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          id: string | null
+          installment_plan: string | null
+          price: number | null
+          project_name: string | null
+          remaining_amount: number | null
+          sale_date: string | null
+          status: string | null
+          unit_number: string | null
+          unit_type: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          area?: number | null
+          created_at?: string | null
+          customer_name?: never
+          customer_phone?: never
+          id?: string | null
+          installment_plan?: string | null
+          price?: number | null
+          project_name?: string | null
+          remaining_amount?: number | null
+          sale_date?: string | null
+          status?: string | null
+          unit_number?: string | null
+          unit_type?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          area?: number | null
+          created_at?: string | null
+          customer_name?: never
+          customer_phone?: never
+          id?: string | null
+          installment_plan?: string | null
+          price?: number | null
+          project_name?: string | null
+          remaining_amount?: number | null
+          sale_date?: string | null
+          status?: string | null
+          unit_number?: string | null
+          unit_type?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      can_access_customer_data: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       create_extract_journal_entry: {
         Args: {
           contractor_name: string

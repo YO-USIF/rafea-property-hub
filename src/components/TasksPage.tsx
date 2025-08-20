@@ -2,12 +2,13 @@
 import React, { useState } from 'react';
 import TaskForm from '@/components/forms/TaskForm';
 import TaskReportForm from '@/components/forms/TaskReportForm';
+import AttachFileForm from '@/components/forms/AttachFileForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, ClipboardList, User, Calendar, CheckCircle2, Trash2, Edit, Printer, FileText, Eye, File, ExternalLink } from 'lucide-react';
+import { Plus, Search, ClipboardList, User, Calendar, CheckCircle2, Trash2, Edit, Printer, FileText, Eye, File, ExternalLink, Paperclip } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useTaskReports } from '@/hooks/useTaskReports';
@@ -19,6 +20,8 @@ const TasksPage = () => {
   const [showReportForm, setShowReportForm] = useState(false);
   const [editingReport, setEditingReport] = useState<any>(null);
   const [showReports, setShowReports] = useState(false);
+  const [showAttachForm, setShowAttachForm] = useState(false);
+  const [attachingTask, setAttachingTask] = useState<any>(null);
   const { tasks, isLoading, deleteTask } = useTasks();
   const { isAdmin, isManager } = useUserRole();
   const { reports, deleteReport } = useTaskReports();
@@ -269,6 +272,17 @@ const TasksPage = () => {
                             size="sm" 
                             variant="outline"
                             onClick={() => {
+                              setAttachingTask(task);
+                              setShowAttachForm(true);
+                            }}
+                            title="إرفاق ملف"
+                          >
+                            <Paperclip className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
                               setEditingTask(task);
                               setShowForm(true);
                             }}
@@ -374,6 +388,24 @@ const TasksPage = () => {
           onSuccess={() => {
             setShowReportForm(false);
             setEditingReport(null);
+          }}
+        />
+      )}
+
+      {isManagerOrAdmin && attachingTask && (
+        <AttachFileForm
+          open={showAttachForm}
+          onOpenChange={(open) => {
+            setShowAttachForm(open);
+            if (!open) setAttachingTask(null);
+          }}
+          taskId={attachingTask.id}
+          taskTitle={attachingTask.title}
+          currentFileUrl={attachingTask.file_url}
+          currentFileName={attachingTask.file_name}
+          onSuccess={() => {
+            setShowAttachForm(false);
+            setAttachingTask(null);
           }}
         />
       )}

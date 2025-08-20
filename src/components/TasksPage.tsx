@@ -101,7 +101,7 @@ const TasksPage = () => {
               إضافة تقرير
             </Button>
           )}
-          {isAdmin && (
+          {isManagerOrAdmin && (
             <Button 
               className="bg-primary hover:bg-primary/90"
               onClick={() => setShowForm(true)}
@@ -215,7 +215,7 @@ const TasksPage = () => {
                   <TableHead className="text-right">نسبة الإنجاز</TableHead>
                   <TableHead className="text-right">تاريخ الاستحقاق</TableHead>
                   <TableHead className="text-right">الملف المرفق</TableHead>
-                  {isAdmin && <TableHead className="text-right">الإجراءات</TableHead>}
+                  {isManagerOrAdmin && <TableHead className="text-right">الإجراءات</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -262,7 +262,7 @@ const TasksPage = () => {
                         <span className="text-gray-400 text-sm">لا يوجد ملف</span>
                       )}
                     </TableCell>
-                    {isAdmin && (
+                    {isManagerOrAdmin && (
                       <TableCell>
                         <div className="flex gap-2">
                           <Button 
@@ -348,7 +348,7 @@ const TasksPage = () => {
         </Card>
       )}
 
-      {isAdmin && (
+      {isManagerOrAdmin && (
         <TaskForm
           open={showForm}
           onOpenChange={(open) => {

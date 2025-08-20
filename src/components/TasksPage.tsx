@@ -279,16 +279,18 @@ const TasksPage = () => {
                           >
                             <Paperclip className="w-4 h-4" />
                           </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => {
-                              setEditingTask(task);
-                              setShowForm(true);
-                            }}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
+                          {isAdmin && (
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => {
+                                setEditingTask(task);
+                                setShowForm(true);
+                              }}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          )}
                           <Button 
                             size="sm" 
                             variant="outline"
@@ -362,7 +364,7 @@ const TasksPage = () => {
         </Card>
       )}
 
-      {isManagerOrAdmin && (
+      {isAdmin && (
         <TaskForm
           open={showForm}
           onOpenChange={(open) => {

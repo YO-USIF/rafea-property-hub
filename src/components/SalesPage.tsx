@@ -50,7 +50,8 @@ const SalesPage = () => {
 
   // حساب حالة التأخير في التسليم
   const getDeliveryStatus = (sale: any) => {
-    if (!sale.sale_date || sale.status !== 'مباع') {
+    // عرض فقط للمبيعات التي تحتوي على تاريخ بيع والحالة مباع أو محجوز
+    if (!sale.sale_date || (sale.status !== 'مباع' && sale.status !== 'محجوز')) {
       return null;
     }
 
@@ -59,33 +60,45 @@ const SalesPage = () => {
       return null;
     }
 
-    const saleDate = new Date(sale.sale_date);
     const completionDate = new Date(project.expected_completion);
     const today = new Date();
     
-    // حساب الفرق بالأشهر
-    const monthsRemaining = Math.round((completionDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24 * 30));
+    // حساب الفرق بالأيام ثم تحويله للأشهر
+    const timeDiff = completionDate.getTime() - today.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    const monthsRemaining = Math.round(daysDiff / 30.44); // متوسط أيام الشهر
 
     if (monthsRemaining < 0) {
       // العقد منتهي - أحمر
       return {
-        status: 'منتهي',
+        status: 'منتهي الصلاحية',
         color: 'bg-red-100 text-red-800 hover:bg-red-100',
-        months: Math.abs(monthsRemaining)
+        months: Math.abs(monthsRemaining),
+        icon: '🔴'
       };
     } else if (monthsRemaining <= 3) {
       // أصفر - 3 شهور أو أقل
       return {
         status: 'قريب الانتهاء',
         color: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100',
-        months: monthsRemaining
+        months: monthsRemaining,
+        icon: '🟡'
       };
-    } else {
+    } else if (monthsRemaining > 6) {
       // أخضر - أكثر من 6 شهور
       return {
-        status: 'مناسب',
+        status: 'وقت مناسب',
         color: 'bg-green-100 text-green-800 hover:bg-green-100',
-        months: monthsRemaining
+        months: monthsRemaining,
+        icon: '🟢'
+      };
+    } else {
+      // بين 3-6 شهور - برتقالي
+      return {
+        status: 'متوسط',
+        color: 'bg-orange-100 text-orange-800 hover:bg-orange-100',
+        months: monthsRemaining,
+        icon: '🟠'
       };
     }
   };
@@ -249,12 +262,13 @@ const SalesPage = () => {
                         return (
                           <div className="flex items-center gap-2">
                             <Badge className={deliveryStatus.color}>
+                              <span className="mr-1">{deliveryStatus.icon}</span>
                               {deliveryStatus.status}
                             </Badge>
                             <span className="text-xs text-gray-500">
-                              {deliveryStatus.status === 'منتهي' 
+                              {deliveryStatus.status === 'منتهي الصلاحية' 
                                 ? `متأخر ${deliveryStatus.months} شهر`
-                                : `${deliveryStatus.months} شهر متبقي`
+                                : `${deliveryStatus.months} شهر`
                               }
                             </span>
                           </div>

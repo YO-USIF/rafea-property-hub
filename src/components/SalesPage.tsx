@@ -55,7 +55,10 @@ const SalesPage = () => {
       return null;
     }
 
-    const project = projects.find(p => p.name === sale.project_name);
+    // تنظيف اسم المشروع من المسافات الإضافية للمقارنة الصحيحة
+    const cleanProjectName = sale.project_name?.trim();
+    const project = projects.find(p => p.name?.trim() === cleanProjectName);
+    
     if (!project || !project.expected_completion) {
       return null;
     }

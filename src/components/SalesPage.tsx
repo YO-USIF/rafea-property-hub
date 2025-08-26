@@ -1,18 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SaleForm from '@/components/forms/SaleForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Home, Users, DollarSign, Calendar, Trash2, Edit, Printer } from 'lucide-react';
+import { Plus, Search, Home, Users, DollarSign, Calendar, Trash2, Edit, Printer, Clock } from 'lucide-react';
 import { useSales } from '@/hooks/useSales';
+import { supabase } from '@/integrations/supabase/client';
 
 const SalesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingSale, setEditingSale] = useState<any>(null);
+  const [projects, setProjects] = useState<any[]>([]);
   const { sales, isLoading, deleteSale } = useSales();
+
+  // جلب بيانات المشاريع لحساب حالة التأخير
+  useEffect(() => {
+    const fetchProjects = async () => {
+      const { data } = await supabase
+        .from('projects')
+        .select('name, expected_completion');
+      setProjects(data || []);
+    };
+    fetchProjects();
+  }, []);
 
   if (isLoading) {
     return (
@@ -32,6 +45,48 @@ const SalesPage = () => {
         return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">متاح</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+  // حساب حالة التأخير في التسليم
+  const getDeliveryStatus = (sale: any) => {
+    if (!sale.sale_date || sale.status !== 'مباع') {
+      return null;
+    }
+
+    const project = projects.find(p => p.name === sale.project_name);
+    if (!project || !project.expected_completion) {
+      return null;
+    }
+
+    const saleDate = new Date(sale.sale_date);
+    const completionDate = new Date(project.expected_completion);
+    const today = new Date();
+    
+    // حساب الفرق بالأشهر
+    const monthsRemaining = Math.round((completionDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24 * 30));
+
+    if (monthsRemaining < 0) {
+      // العقد منتهي - أحمر
+      return {
+        status: 'منتهي',
+        color: 'bg-red-100 text-red-800 hover:bg-red-100',
+        months: Math.abs(monthsRemaining)
+      };
+    } else if (monthsRemaining <= 3) {
+      // أصفر - 3 شهور أو أقل
+      return {
+        status: 'قريب الانتهاء',
+        color: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100',
+        months: monthsRemaining
+      };
+    } else {
+      // أخضر - أكثر من 6 شهور
+      return {
+        status: 'مناسب',
+        color: 'bg-green-100 text-green-800 hover:bg-green-100',
+        months: monthsRemaining
+      };
     }
   };
 
@@ -164,6 +219,7 @@ const SalesPage = () => {
                   <TableHead className="text-right">السعر</TableHead>
                   <TableHead className="text-right">العميل</TableHead>
                   <TableHead className="text-right">الحالة</TableHead>
+                  <TableHead className="text-right">حالة التسليم</TableHead>
                   <TableHead className="text-right">المبلغ المتبقي</TableHead>
                   <TableHead className="text-right">تاريخ البيع</TableHead>
                   <TableHead className="text-right">الإجراءات</TableHead>
@@ -184,6 +240,27 @@ const SalesPage = () => {
                       </div>
                     </TableCell>
                     <TableCell>{getStatusBadge(sale.status)}</TableCell>
+                    <TableCell>
+                      {(() => {
+                        const deliveryStatus = getDeliveryStatus(sale);
+                        if (!deliveryStatus) {
+                          return <Badge variant="outline">غير محدد</Badge>;
+                        }
+                        return (
+                          <div className="flex items-center gap-2">
+                            <Badge className={deliveryStatus.color}>
+                              {deliveryStatus.status}
+                            </Badge>
+                            <span className="text-xs text-gray-500">
+                              {deliveryStatus.status === 'منتهي' 
+                                ? `متأخر ${deliveryStatus.months} شهر`
+                                : `${deliveryStatus.months} شهر متبقي`
+                              }
+                            </span>
+                          </div>
+                        );
+                      })()}
+                    </TableCell>
                     <TableCell>
                       {sale.remaining_amount > 0 ? `${sale.remaining_amount.toLocaleString()} ر.س` : 'مسدد بالكامل'}
                     </TableCell>

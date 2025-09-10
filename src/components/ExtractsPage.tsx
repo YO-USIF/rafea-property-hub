@@ -8,7 +8,6 @@ import {
   Plus, 
   Search, 
   Edit, 
-  Trash2, 
   FileText, 
   Calculator,
   TrendingUp,
@@ -28,7 +27,7 @@ const ExtractsPage = () => {
   
   const { user } = useAuth();
   const { userRole, isManager, isAdmin, loading: roleLoading } = useUserRole();
-  const { extracts, isLoading, deleteExtract } = useExtracts();
+  const { extracts, isLoading } = useExtracts();
 
   // إضافة تسجيل للتشخيص
   console.log('Current user:', user?.email);
@@ -77,11 +76,12 @@ const ExtractsPage = () => {
     setShowForm(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('هل أنت متأكد من حذف هذا المستخص؟')) {
-      deleteExtract.mutate(id);
-    }
-  };
+  // تم إلغاء صلاحية الحذف
+  // const handleDelete = async (id: string) => {
+  //   if (window.confirm('هل أنت متأكد من حذف هذا المستخص؟')) {
+  //     deleteExtract.mutate(id);
+  //   }
+  // };
 
   const handleFormSuccess = () => {
     setShowForm(false);
@@ -256,13 +256,7 @@ const ExtractsPage = () => {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDelete(extract.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        {/* تم إزالة زر الحذف */}
                       </div>
                     </TableCell>
                   </TableRow>

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useExtracts } from '@/hooks/useExtracts';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
 import ExtractForm from '@/components/forms/ExtractForm';
 
 const ExtractsPage = () => {
@@ -26,7 +27,16 @@ const ExtractsPage = () => {
   const [editingExtract, setEditingExtract] = useState<any>(null);
   
   const { user } = useAuth();
+  const { userRole, isManager, isAdmin, loading: roleLoading } = useUserRole();
   const { extracts, isLoading, deleteExtract } = useExtracts();
+
+  // إضافة تسجيل للتشخيص
+  console.log('Current user:', user?.email);
+  console.log('User role:', userRole);
+  console.log('Is manager:', isManager);
+  console.log('Is admin:', isAdmin);
+  console.log('Role loading:', roleLoading);
+  console.log('Extracts count:', extracts.length);
 
   // تصفية المستخصات بناءً على البحث
   const filteredExtracts = extracts.filter(extract =>

@@ -14,11 +14,17 @@ export const useSales = () => {
   const { data: sales = [], isLoading } = useQuery({
     queryKey: ['sales'],
     queryFn: async () => {
-      // الآن نستخدم الجدول الأصلي فقط مع الاعتماد على RLS policies
-      // لضمان أن كل مستخدم يرى البيانات المناسبة له
+      // جلب المبيعات مع بيانات المشروع المرتبط
       const { data, error } = await supabase
         .from('sales')
-        .select('*')
+        .select(`
+          *,
+          projects (
+            id,
+            name,
+            expected_completion
+          )
+        `)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -29,6 +35,19 @@ export const useSales = () => {
 
   const createSale = useMutation({
     mutationFn: async (saleData: any) => {
+      // التأكد من تحديث project_name بناءً على project_id
+      if (saleData.project_id && !saleData.project_name) {
+        const { data: project } = await supabase
+          .from('projects')
+          .select('name')
+          .eq('id', saleData.project_id)
+          .single();
+        
+        if (project) {
+          saleData.project_name = project.name;
+        }
+      }
+
       const { data, error } = await supabase
         .from('sales')
         .insert([{ ...saleData, user_id: user?.id }])
@@ -54,6 +73,7 @@ export const useSales = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sales'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast({ title: "تم إضافة المبيعة بنجاح" });
     },
     onError: (error) => {
@@ -63,6 +83,19 @@ export const useSales = () => {
 
   const updateSale = useMutation({
     mutationFn: async ({ id, ...saleData }: any) => {
+      // التأكد من تحديث project_name بناءً على project_id
+      if (saleData.project_id && !saleData.project_name) {
+        const { data: project } = await supabase
+          .from('projects')
+          .select('name')
+          .eq('id', saleData.project_id)
+          .single();
+        
+        if (project) {
+          saleData.project_name = project.name;
+        }
+      }
+
       let query = supabase
         .from('sales')
         .update(saleData)
@@ -76,10 +109,12 @@ export const useSales = () => {
       const { data, error } = await query.select().single();
       
       if (error) throw error;
+
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sales'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast({ title: "تم تحديث المبيعة بنجاح" });
     },
     onError: (error) => {
@@ -89,6 +124,13 @@ export const useSales = () => {
 
   const deleteSale = useMutation({
     mutationFn: async (id: string) => {
+      // جلب بيانات المبيعة قبل حذفها لتحديث إحصائيات المشروع
+      const { data: sale } = await supabase
+        .from('sales')
+        .select('project_id')
+        .eq('id', id)
+        .single();
+
       let query = supabase
         .from('sales')
         .delete()
@@ -105,6 +147,7 @@ export const useSales = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sales'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast({ title: "تم حذف المبيعة بنجاح" });
     },
     onError: (error) => {

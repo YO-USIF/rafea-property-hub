@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,11 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useSales } from '@/hooks/useSales';
+import { useProjects } from '@/hooks/useProjects';
 
 interface Sale {
   id?: string;
   customer_name: string;
   customer_phone?: string;
+  project_id?: string;
   project_name: string;
   unit_number: string;
   unit_type: string;
@@ -31,11 +33,13 @@ interface SaleFormProps {
 
 const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
   const { createSale, updateSale } = useSales();
+  const { projects } = useProjects();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Sale>({
     customer_name: sale?.customer_name || '',
     customer_phone: sale?.customer_phone || '',
+    project_id: sale?.project_id || '',
     project_name: sale?.project_name || '',
     unit_number: sale?.unit_number || '',
     unit_type: sale?.unit_type || 'شقة',
@@ -46,6 +50,16 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
     sale_date: sale?.sale_date || '',
     installment_plan: sale?.installment_plan || ''
   });
+
+  // تحديث اسم المشروع عند اختيار مشروع جديد
+  useEffect(() => {
+    if (formData.project_id) {
+      const selectedProject = projects.find(p => p.id === formData.project_id);
+      if (selectedProject) {
+        setFormData(prev => ({ ...prev, project_name: selectedProject.name }));
+      }
+    }
+  }, [formData.project_id, projects]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,13 +118,22 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="project_name">اسم المشروع</Label>
-              <Input
-                id="project_name"
-                value={formData.project_name}
-                onChange={(e) => setFormData(prev => ({ ...prev, project_name: e.target.value }))}
-                required
-              />
+              <Label htmlFor="project_id">المشروع</Label>
+              <Select
+                value={formData.project_id}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, project_id: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر المشروع" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50">
+                  {projects.map((project) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

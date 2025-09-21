@@ -741,6 +741,7 @@ export type Database = {
           id: string
           installment_plan: string | null
           price: number
+          project_id: string | null
           project_name: string
           remaining_amount: number | null
           sale_date: string | null
@@ -758,6 +759,7 @@ export type Database = {
           id?: string
           installment_plan?: string | null
           price: number
+          project_id?: string | null
           project_name: string
           remaining_amount?: number | null
           sale_date?: string | null
@@ -775,6 +777,7 @@ export type Database = {
           id?: string
           installment_plan?: string | null
           price?: number
+          project_id?: string | null
           project_name?: string
           remaining_amount?: number | null
           sale_date?: string | null
@@ -784,7 +787,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_sales_project"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       security_settings: {
         Row: {

@@ -7,25 +7,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, Search, Home, Users, DollarSign, Calendar, Trash2, Edit, Printer, Clock } from 'lucide-react';
 import { useSales } from '@/hooks/useSales';
-import { supabase } from '@/integrations/supabase/client';
 
 const SalesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingSale, setEditingSale] = useState<any>(null);
-  const [projects, setProjects] = useState<any[]>([]);
   const { sales, isLoading, deleteSale } = useSales();
-
-  // جلب بيانات المشاريع لحساب حالة التأخير
-  useEffect(() => {
-    const fetchProjects = async () => {
-      const { data } = await supabase
-        .from('projects')
-        .select('name, expected_completion');
-      setProjects(data || []);
-    };
-    fetchProjects();
-  }, []);
 
   if (isLoading) {
     return (
@@ -55,9 +42,8 @@ const SalesPage = () => {
       return null;
     }
 
-    // تنظيف اسم المشروع من المسافات الإضافية للمقارنة الصحيحة
-    const cleanProjectName = sale.project_name?.trim();
-    const project = projects.find(p => p.name?.trim() === cleanProjectName);
+    // استخدام بيانات المشروع المرتبط مباشرة
+    const project = sale.projects;
     
     if (!project || !project.expected_completion) {
       return null;

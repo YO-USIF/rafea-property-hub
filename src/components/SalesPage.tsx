@@ -106,14 +106,18 @@ const SalesPage = () => {
       sale.unit_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       sale.status?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesProject = selectedProject === 'all' || sale.project_id === selectedProject;
+    // تحسين التصفية لتدعم كلا من project_id و project_name
+    const matchesProject = selectedProject === 'all' || 
+      sale.project_id === selectedProject ||
+      (sale.project_name && projects.find(p => p.id === selectedProject)?.name === sale.project_name);
     
     return matchesSearch && matchesProject;
   });
 
   // تجميع المبيعات حسب المشروع
   const salesByProject = filteredSales.reduce((acc, sale) => {
-    const projectId = sale.project_id || 'unknown';
+    // استخدام project_id إذا متوفر، وإلا استخدام project_name كمعرف
+    const projectId = sale.project_id || `name-${sale.project_name?.replace(/\s+/g, '-')}`;
     const projectName = sale.project_name || 'مشروع غير محدد';
     
     if (!acc[projectId]) {

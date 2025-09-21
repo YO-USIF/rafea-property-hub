@@ -56,6 +56,17 @@ export const useSales = () => {
       
       if (error) throw error;
 
+      // تحديث إحصائيات المشروع (الترايجر سيقوم بهذا تلقائياً، لكن نضيف هذا للتأكيد)
+      if (saleData.project_id) {
+        try {
+          await supabase.rpc('update_project_stats', {
+            project_id: saleData.project_id
+          });
+        } catch (err) {
+          console.warn('Could not update project stats:', err);
+        }
+      }
+
       // إنشاء قيد محاسبي للمبيعة
       if (saleData.status === 'مباع' && saleData.price > 0) {
         try {

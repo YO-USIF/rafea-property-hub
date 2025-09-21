@@ -1018,6 +1018,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      update_project_stats: {
+        Args: { project_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       user_role: "مدير النظام" | "مدير" | "موظف مبيعات" | "محاسب" | "موظف"

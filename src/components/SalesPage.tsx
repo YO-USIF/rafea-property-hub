@@ -3,16 +3,22 @@ import SaleForm from '@/components/forms/SaleForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Home, Users, DollarSign, Calendar, Trash2, Edit, Printer, Clock } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus, Search, Home, Users, DollarSign, Calendar, Trash2, Edit, Printer, Clock, Building2, Filter } from 'lucide-react';
 import { useSales } from '@/hooks/useSales';
+import { useProjects } from '@/hooks/useProjects';
 
 const SalesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingSale, setEditingSale] = useState<any>(null);
+  const [selectedProject, setSelectedProject] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'all' | 'grouped'>('all');
   const { sales, isLoading, deleteSale } = useSales();
+  const { projects } = useProjects();
 
   if (isLoading) {
     return (
@@ -92,19 +98,59 @@ const SalesPage = () => {
     }
   };
 
-  // تصفية المبيعات حسب البحث
-  const filteredSales = sales.filter(sale =>
-    sale.project_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sale.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sale.unit_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sale.unit_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sale.status?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // تصفية المبيعات حسب البحث والمشروع المحدد
+  const filteredSales = sales.filter(sale => {
+    const matchesSearch = sale.project_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sale.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sale.unit_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sale.unit_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sale.status?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesProject = selectedProject === 'all' || sale.project_id === selectedProject;
+    
+    return matchesSearch && matchesProject;
+  });
 
-  const totalUnits = sales.length;
-  const soldUnits = sales.filter(unit => unit.status === 'مباع').length;
-  const reservedUnits = sales.filter(unit => unit.status === 'محجوز').length;
-  const totalRevenue = sales
+  // تجميع المبيعات حسب المشروع
+  const salesByProject = filteredSales.reduce((acc, sale) => {
+    const projectId = sale.project_id || 'unknown';
+    const projectName = sale.project_name || 'مشروع غير محدد';
+    
+    if (!acc[projectId]) {
+      acc[projectId] = {
+        projectId,
+        projectName,
+        sales: [],
+        stats: {
+          totalUnits: 0,
+          soldUnits: 0,
+          reservedUnits: 0,
+          availableUnits: 0,
+          totalRevenue: 0
+        }
+      };
+    }
+    
+    acc[projectId].sales.push(sale);
+    acc[projectId].stats.totalUnits++;
+    
+    if (sale.status === 'مباع') {
+      acc[projectId].stats.soldUnits++;
+      acc[projectId].stats.totalRevenue += sale.price;
+    } else if (sale.status === 'محجوز') {
+      acc[projectId].stats.reservedUnits++;
+    } else if (sale.status === 'متاح') {
+      acc[projectId].stats.availableUnits++;
+    }
+    
+    return acc;
+  }, {} as Record<string, any>);
+
+  const totalUnits = filteredSales.length;
+  const soldUnits = filteredSales.filter(unit => unit.status === 'مباع').length;
+  const reservedUnits = filteredSales.filter(unit => unit.status === 'محجوز').length;
+  const availableUnits = filteredSales.filter(unit => unit.status === 'متاح').length;
+  const totalRevenue = filteredSales
     .filter(unit => unit.status === 'مباع')
     .reduce((sum, unit) => sum + unit.price, 0);
 
@@ -126,7 +172,7 @@ const SalesPage = () => {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">إجمالي الوحدات</CardTitle>
@@ -162,6 +208,17 @@ const SalesPage = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">المتاحة</CardTitle>
+            <Building2 className="h-4 w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">{availableUnits}</div>
+            <p className="text-xs text-muted-foreground">وحدة متاحة</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">إجمالي المبيعات</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -172,13 +229,165 @@ const SalesPage = () => {
         </Card>
       </div>
 
-      {/* Sales Table */}
+      {/* الفلاتر وخيارات العرض */}
       <Card>
         <CardHeader>
-          <CardTitle>سجل المبيعات</CardTitle>
-          <CardDescription>قائمة جميع الوحدات السكنية وحالة بيعها</CardDescription>
+          <CardTitle>تصفية وتنظيم المبيعات</CardTitle>
+          <CardDescription>اختر المشروع وطريقة العرض المناسبة</CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="flex gap-4 items-center">
+            <div className="flex-1">
+              <Select value={selectedProject} onValueChange={setSelectedProject}>
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر المشروع" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50">
+                  <SelectItem value="all">جميع المشاريع</SelectItem>
+                  {projects.map((project) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                variant={viewMode === 'all' ? 'default' : 'outline'}
+                onClick={() => setViewMode('all')}
+                size="sm"
+              >
+                عرض شامل
+              </Button>
+              <Button 
+                variant={viewMode === 'grouped' ? 'default' : 'outline'}
+                onClick={() => setViewMode('grouped')}
+                size="sm"
+              >
+                تجميع حسب المشروع
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Sales Content */}
+      {viewMode === 'grouped' ? (
+        <div className="space-y-6">
+          {Object.values(salesByProject).map((projectData: any) => (
+            <Card key={projectData.projectId}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="h-5 w-5" />
+                  {projectData.projectName}
+                </CardTitle>
+                <CardDescription>
+                  {projectData.stats.totalUnits} وحدة - {projectData.stats.soldUnits} مباعة - {projectData.stats.reservedUnits} محجوزة - {projectData.stats.availableUnits} متاحة
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* إحصائيات المشروع */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                  <div className="text-center p-3 bg-green-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">{projectData.stats.soldUnits}</div>
+                    <div className="text-sm text-green-700">مباعة</div>
+                  </div>
+                  <div className="text-center p-3 bg-yellow-50 rounded-lg">
+                    <div className="text-2xl font-bold text-yellow-600">{projectData.stats.reservedUnits}</div>
+                    <div className="text-sm text-yellow-700">محجوزة</div>
+                  </div>
+                  <div className="text-center p-3 bg-blue-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">{projectData.stats.availableUnits}</div>
+                    <div className="text-sm text-blue-700">متاحة</div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <div className="text-lg font-bold text-gray-600">{(projectData.stats.totalRevenue / 1000000).toFixed(1)}م</div>
+                    <div className="text-sm text-gray-700">إجمالي المبيعات</div>
+                  </div>
+                </div>
+                
+                {/* جدول مبيعات المشروع */}
+                <div className="border rounded-lg overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-right">رقم الوحدة</TableHead>
+                        <TableHead className="text-right">النوع</TableHead>
+                        <TableHead className="text-right">المساحة</TableHead>
+                        <TableHead className="text-right">السعر</TableHead>
+                        <TableHead className="text-right">العميل</TableHead>
+                        <TableHead className="text-right">الحالة</TableHead>
+                        <TableHead className="text-right">حالة التسليم</TableHead>
+                        <TableHead className="text-right">الإجراءات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {projectData.sales.map((sale: any) => (
+                        <TableRow key={sale.id}>
+                          <TableCell className="font-medium">{sale.unit_number}</TableCell>
+                          <TableCell>{sale.unit_type}</TableCell>
+                          <TableCell>{sale.area} م²</TableCell>
+                          <TableCell>{sale.price.toLocaleString()} ر.س</TableCell>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">{sale.customer_name}</div>
+                              <div className="text-sm text-gray-500">{sale.customer_phone}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell>{getStatusBadge(sale.status)}</TableCell>
+                          <TableCell>
+                            {(() => {
+                              const deliveryStatus = getDeliveryStatus(sale);
+                              if (!deliveryStatus) {
+                                return <Badge variant="outline">غير محدد</Badge>;
+                              }
+                              return (
+                                <div className="flex items-center gap-2">
+                                  <Badge className={deliveryStatus.color}>
+                                    <span className="mr-1">{deliveryStatus.icon}</span>
+                                    {deliveryStatus.status}
+                                  </Badge>
+                                  <span className="text-xs text-gray-500">
+                                    {deliveryStatus.status === 'منتهي الصلاحية' 
+                                      ? `متأخر ${deliveryStatus.months} شهر`
+                                      : `${deliveryStatus.months} شهر`
+                                    }
+                                  </span>
+                                </div>
+                              );
+                            })()}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => {
+                                  setEditingSale(sale);
+                                  setShowForm(true);
+                                }}
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>سجل المبيعات</CardTitle>
+            <CardDescription>قائمة جميع الوحدات السكنية وحالة بيعها</CardDescription>
+          </CardHeader>
+          <CardContent>
           <div className="flex gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -517,8 +726,10 @@ const SalesPage = () => {
             </Table>
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      )}
 
+      {/* Sale Form Dialog */}
       <SaleForm
         open={showForm}
         onOpenChange={(open) => {

@@ -736,6 +736,7 @@ export type Database = {
         Row: {
           area: number
           created_at: string
+          customer_id_number: string | null
           customer_name: string
           customer_phone: string | null
           id: string
@@ -754,6 +755,7 @@ export type Database = {
         Insert: {
           area: number
           created_at?: string
+          customer_id_number?: string | null
           customer_name: string
           customer_phone?: string | null
           id?: string
@@ -772,6 +774,7 @@ export type Database = {
         Update: {
           area?: number
           created_at?: string
+          customer_id_number?: string | null
           customer_name?: string
           customer_phone?: string | null
           id?: string

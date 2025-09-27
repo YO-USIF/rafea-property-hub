@@ -12,6 +12,7 @@ interface Sale {
   id?: string;
   customer_name: string;
   customer_phone?: string;
+  customer_id_number?: string;
   project_id?: string;
   project_name: string;
   unit_number: string;
@@ -39,6 +40,7 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
   const [formData, setFormData] = useState<Sale>({
     customer_name: sale?.customer_name || '',
     customer_phone: sale?.customer_phone || '',
+    customer_id_number: sale?.customer_id_number || '',
     project_id: sale?.project_id || '',
     project_name: sale?.project_name || '',
     unit_number: sale?.unit_number || '',
@@ -105,6 +107,16 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
                 value={formData.customer_name}
                 onChange={(e) => setFormData(prev => ({ ...prev, customer_name: e.target.value }))}
                 required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="customer_id_number">رقم الهوية</Label>
+              <Input
+                id="customer_id_number"
+                value={formData.customer_id_number}
+                onChange={(e) => setFormData(prev => ({ ...prev, customer_id_number: e.target.value }))}
+                placeholder="مثال: 1234567890"
               />
             </div>
 

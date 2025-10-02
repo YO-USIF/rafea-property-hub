@@ -741,6 +741,7 @@ export type Database = {
           customer_phone: string | null
           id: string
           installment_plan: string | null
+          marketer_name: string | null
           price: number
           project_id: string | null
           project_name: string
@@ -760,6 +761,7 @@ export type Database = {
           customer_phone?: string | null
           id?: string
           installment_plan?: string | null
+          marketer_name?: string | null
           price: number
           project_id?: string | null
           project_name: string
@@ -779,6 +781,7 @@ export type Database = {
           customer_phone?: string | null
           id?: string
           installment_plan?: string | null
+          marketer_name?: string | null
           price?: number
           project_id?: string | null
           project_name?: string

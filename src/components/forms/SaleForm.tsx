@@ -13,6 +13,7 @@ interface Sale {
   customer_name: string;
   customer_phone?: string;
   customer_id_number?: string;
+  marketer_name?: string;
   project_id?: string;
   project_name: string;
   unit_number: string;
@@ -41,6 +42,7 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
     customer_name: sale?.customer_name || '',
     customer_phone: sale?.customer_phone || '',
     customer_id_number: sale?.customer_id_number || '',
+    marketer_name: sale?.marketer_name || '',
     project_id: sale?.project_id || '',
     project_name: sale?.project_name || '',
     unit_number: sale?.unit_number || '',
@@ -126,6 +128,16 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
                 id="customer_phone"
                 value={formData.customer_phone}
                 onChange={(e) => setFormData(prev => ({ ...prev, customer_phone: e.target.value }))}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="marketer_name">اسم المسوق</Label>
+              <Input
+                id="marketer_name"
+                value={formData.marketer_name}
+                onChange={(e) => setFormData(prev => ({ ...prev, marketer_name: e.target.value }))}
+                placeholder="أدخل اسم المسوق"
               />
             </div>
 

@@ -39,45 +39,66 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Sale>({
-    customer_name: sale?.customer_name || '',
-    customer_phone: sale?.customer_phone || '',
-    customer_id_number: sale?.customer_id_number || '',
-    marketer_name: sale?.marketer_name || '',
-    project_id: sale?.project_id || '',
-    project_name: sale?.project_name || '',
-    unit_number: sale?.unit_number || '',
-    unit_type: sale?.unit_type || 'شقة',
-    area: sale?.area || 0,
-    price: sale?.price || 0,
-    remaining_amount: sale?.remaining_amount || 0,
-    status: sale?.status || 'متاح',
-    sale_date: sale?.sale_date || '',
-    installment_plan: sale?.installment_plan || ''
+    customer_name: '',
+    customer_phone: '',
+    customer_id_number: '',
+    marketer_name: '',
+    project_id: '',
+    project_name: '',
+    unit_number: '',
+    unit_type: 'شقة',
+    area: 0,
+    price: 0,
+    remaining_amount: 0,
+    status: 'متاح',
+    sale_date: '',
+    installment_plan: ''
   });
 
-  // تحديث البيانات عند تغيير sale (للتعديل)
+  // تحديث النموذج عند فتح الحوار أو تغيير البيانات
   useEffect(() => {
-    if (sale) {
-      setFormData({
-        customer_name: sale.customer_name || '',
-        customer_phone: sale.customer_phone || '',
-        customer_id_number: sale.customer_id_number || '',
-        marketer_name: sale.marketer_name || '',
-        project_id: sale.project_id || '',
-        project_name: sale.project_name || '',
-        unit_number: sale.unit_number || '',
-        unit_type: sale.unit_type || 'شقة',
-        area: sale.area || 0,
-        price: sale.price || 0,
-        remaining_amount: sale.remaining_amount || 0,
-        status: sale.status || 'متاح',
-        sale_date: sale.sale_date || '',
-        installment_plan: sale.installment_plan || ''
-      });
+    if (open) {
+      if (sale) {
+        // وضع التعديل - تحميل البيانات الموجودة
+        setFormData({
+          customer_name: sale.customer_name || '',
+          customer_phone: sale.customer_phone || '',
+          customer_id_number: sale.customer_id_number || '',
+          marketer_name: sale.marketer_name || '',
+          project_id: sale.project_id || '',
+          project_name: sale.project_name || '',
+          unit_number: sale.unit_number || '',
+          unit_type: sale.unit_type || 'شقة',
+          area: sale.area || 0,
+          price: sale.price || 0,
+          remaining_amount: sale.remaining_amount || 0,
+          status: sale.status || 'متاح',
+          sale_date: sale.sale_date || '',
+          installment_plan: sale.installment_plan || ''
+        });
+      } else {
+        // وضع الإضافة - إعادة تعيين النموذج
+        setFormData({
+          customer_name: '',
+          customer_phone: '',
+          customer_id_number: '',
+          marketer_name: '',
+          project_id: '',
+          project_name: '',
+          unit_number: '',
+          unit_type: 'شقة',
+          area: 0,
+          price: 0,
+          remaining_amount: 0,
+          status: 'متاح',
+          sale_date: '',
+          installment_plan: ''
+        });
+      }
     }
-  }, [sale]);
+  }, [open, sale]);
 
-  // تحديث اسم المشروع عند اختيار مشروع جديد
+  // تحديث اسم المشروع عند اختيار مشروع جديد (فقط في وضع الإضافة)
   useEffect(() => {
     if (formData.project_id && !sale) {
       const selectedProject = projects.find(p => p.id === formData.project_id);

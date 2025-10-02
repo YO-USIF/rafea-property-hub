@@ -55,15 +55,37 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
     installment_plan: sale?.installment_plan || ''
   });
 
+  // تحديث البيانات عند تغيير sale (للتعديل)
+  useEffect(() => {
+    if (sale) {
+      setFormData({
+        customer_name: sale.customer_name || '',
+        customer_phone: sale.customer_phone || '',
+        customer_id_number: sale.customer_id_number || '',
+        marketer_name: sale.marketer_name || '',
+        project_id: sale.project_id || '',
+        project_name: sale.project_name || '',
+        unit_number: sale.unit_number || '',
+        unit_type: sale.unit_type || 'شقة',
+        area: sale.area || 0,
+        price: sale.price || 0,
+        remaining_amount: sale.remaining_amount || 0,
+        status: sale.status || 'متاح',
+        sale_date: sale.sale_date || '',
+        installment_plan: sale.installment_plan || ''
+      });
+    }
+  }, [sale]);
+
   // تحديث اسم المشروع عند اختيار مشروع جديد
   useEffect(() => {
-    if (formData.project_id) {
+    if (formData.project_id && !sale) {
       const selectedProject = projects.find(p => p.id === formData.project_id);
       if (selectedProject) {
         setFormData(prev => ({ ...prev, project_name: selectedProject.name }));
       }
     }
-  }, [formData.project_id, projects]);
+  }, [formData.project_id, projects, sale]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -72,8 +72,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
               <Building className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-sidebar-foreground">رافع العقارية</h1>
-              <p className="text-xs text-sidebar-foreground/70">نظام الإدارة المتكامل</p>
+              <h1 className="text-lg font-bold text-sidebar-foreground">سهيل طيبة</h1>
+              <p className="text-xs text-sidebar-foreground/70">للتطوير العقاري</p>
             </div>
           </div>
         )}

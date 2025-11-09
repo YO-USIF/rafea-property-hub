@@ -1130,6 +1130,20 @@ export type Database = {
         Args: { customer_name: string; sale_amount: number; sale_id: string }
         Returns: string
       }
+      get_low_stock_items: {
+        Args: never
+        Returns: {
+          category: string
+          current_quantity: number
+          id: string
+          item_code: string
+          item_name: string
+          location: string
+          minimum_quantity: number
+          shortage_percentage: number
+          unit: string
+        }[]
+      }
       is_admin: { Args: never; Returns: boolean }
       is_manager_or_admin: { Args: never; Returns: boolean }
       update_project_stats: { Args: { project_id: string }; Returns: undefined }

@@ -54,6 +54,13 @@ export const WarehousePage = () => {
     deleteTransaction,
   } = useWarehouse();
 
+  const [isAddItemOpen, setIsAddItemOpen] = useState(false);
+  const [isAddInOpen, setIsAddInOpen] = useState(false);
+  const [isAddOutOpen, setIsAddOutOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<any>(null);
+  const [deletingItem, setDeletingItem] = useState<any>(null);
+  const [deletingTransaction, setDeletingTransaction] = useState<any>(null);
+
   // حماية الصفحة للمدراء فقط
   if (loading) {
     return (
@@ -75,13 +82,6 @@ export const WarehousePage = () => {
       </div>
     );
   }
-
-  const [isAddItemOpen, setIsAddItemOpen] = useState(false);
-  const [isAddInOpen, setIsAddInOpen] = useState(false);
-  const [isAddOutOpen, setIsAddOutOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
-  const [deletingItem, setDeletingItem] = useState<any>(null);
-  const [deletingTransaction, setDeletingTransaction] = useState<any>(null);
 
   const handleAddItem = (data: any) => {
     createInventoryItem.mutate(data, {

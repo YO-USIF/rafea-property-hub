@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -39,6 +40,8 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export const WarehousePage = () => {
+  const { isManager, isAdmin } = useUserRole();
+  const isManagerOrAdmin = isManager || isAdmin;
   const {
     inventory,
     transactions,
@@ -203,22 +206,24 @@ export const WarehousePage = () => {
         </TabsList>
 
         <TabsContent value="inventory" className="space-y-4">
-          <div className="flex gap-2">
-            <Dialog open={isAddItemOpen} onOpenChange={setIsAddItemOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="ml-2 h-4 w-4" />
-                  إضافة صنف جديد
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>إضافة صنف جديد للمخزون</DialogTitle>
-                </DialogHeader>
-                <InventoryItemForm onSubmit={handleAddItem} onCancel={() => setIsAddItemOpen(false)} />
-              </DialogContent>
-            </Dialog>
-          </div>
+          {isManagerOrAdmin && (
+            <div className="flex gap-2">
+              <Dialog open={isAddItemOpen} onOpenChange={setIsAddItemOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="ml-2 h-4 w-4" />
+                    إضافة صنف جديد
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>إضافة صنف جديد للمخزون</DialogTitle>
+                  </DialogHeader>
+                  <InventoryItemForm onSubmit={handleAddItem} onCancel={() => setIsAddItemOpen(false)} />
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
 
           <Card>
             <CardHeader>
@@ -246,7 +251,7 @@ export const WarehousePage = () => {
                         <TableHead>سعر الوحدة</TableHead>
                         <TableHead>القيمة</TableHead>
                         <TableHead>الموقع</TableHead>
-                        <TableHead>الإجراءات</TableHead>
+                        {isManagerOrAdmin && <TableHead>الإجراءات</TableHead>}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -275,24 +280,26 @@ export const WarehousePage = () => {
                             {(item.current_quantity * item.unit_price).toLocaleString()} ريال
                           </TableCell>
                           <TableCell>{item.location || "-"}</TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setEditingItem(item)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setDeletingItem(item)}
-                              >
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
-                            </div>
-                          </TableCell>
+                          {isManagerOrAdmin && (
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setEditingItem(item)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setDeletingItem(item)}
+                                >
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          )}
                         </TableRow>
                       ))}
                     </TableBody>
@@ -304,45 +311,47 @@ export const WarehousePage = () => {
         </TabsContent>
 
         <TabsContent value="transactions" className="space-y-4">
-          <div className="flex gap-2">
-            <Dialog open={isAddInOpen} onOpenChange={setIsAddInOpen}>
-              <DialogTrigger asChild>
-                <Button variant="default">
-                  <TrendingUp className="ml-2 h-4 w-4" />
-                  تسجيل دخول بضاعة
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>تسجيل دخول بضاعة للمستودع</DialogTitle>
-                </DialogHeader>
-                <WarehouseTransactionForm
-                  transactionType="دخول"
-                  onSubmit={handleAddTransaction}
-                  onCancel={() => setIsAddInOpen(false)}
-                />
-              </DialogContent>
-            </Dialog>
+          {isManagerOrAdmin && (
+            <div className="flex gap-2">
+              <Dialog open={isAddInOpen} onOpenChange={setIsAddInOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="default">
+                    <TrendingUp className="ml-2 h-4 w-4" />
+                    تسجيل دخول بضاعة
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>تسجيل دخول بضاعة للمستودع</DialogTitle>
+                  </DialogHeader>
+                  <WarehouseTransactionForm
+                    transactionType="دخول"
+                    onSubmit={handleAddTransaction}
+                    onCancel={() => setIsAddInOpen(false)}
+                  />
+                </DialogContent>
+              </Dialog>
 
-            <Dialog open={isAddOutOpen} onOpenChange={setIsAddOutOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline">
-                  <TrendingDown className="ml-2 h-4 w-4" />
-                  تسجيل خروج بضاعة
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>تسجيل خروج بضاعة من المستودع</DialogTitle>
-                </DialogHeader>
-                <WarehouseTransactionForm
-                  transactionType="خروج"
-                  onSubmit={handleAddTransaction}
-                  onCancel={() => setIsAddOutOpen(false)}
-                />
-              </DialogContent>
-            </Dialog>
-          </div>
+              <Dialog open={isAddOutOpen} onOpenChange={setIsAddOutOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline">
+                    <TrendingDown className="ml-2 h-4 w-4" />
+                    تسجيل خروج بضاعة
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>تسجيل خروج بضاعة من المستودع</DialogTitle>
+                  </DialogHeader>
+                  <WarehouseTransactionForm
+                    transactionType="خروج"
+                    onSubmit={handleAddTransaction}
+                    onCancel={() => setIsAddOutOpen(false)}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
 
           <Card>
             <CardHeader>
@@ -369,7 +378,7 @@ export const WarehousePage = () => {
                         <TableHead>الإجمالي</TableHead>
                         <TableHead>المشروع</TableHead>
                         <TableHead>رقم المرجع</TableHead>
-                        <TableHead>الإجراءات</TableHead>
+                        {isManagerOrAdmin && <TableHead>الإجراءات</TableHead>}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -391,15 +400,17 @@ export const WarehousePage = () => {
                           <TableCell>{transaction.total_amount.toLocaleString()} ريال</TableCell>
                           <TableCell>{transaction.project_name || "-"}</TableCell>
                           <TableCell>{transaction.reference_number}</TableCell>
-                          <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setDeletingTransaction(transaction)}
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </TableCell>
+                          {isManagerOrAdmin && (
+                            <TableCell>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setDeletingTransaction(transaction)}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </TableCell>
+                          )}
                         </TableRow>
                       ))}
                     </TableBody>

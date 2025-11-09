@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export const WarehousePage = () => {
-  const { isManager, isAdmin } = useUserRole();
+  const { isManager, isAdmin, loading } = useUserRole();
   const isManagerOrAdmin = isManager || isAdmin;
   const {
     inventory,
@@ -53,6 +53,28 @@ export const WarehousePage = () => {
     createTransaction,
     deleteTransaction,
   } = useWarehouse();
+
+  // حماية الصفحة للمدراء فقط
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <p className="text-lg">جارٍ التحميل...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isManagerOrAdmin) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2">غير مصرح لك بالوصول</h2>
+          <p className="text-muted-foreground">هذه الصفحة متاحة للمدراء فقط</p>
+        </div>
+      </div>
+    );
+  }
 
   const [isAddItemOpen, setIsAddItemOpen] = useState(false);
   const [isAddInOpen, setIsAddInOpen] = useState(false);

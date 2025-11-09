@@ -30,7 +30,8 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { signOut, user } = useAuth();
-  const { isAdmin } = useUserRole();
+  const { isAdmin, isManager } = useUserRole();
+  const isManagerOrAdmin = isManager || isAdmin;
 
   const menuItems = [
     { id: 'dashboard', name: 'لوحة التحكم', icon: Home },
@@ -39,7 +40,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
     { id: 'contractors', name: 'المقاولون', icon: Users },
     { id: 'suppliers', name: 'الموردون', icon: Truck },
     { id: 'purchases', name: 'المشتريات', icon: FileText },
-    { id: 'warehouse', name: 'المستودع', icon: Package },
+    { id: 'warehouse', name: 'المستودع', icon: Package, managerOnly: true },
     { id: 'extracts', name: 'المستخصات', icon: Receipt },
     { id: 'invoices', name: 'الفواتير', icon: Receipt },
     { id: 'accounting', name: 'النظام المحاسبي', icon: Calculator },
@@ -54,6 +55,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   const filteredMenuItems = menuItems.filter(item => {
     if (item.adminOnly) {
       return isAdmin;
+    }
+    if (item.managerOnly) {
+      return isManagerOrAdmin;
     }
     return true;
   });

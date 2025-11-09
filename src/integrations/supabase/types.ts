@@ -986,15 +986,129 @@ export type Database = {
         }
         Relationships: []
       }
+      warehouse_inventory: {
+        Row: {
+          category: string
+          created_at: string
+          current_quantity: number
+          description: string | null
+          id: string
+          item_code: string
+          item_name: string
+          location: string | null
+          minimum_quantity: number
+          unit: string
+          unit_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          current_quantity?: number
+          description?: string | null
+          id?: string
+          item_code: string
+          item_name: string
+          location?: string | null
+          minimum_quantity?: number
+          unit: string
+          unit_price?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          current_quantity?: number
+          description?: string | null
+          id?: string
+          item_code?: string
+          item_name?: string
+          location?: string | null
+          minimum_quantity?: number
+          unit?: string
+          unit_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      warehouse_transactions: {
+        Row: {
+          created_at: string
+          created_by_name: string | null
+          id: string
+          inventory_item_id: string
+          notes: string | null
+          project_id: string | null
+          project_name: string | null
+          quantity: number
+          reference_number: string
+          total_amount: number
+          transaction_date: string
+          transaction_type: string
+          unit_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by_name?: string | null
+          id?: string
+          inventory_item_id: string
+          notes?: string | null
+          project_id?: string | null
+          project_name?: string | null
+          quantity: number
+          reference_number: string
+          total_amount?: number
+          transaction_date?: string
+          transaction_type: string
+          unit_price?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by_name?: string | null
+          id?: string
+          inventory_item_id?: string
+          notes?: string | null
+          project_id?: string | null
+          project_name?: string | null
+          quantity?: number
+          reference_number?: string
+          total_amount?: number
+          transaction_date?: string
+          transaction_type?: string
+          unit_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "warehouse_transactions_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "warehouse_inventory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "warehouse_transactions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      can_access_customer_data: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      can_access_customer_data: { Args: never; Returns: boolean }
       create_extract_journal_entry: {
         Args: {
           contractor_name: string
@@ -1016,18 +1130,9 @@ export type Database = {
         Args: { customer_name: string; sale_amount: number; sale_id: string }
         Returns: string
       }
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_manager_or_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      update_project_stats: {
-        Args: { project_id: string }
-        Returns: undefined
-      }
+      is_admin: { Args: never; Returns: boolean }
+      is_manager_or_admin: { Args: never; Returns: boolean }
+      update_project_stats: { Args: { project_id: string }; Returns: undefined }
     }
     Enums: {
       user_role: "مدير النظام" | "مدير" | "موظف مبيعات" | "محاسب" | "موظف"

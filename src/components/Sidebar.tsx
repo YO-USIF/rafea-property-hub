@@ -18,7 +18,8 @@ import {
   X,
   LogOut,
   Calculator,
-  Receipt
+  Receipt,
+  Package
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -38,6 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
     { id: 'contractors', name: 'المقاولون', icon: Users },
     { id: 'suppliers', name: 'الموردون', icon: Truck },
     { id: 'purchases', name: 'المشتريات', icon: FileText },
+    { id: 'warehouse', name: 'المستودع', icon: Package },
     { id: 'extracts', name: 'المستخصات', icon: Receipt },
     { id: 'invoices', name: 'الفواتير', icon: Receipt },
     { id: 'accounting', name: 'النظام المحاسبي', icon: Calculator },

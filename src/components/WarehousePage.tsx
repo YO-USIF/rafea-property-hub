@@ -1,0 +1,428 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useWarehouse } from "@/hooks/useWarehouse";
+import { InventoryItemForm } from "./forms/InventoryItemForm";
+import { WarehouseTransactionForm } from "./forms/WarehouseTransactionForm";
+import { Plus, Package, TrendingUp, TrendingDown, Edit, Trash2, AlertTriangle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+export const WarehousePage = () => {
+  const {
+    inventory,
+    transactions,
+    isLoadingInventory,
+    isLoadingTransactions,
+    createInventoryItem,
+    updateInventoryItem,
+    deleteInventoryItem,
+    createTransaction,
+    deleteTransaction,
+  } = useWarehouse();
+
+  const [isAddItemOpen, setIsAddItemOpen] = useState(false);
+  const [isAddInOpen, setIsAddInOpen] = useState(false);
+  const [isAddOutOpen, setIsAddOutOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<any>(null);
+  const [deletingItem, setDeletingItem] = useState<any>(null);
+  const [deletingTransaction, setDeletingTransaction] = useState<any>(null);
+
+  const handleAddItem = (data: any) => {
+    createInventoryItem.mutate(data, {
+      onSuccess: () => setIsAddItemOpen(false),
+    });
+  };
+
+  const handleUpdateItem = (data: any) => {
+    if (editingItem) {
+      updateInventoryItem.mutate(
+        { id: editingItem.id, ...data },
+        {
+          onSuccess: () => setEditingItem(null),
+        }
+      );
+    }
+  };
+
+  const handleDeleteItem = () => {
+    if (deletingItem) {
+      deleteInventoryItem.mutate(deletingItem.id, {
+        onSuccess: () => setDeletingItem(null),
+      });
+    }
+  };
+
+  const handleAddTransaction = (data: any) => {
+    createTransaction.mutate(data, {
+      onSuccess: () => {
+        setIsAddInOpen(false);
+        setIsAddOutOpen(false);
+      },
+    });
+  };
+
+  const handleDeleteTransaction = () => {
+    if (deletingTransaction) {
+      deleteTransaction.mutate(deletingTransaction.id, {
+        onSuccess: () => setDeletingTransaction(null),
+      });
+    }
+  };
+
+  const lowStockItems = inventory.filter(
+    (item) => item.current_quantity <= item.minimum_quantity
+  );
+
+  const totalValue = inventory.reduce(
+    (sum, item) => sum + item.current_quantity * item.unit_price,
+    0
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">المستودع</h1>
+          <p className="text-muted-foreground">إدارة المخزون وحركات الدخول والخروج</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">إجمالي الأصناف</CardTitle>
+            <Package className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{inventory.length}</div>
+            <p className="text-xs text-muted-foreground">صنف في المستودع</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">قيمة المخزون</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalValue.toLocaleString()} ريال</div>
+            <p className="text-xs text-muted-foreground">القيمة الإجمالية</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">تنبيهات المخزون</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-destructive" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-destructive">{lowStockItems.length}</div>
+            <p className="text-xs text-muted-foreground">صنف أقل من الحد الأدنى</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Tabs defaultValue="inventory" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="inventory">المخزون</TabsTrigger>
+          <TabsTrigger value="transactions">الحركات</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="inventory" className="space-y-4">
+          <div className="flex gap-2">
+            <Dialog open={isAddItemOpen} onOpenChange={setIsAddItemOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="ml-2 h-4 w-4" />
+                  إضافة صنف جديد
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>إضافة صنف جديد للمخزون</DialogTitle>
+                </DialogHeader>
+                <InventoryItemForm onSubmit={handleAddItem} onCancel={() => setIsAddItemOpen(false)} />
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>أصناف المخزون</CardTitle>
+              <CardDescription>قائمة بجميع الأصناف المتوفرة في المستودع</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoadingInventory ? (
+                <div className="text-center py-8">جارٍ التحميل...</div>
+              ) : inventory.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  لا توجد أصناف في المخزون
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>كود الصنف</TableHead>
+                        <TableHead>اسم الصنف</TableHead>
+                        <TableHead>التصنيف</TableHead>
+                        <TableHead>الكمية الحالية</TableHead>
+                        <TableHead>الحد الأدنى</TableHead>
+                        <TableHead>الوحدة</TableHead>
+                        <TableHead>سعر الوحدة</TableHead>
+                        <TableHead>القيمة</TableHead>
+                        <TableHead>الموقع</TableHead>
+                        <TableHead>الإجراءات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {inventory.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium">{item.item_code}</TableCell>
+                          <TableCell>{item.item_name}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{item.category}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <span
+                              className={
+                                item.current_quantity <= item.minimum_quantity
+                                  ? "text-destructive font-bold"
+                                  : ""
+                              }
+                            >
+                              {item.current_quantity}
+                            </span>
+                          </TableCell>
+                          <TableCell>{item.minimum_quantity}</TableCell>
+                          <TableCell>{item.unit}</TableCell>
+                          <TableCell>{item.unit_price.toLocaleString()} ريال</TableCell>
+                          <TableCell>
+                            {(item.current_quantity * item.unit_price).toLocaleString()} ريال
+                          </TableCell>
+                          <TableCell>{item.location || "-"}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setEditingItem(item)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setDeletingItem(item)}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="transactions" className="space-y-4">
+          <div className="flex gap-2">
+            <Dialog open={isAddInOpen} onOpenChange={setIsAddInOpen}>
+              <DialogTrigger asChild>
+                <Button variant="default">
+                  <TrendingUp className="ml-2 h-4 w-4" />
+                  تسجيل دخول بضاعة
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>تسجيل دخول بضاعة للمستودع</DialogTitle>
+                </DialogHeader>
+                <WarehouseTransactionForm
+                  transactionType="دخول"
+                  onSubmit={handleAddTransaction}
+                  onCancel={() => setIsAddInOpen(false)}
+                />
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={isAddOutOpen} onOpenChange={setIsAddOutOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <TrendingDown className="ml-2 h-4 w-4" />
+                  تسجيل خروج بضاعة
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>تسجيل خروج بضاعة من المستودع</DialogTitle>
+                </DialogHeader>
+                <WarehouseTransactionForm
+                  transactionType="خروج"
+                  onSubmit={handleAddTransaction}
+                  onCancel={() => setIsAddOutOpen(false)}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>حركات المستودع</CardTitle>
+              <CardDescription>سجل حركات الدخول والخروج</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoadingTransactions ? (
+                <div className="text-center py-8">جارٍ التحميل...</div>
+              ) : transactions.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  لا توجد حركات مسجلة
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>التاريخ</TableHead>
+                        <TableHead>النوع</TableHead>
+                        <TableHead>الصنف</TableHead>
+                        <TableHead>الكمية</TableHead>
+                        <TableHead>سعر الوحدة</TableHead>
+                        <TableHead>الإجمالي</TableHead>
+                        <TableHead>المشروع</TableHead>
+                        <TableHead>رقم المرجع</TableHead>
+                        <TableHead>الإجراءات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {transactions.map((transaction: any) => (
+                        <TableRow key={transaction.id}>
+                          <TableCell>{new Date(transaction.transaction_date).toLocaleDateString('ar-SA')}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={transaction.transaction_type === "دخول" ? "default" : "secondary"}
+                            >
+                              {transaction.transaction_type}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {transaction.warehouse_inventory?.item_name || "-"}
+                          </TableCell>
+                          <TableCell>{transaction.quantity}</TableCell>
+                          <TableCell>{transaction.unit_price.toLocaleString()} ريال</TableCell>
+                          <TableCell>{transaction.total_amount.toLocaleString()} ريال</TableCell>
+                          <TableCell>{transaction.project_name || "-"}</TableCell>
+                          <TableCell>{transaction.reference_number}</TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDeletingTransaction(transaction)}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      <Dialog open={!!editingItem} onOpenChange={(open) => !open && setEditingItem(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>تعديل الصنف</DialogTitle>
+          </DialogHeader>
+          {editingItem && (
+            <InventoryItemForm
+              initialData={editingItem}
+              onSubmit={handleUpdateItem}
+              onCancel={() => setEditingItem(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deletingItem} onOpenChange={(open) => !open && setDeletingItem(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+            <AlertDialogDescription>
+              هل أنت متأكد من حذف الصنف "{deletingItem?.item_name}"؟ سيتم حذف جميع الحركات المرتبطة به.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteItem} className="bg-destructive">
+              حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={!!deletingTransaction}
+        onOpenChange={(open) => !open && setDeletingTransaction(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+            <AlertDialogDescription>
+              هل أنت متأكد من حذف هذه الحركة؟ هذا الإجراء لا يمكن التراجع عنه.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteTransaction} className="bg-destructive">
+              حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <div className="text-center text-sm text-muted-foreground pb-4">
+        شركة سهيل طيبة للتطوير العقاري © 2024
+      </div>
+    </div>
+  );
+};

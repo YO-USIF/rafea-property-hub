@@ -16,6 +16,7 @@ import TasksPage from '../components/TasksPage';
 import ReportsPage from '../components/ReportsPage';
 import SettingsPage from '../components/SettingsPage';
 import NotificationsManagement from '../components/NotificationsManagement';
+import { WarehousePage } from '../components/WarehousePage';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -35,6 +36,8 @@ const Index = () => {
         return <SuppliersPage />;
       case 'purchases':
         return <PurchasesPage />;
+      case 'warehouse':
+        return <WarehousePage />;
       case 'extracts':
         return <ExtractsPage />;
       case 'accounting':

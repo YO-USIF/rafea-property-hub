@@ -30,7 +30,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { signOut, user } = useAuth();
-  const { isAdmin, isManager } = useUserRole();
+  const { isAdmin, isManager, isProjectManager } = useUserRole();
   const isManagerOrAdmin = isManager || isAdmin;
 
   const menuItems = [
@@ -53,6 +53,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
 
   // تصفية العناصر بناءً على الصلاحيات
   const filteredMenuItems = menuItems.filter(item => {
+    // مدير المشروع يرى فقط المقاولين والمستخصات
+    if (isProjectManager) {
+      return item.id === 'contractors' || item.id === 'extracts';
+    }
     if (item.adminOnly) {
       return isAdmin;
     }

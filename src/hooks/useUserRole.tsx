@@ -7,6 +7,7 @@ export const useUserRole = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [isManager, setIsManager] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isProjectManager, setIsProjectManager] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,9 +36,12 @@ export const useUserRole = () => {
         setUserRole(role);
         const isManagerRole = role === 'مدير' || role === 'مدير النظام';
         const isAdminRole = role === 'مدير النظام';
+        // استخدام string للتحقق من مدير المشروع لتجنب خطأ TypeScript
+        const isProjectManagerRole = (role as string) === 'مدير مشروع';
         setIsManager(isManagerRole);
         setIsAdmin(isAdminRole);
-        console.log('Role processed:', { role, isManagerRole, isAdminRole });
+        setIsProjectManager(isProjectManagerRole);
+        console.log('Role processed:', { role, isManagerRole, isAdminRole, isProjectManagerRole });
       } catch (error) {
         console.error('Error fetching user role:', error);
       } finally {
@@ -52,6 +56,7 @@ export const useUserRole = () => {
     userRole,
     isManager,
     isAdmin,
+    isProjectManager,
     loading,
   };
 };

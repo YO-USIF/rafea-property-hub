@@ -175,6 +175,7 @@ export type Database = {
       extracts: {
         Row: {
           amount: number
+          amount_before_tax: number | null
           attached_file_name: string | null
           attached_file_url: string | null
           contractor_name: string
@@ -189,11 +190,14 @@ export type Database = {
           project_id: string | null
           project_name: string
           status: string
+          tax_amount: number | null
+          tax_included: boolean | null
           updated_at: string
           user_id: string
         }
         Insert: {
           amount?: number
+          amount_before_tax?: number | null
           attached_file_name?: string | null
           attached_file_url?: string | null
           contractor_name: string
@@ -208,11 +212,14 @@ export type Database = {
           project_id?: string | null
           project_name: string
           status?: string
+          tax_amount?: number | null
+          tax_included?: boolean | null
           updated_at?: string
           user_id: string
         }
         Update: {
           amount?: number
+          amount_before_tax?: number | null
           attached_file_name?: string | null
           attached_file_url?: string | null
           contractor_name?: string
@@ -227,6 +234,8 @@ export type Database = {
           project_id?: string | null
           project_name?: string
           status?: string
+          tax_amount?: number | null
+          tax_included?: boolean | null
           updated_at?: string
           user_id?: string
         }

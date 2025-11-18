@@ -13,17 +13,21 @@ import {
   TrendingUp,
   DollarSign,
   Download,
-  Filter
+  Filter,
+  Printer
 } from 'lucide-react';
 import { useExtracts } from '@/hooks/useExtracts';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import ExtractForm from '@/components/forms/ExtractForm';
+import ExtractPrintView from '@/components/forms/ExtractPrintView';
 
 const ExtractsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingExtract, setEditingExtract] = useState<any>(null);
+  const [printingExtract, setPrintingExtract] = useState<any>(null);
+  const [showPrintView, setShowPrintView] = useState(false);
   
   const { user } = useAuth();
   const { userRole, isManager, isAdmin, loading: roleLoading } = useUserRole();
@@ -76,12 +80,10 @@ const ExtractsPage = () => {
     setShowForm(true);
   };
 
-  // تم إلغاء صلاحية الحذف
-  // const handleDelete = async (id: string) => {
-  //   if (window.confirm('هل أنت متأكد من حذف هذا المستخص؟')) {
-  //     deleteExtract.mutate(id);
-  //   }
-  // };
+  const handlePrint = (extract: any) => {
+    setPrintingExtract(extract);
+    setShowPrintView(true);
+  };
 
   const handleFormSuccess = () => {
     setShowForm(false);
@@ -252,11 +254,19 @@ const ExtractsPage = () => {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => handlePrint(extract)}
+                          title="طباعة المستخلص"
+                        >
+                          <Printer className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => handleEdit(extract)}
+                          title="تعديل المستخلص"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        {/* تم إزالة زر الحذف */}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -279,6 +289,13 @@ const ExtractsPage = () => {
         onOpenChange={setShowForm}
         extract={editingExtract}
         onSuccess={handleFormSuccess}
+      />
+
+      {/* Print View Dialog */}
+      <ExtractPrintView
+        open={showPrintView}
+        onOpenChange={setShowPrintView}
+        extract={printingExtract}
       />
     </div>
   );

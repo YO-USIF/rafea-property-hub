@@ -219,6 +219,7 @@ const SettingsPage = () => {
                         <SelectContent>
                           <SelectItem value="مدير النظام">مدير النظام</SelectItem>
                           <SelectItem value="مدير">مدير</SelectItem>
+                          <SelectItem value="مدير مشروع">مدير مشروع</SelectItem>
                           <SelectItem value="موظف مبيعات">موظف مبيعات</SelectItem>
                           <SelectItem value="محاسب">محاسب</SelectItem>
                           <SelectItem value="موظف">موظف</SelectItem>

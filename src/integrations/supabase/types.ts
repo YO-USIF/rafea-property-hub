@@ -1158,7 +1158,13 @@ export type Database = {
       update_project_stats: { Args: { project_id: string }; Returns: undefined }
     }
     Enums: {
-      user_role: "مدير النظام" | "مدير" | "موظف مبيعات" | "محاسب" | "موظف"
+      user_role:
+        | "مدير النظام"
+        | "مدير"
+        | "موظف مبيعات"
+        | "محاسب"
+        | "موظف"
+        | "مدير مشروع"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1286,7 +1292,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      user_role: ["مدير النظام", "مدير", "موظف مبيعات", "محاسب", "موظف"],
+      user_role: [
+        "مدير النظام",
+        "مدير",
+        "موظف مبيعات",
+        "محاسب",
+        "موظف",
+        "مدير مشروع",
+      ],
     },
   },
 } as const

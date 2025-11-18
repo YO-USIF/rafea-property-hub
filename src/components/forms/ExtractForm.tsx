@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { FileUpload } from '@/components/ui/file-upload';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useExtracts } from '@/hooks/useExtracts';
 import { useProjects } from '@/hooks/useProjects';
@@ -26,6 +27,9 @@ interface Extract {
   previous_amount?: number;
   attached_file_url?: string;
   attached_file_name?: string;
+  tax_included?: boolean;
+  tax_amount?: number;
+  amount_before_tax?: number;
 }
 
 interface ExtractFormProps {
@@ -54,7 +58,10 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess }: ExtractFormProp
     current_amount: extract?.current_amount || 0,
     previous_amount: extract?.previous_amount || 0,
     attached_file_url: extract?.attached_file_url || '',
-    attached_file_name: extract?.attached_file_name || ''
+    attached_file_name: extract?.attached_file_name || '',
+    tax_included: extract?.tax_included || false,
+    tax_amount: extract?.tax_amount || 0,
+    amount_before_tax: extract?.amount_before_tax || 0
   });
 
   // تحديث البيانات عند تغيير العنصر المرسل للتعديل
@@ -73,7 +80,10 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess }: ExtractFormProp
         current_amount: extract.current_amount || 0,
         previous_amount: extract.previous_amount || 0,
         attached_file_url: extract.attached_file_url || '',
-        attached_file_name: extract.attached_file_name || ''
+        attached_file_name: extract.attached_file_name || '',
+        tax_included: extract.tax_included || false,
+        tax_amount: extract.tax_amount || 0,
+        amount_before_tax: extract.amount_before_tax || 0
       });
     } else {
       setFormData({
@@ -89,10 +99,34 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess }: ExtractFormProp
         current_amount: 0,
         previous_amount: 0,
         attached_file_url: '',
-        attached_file_name: ''
+        attached_file_name: '',
+        tax_included: false,
+        tax_amount: 0,
+        amount_before_tax: 0
       });
     }
   }, [extract]);
+
+  // حساب الضريبة تلقائياً عند تغيير المبلغ أو حالة الضريبة
+  useEffect(() => {
+    if (formData.tax_included && formData.amount > 0) {
+      // إذا كان المبلغ شامل الضريبة، نحسب المبلغ قبل الضريبة
+      const amountBeforeTax = formData.amount / 1.15;
+      const taxAmount = formData.amount - amountBeforeTax;
+      setFormData(prev => ({
+        ...prev,
+        amount_before_tax: Math.round(amountBeforeTax * 100) / 100,
+        tax_amount: Math.round(taxAmount * 100) / 100
+      }));
+    } else if (!formData.tax_included && formData.amount > 0) {
+      // إذا كان المبلغ غير شامل الضريبة، المبلغ قبل الضريبة = المبلغ نفسه
+      setFormData(prev => ({
+        ...prev,
+        amount_before_tax: formData.amount,
+        tax_amount: 0
+      }));
+    }
+  }, [formData.amount, formData.tax_included]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,7 +146,10 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess }: ExtractFormProp
         current_amount: formData.current_amount,
         previous_amount: formData.previous_amount,
         attached_file_url: formData.attached_file_url,
-        attached_file_name: formData.attached_file_name
+        attached_file_name: formData.attached_file_name,
+        tax_included: formData.tax_included,
+        tax_amount: formData.tax_amount,
+        amount_before_tax: formData.amount_before_tax
       };
 
       if (extract?.id) {
@@ -212,6 +249,45 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess }: ExtractFormProp
                 required
               />
             </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Checkbox
+                  id="tax_included"
+                  checked={formData.tax_included}
+                  onCheckedChange={(checked) => 
+                    setFormData(prev => ({ ...prev, tax_included: checked as boolean }))
+                  }
+                />
+                <Label htmlFor="tax_included" className="cursor-pointer">
+                  شامل ضريبة القيمة المضافة 15%
+                </Label>
+              </div>
+            </div>
+
+            {formData.tax_included && formData.amount > 0 && (
+              <>
+                <div className="space-y-2">
+                  <Label>المبلغ قبل الضريبة</Label>
+                  <Input
+                    type="number"
+                    value={formData.amount_before_tax?.toFixed(2) || 0}
+                    disabled
+                    className="bg-muted"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>قيمة الضريبة (15%)</Label>
+                  <Input
+                    type="number"
+                    value={formData.tax_amount?.toFixed(2) || 0}
+                    disabled
+                    className="bg-muted"
+                  />
+                </div>
+              </>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="extract_date">تاريخ المستخلص</Label>

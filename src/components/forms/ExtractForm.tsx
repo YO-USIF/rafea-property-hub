@@ -37,9 +37,10 @@ interface ExtractFormProps {
   onOpenChange: (open: boolean) => void;
   extract?: Extract;
   onSuccess: () => void;
+  isProjectManager?: boolean;
 }
 
-const ExtractForm = ({ open, onOpenChange, extract, onSuccess }: ExtractFormProps) => {
+const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager = false }: ExtractFormProps) => {
   const { toast } = useToast();
   const { createExtract, updateExtract } = useExtracts();
   const { projects } = useProjects();
@@ -339,15 +340,20 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess }: ExtractFormProp
               <Select
                 value={formData.status}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
+                disabled={isProjectManager}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="قيد المراجعة">قيد المراجعة</SelectItem>
-                  <SelectItem value="معتمد">معتمد</SelectItem>
-                  <SelectItem value="مدفوع">مدفوع</SelectItem>
-                  <SelectItem value="مرفوض">مرفوض</SelectItem>
+                  {!isProjectManager && (
+                    <>
+                      <SelectItem value="معتمد">معتمد</SelectItem>
+                      <SelectItem value="مدفوع">مدفوع</SelectItem>
+                      <SelectItem value="مرفوض">مرفوض</SelectItem>
+                    </>
+                  )}
                 </SelectContent>
               </Select>
             </div>

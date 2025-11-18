@@ -30,7 +30,7 @@ const ExtractsPage = () => {
   const [showPrintView, setShowPrintView] = useState(false);
   
   const { user } = useAuth();
-  const { userRole, isManager, isAdmin, loading: roleLoading } = useUserRole();
+  const { userRole, isManager, isAdmin, isProjectManager, loading: roleLoading } = useUserRole();
   const { extracts, isLoading } = useExtracts();
 
   // إضافة تسجيل للتشخيص
@@ -289,6 +289,7 @@ const ExtractsPage = () => {
         onOpenChange={setShowForm}
         extract={editingExtract}
         onSuccess={handleFormSuccess}
+        isProjectManager={isProjectManager}
       />
 
       {/* Print View Dialog */}

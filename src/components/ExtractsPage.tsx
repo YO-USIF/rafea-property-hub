@@ -21,6 +21,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import ExtractForm from '@/components/forms/ExtractForm';
 import ExtractPrintView from '@/components/forms/ExtractPrintView';
+import { ExtractsProjectSummary } from '@/components/reports/ExtractsProjectSummary';
 
 const ExtractsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -186,6 +187,9 @@ const ExtractsPage = () => {
           </Card>
         ))}
       </div>
+
+      {/* Project Summary */}
+      <ExtractsProjectSummary extracts={extracts} />
 
       {/* Search and Filter */}
       <Card>

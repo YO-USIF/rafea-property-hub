@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -41,7 +42,12 @@ import {
 
 export const WarehousePage = () => {
   const { isManager, isAdmin, loading } = useUserRole();
+  const { user } = useAuth();
   const isManagerOrAdmin = isManager || isAdmin;
+  
+  // التحقق من أن المستخدم هو المدير عمار (صلاحية إضافة فقط)
+  const isAmmarManager = user?.email === 'amarnory92@gmail.com';
+  const canEditAndDelete = isManagerOrAdmin && !isAmmarManager;
   const {
     inventory,
     transactions,
@@ -304,22 +310,26 @@ export const WarehousePage = () => {
                           <TableCell>{item.location || "-"}</TableCell>
                           {isManagerOrAdmin && (
                             <TableCell>
-                              <div className="flex gap-2">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => setEditingItem(item)}
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => setDeletingItem(item)}
-                                >
-                                  <Trash2 className="h-4 w-4 text-destructive" />
-                                </Button>
-                              </div>
+                              {canEditAndDelete ? (
+                                <div className="flex gap-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setEditingItem(item)}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setDeletingItem(item)}
+                                  >
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                  </Button>
+                                </div>
+                              ) : (
+                                <span className="text-xs text-muted-foreground">عرض فقط</span>
+                              )}
                             </TableCell>
                           )}
                         </TableRow>
@@ -424,13 +434,17 @@ export const WarehousePage = () => {
                           <TableCell>{transaction.reference_number}</TableCell>
                           {isManagerOrAdmin && (
                             <TableCell>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setDeletingTransaction(transaction)}
-                              >
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
+                              {canEditAndDelete ? (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setDeletingTransaction(transaction)}
+                                >
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              ) : (
+                                <span className="text-xs text-muted-foreground">عرض فقط</span>
+                              )}
                             </TableCell>
                           )}
                         </TableRow>

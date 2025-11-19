@@ -172,6 +172,74 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_access_logs: {
+        Row: {
+          accessed_at: string
+          action: string
+          customer_id: string
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          accessed_at?: string
+          action: string
+          customer_id: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          accessed_at?: string
+          action?: string
+          customer_id?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_access_logs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customers: {
+        Row: {
+          created_at: string
+          created_by: string
+          customer_id_number: string | null
+          customer_name: string
+          customer_phone: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          customer_id_number?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          customer_id_number?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       extracts: {
         Row: {
           amount: number
@@ -745,6 +813,7 @@ export type Database = {
         Row: {
           area: number
           created_at: string
+          customer_id: string | null
           customer_id_number: string | null
           customer_name: string
           customer_phone: string | null
@@ -765,6 +834,7 @@ export type Database = {
         Insert: {
           area: number
           created_at?: string
+          customer_id?: string | null
           customer_id_number?: string | null
           customer_name: string
           customer_phone?: string | null
@@ -785,6 +855,7 @@ export type Database = {
         Update: {
           area?: number
           created_at?: string
+          customer_id?: string | null
           customer_id_number?: string | null
           customer_name?: string
           customer_phone?: string | null
@@ -808,6 +879,13 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
         ]
@@ -1195,6 +1273,10 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_manager_or_admin: { Args: never; Returns: boolean }
+      log_customer_access: {
+        Args: { _action: string; _customer_id: string }
+        Returns: undefined
+      }
       update_project_stats: { Args: { project_id: string }; Returns: undefined }
     }
     Enums: {

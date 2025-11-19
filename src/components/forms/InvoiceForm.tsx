@@ -11,6 +11,8 @@ import { useInvoices } from '@/hooks/useInvoices';
 import { useProjects } from '@/hooks/useProjects';
 import { useSuppliers } from '@/hooks/useSuppliers';
 import { useUserRole } from '@/hooks/useUserRole';
+import { invoiceFormSchema, type InvoiceFormData } from '@/lib/validationSchemas';
+import { ZodError } from 'zod';
 
 interface Invoice {
   id?: string;
@@ -99,7 +101,7 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
         invoice_number: formData.invoice_number,
         supplier_name: formData.supplier_name,
         project_id: formData.project_id === "none" || formData.project_id === "multiple" || !formData.project_id ? null : formData.project_id,
-        amount: formData.amount,
+        amount: Number(formData.amount),
         description: formData.description,
         invoice_date: formData.invoice_date,
         due_date: formData.due_date,
@@ -108,16 +110,18 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
         attached_file_name: formData.attached_file_name
       };
 
-      console.log('Invoice payload:', invoicePayload);
+      // التحقق من صحة البيانات باستخدام Zod
+      const validatedData = invoiceFormSchema.parse(invoicePayload);
+
+      console.log('Validated invoice data:', validatedData);
 
       if (invoice?.id) {
         console.log('Updating invoice with ID:', invoice.id);
-        console.log('Update permissions check:', { isManager, isAdmin, canUpdate: isManager || isAdmin });
-        const result = await updateInvoice.mutateAsync({ id: invoice.id, ...invoicePayload });
+        const result = await updateInvoice.mutateAsync({ id: invoice.id, ...validatedData });
         console.log('Update result:', result);
       } else {
         console.log('Creating new invoice');
-        const result = await createInvoice.mutateAsync(invoicePayload);
+        const result = await createInvoice.mutateAsync(validatedData);
         console.log('Create result:', result);
       }
       
@@ -126,13 +130,21 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
       onOpenChange(false);
     } catch (error: any) {
       console.error('Error saving invoice:', error);
-      console.error('Error details:', error.message);
-      console.error('Error stack:', error.stack);
-      toast({ 
-        title: "خطأ في حفظ الفاتورة", 
-        description: error.message || "حدث خطأ غير متوقع",
-        variant: "destructive" 
-      });
+      if (error.name === 'ZodError') {
+        // عرض أخطاء التحقق للمستخدم
+        const errorMessage = error.errors.map((err: any) => `${err.path.join('.')}: ${err.message}`).join('\n');
+        toast({
+          title: 'بيانات غير صحيحة',
+          description: errorMessage,
+          variant: 'destructive'
+        });
+      } else {
+        toast({ 
+          title: "خطأ في حفظ الفاتورة", 
+          description: error.message || "حدث خطأ غير متوقع",
+          variant: "destructive" 
+        });
+      }
     } finally {
       setLoading(false);
     }

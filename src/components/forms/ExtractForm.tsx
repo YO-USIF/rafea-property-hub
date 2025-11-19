@@ -11,6 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useExtracts } from '@/hooks/useExtracts';
 import { useProjects } from '@/hooks/useProjects';
 import { useContractors } from '@/hooks/useContractors';
+import { extractFormSchema, type ExtractFormData } from '@/lib/validationSchemas';
+import { ZodError } from 'zod';
 
 interface Extract {
   id?: string;
@@ -134,35 +136,53 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
     setLoading(true);
 
     try {
-      const extractPayload: any = {
-        ...(formData.extract_number && { extract_number: formData.extract_number }),
+      const extractPayload = {
+        extract_number: formData.extract_number && formData.extract_number.trim() !== '' ? formData.extract_number : undefined,
         contractor_name: formData.contractor_name,
         project_name: formData.project_name,
-        project_id: formData.project_id === "none" ? null : (formData.project_id === "multiple" ? null : formData.project_id),
-        extract_date: formData.extract_date,
-        amount: formData.amount,
+        project_id: formData.project_id === "none" || !formData.project_id ? null : formData.project_id,
+        amount: Number(formData.amount),
+        amount_before_tax: formData.amount_before_tax ? Number(formData.amount_before_tax) : undefined,
+        tax_amount: formData.tax_amount ? Number(formData.tax_amount) : undefined,
+        tax_included: formData.tax_included,
         description: formData.description,
-        status: formData.status,
-        percentage_completed: formData.percentage_completed || 0,
-        current_amount: formData.current_amount || 0,
-        previous_amount: formData.previous_amount || 0,
+        extract_date: formData.extract_date,
+        status: isProjectManager ? 'قيد المراجعة' : formData.status,
+        percentage_completed: formData.percentage_completed ? Number(formData.percentage_completed) : undefined,
+        current_amount: formData.current_amount ? Number(formData.current_amount) : undefined,
+        previous_amount: formData.previous_amount ? Number(formData.previous_amount) : undefined,
         attached_file_url: formData.attached_file_url,
         attached_file_name: formData.attached_file_name,
-        tax_included: formData.tax_included,
-        tax_amount: formData.tax_amount,
-        amount_before_tax: formData.amount_before_tax
       };
 
+      // التحقق من صحة البيانات باستخدام Zod
+      const validatedData = extractFormSchema.parse(extractPayload);
+
       if (extract?.id) {
-        await updateExtract.mutateAsync({ id: extract.id, ...extractPayload });
+        await updateExtract.mutateAsync({ id: extract.id, ...validatedData });
       } else {
-        await createExtract.mutateAsync(extractPayload);
+        await createExtract.mutateAsync(validatedData);
       }
       
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
       console.error('Error saving extract:', error);
+      if (error.name === 'ZodError') {
+        // عرض أخطاء التحقق للمستخدم
+        const errorMessage = error.errors.map((err: any) => `${err.path.join('.')}: ${err.message}`).join('\n');
+        toast({
+          title: 'بيانات غير صحيحة',
+          description: errorMessage,
+          variant: 'destructive'
+        });
+      } else {
+        toast({
+          title: 'حدث خطأ أثناء حفظ البيانات',
+          description: 'يرجى المحاولة مرة أخرى',
+          variant: 'destructive'
+        });
+      }
     } finally {
       setLoading(false);
     }

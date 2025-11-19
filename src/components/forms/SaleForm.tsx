@@ -7,6 +7,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useToast } from '@/hooks/use-toast';
 import { useSales } from '@/hooks/useSales';
 import { useProjects } from '@/hooks/useProjects';
+import { saleFormSchema, type SaleFormData } from '@/lib/validationSchemas';
+import { ZodError } from 'zod';
 
 interface Sale {
   id?: string;
@@ -113,19 +115,37 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
     setLoading(true);
 
     try {
+      // التحقق من صحة البيانات باستخدام Zod
+      const validatedData = saleFormSchema.parse({
+        ...formData,
+        area: Number(formData.area),
+        price: Number(formData.price),
+        remaining_amount: formData.remaining_amount ? Number(formData.remaining_amount) : 0,
+      });
+
       if (sale?.id) {
-        await updateSale.mutateAsync({ id: sale.id, ...formData });
+        await updateSale.mutateAsync({ id: sale.id, ...validatedData });
       } else {
-        await createSale.mutateAsync(formData);
+        await createSale.mutateAsync(validatedData);
       }
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
-      toast({
-        title: "خطأ",
-        description: error.message,
-        variant: "destructive"
-      });
+      if (error.name === 'ZodError') {
+        // عرض أخطاء التحقق للمستخدم
+        const errorMessage = error.errors.map((err: any) => `${err.path.join('.')}: ${err.message}`).join('\n');
+        toast({
+          title: 'بيانات غير صحيحة',
+          description: errorMessage,
+          variant: 'destructive'
+        });
+      } else {
+        toast({
+          title: "خطأ",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(false);
     }

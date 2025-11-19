@@ -62,20 +62,20 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
       return item.id === 'contractors' || item.id === 'extracts';
     }
     
-    // التحقق من الصلاحيات الإدارية أولاً
-    if (item.adminOnly) {
-      return isAdmin;
-    }
-    if (item.managerOnly) {
-      return isManagerOrAdmin;
-    }
-    
-    // مدير النظام والمدراء لديهم جميع الصلاحيات
-    if (isAdmin || isManager) {
+    // مدير النظام فقط له جميع الصلاحيات
+    if (isAdmin) {
       return true;
     }
     
-    // الموظفون العاديون: التحقق من صلاحيات الوصول للصفحة من نظام الصلاحيات المخصص
+    // التحقق من الصلاحيات الإدارية
+    if (item.adminOnly) {
+      return false; // فقط مدير النظام
+    }
+    if (item.managerOnly) {
+      return isManager; // المدراء فقط
+    }
+    
+    // الجميع (بما في ذلك المدراء) يخضعون لنظام الصلاحيات
     return canAccessPage(item.id);
   });
 

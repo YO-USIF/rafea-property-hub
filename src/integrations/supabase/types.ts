@@ -974,6 +974,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_permissions: {
+        Row: {
+          can_create: boolean
+          can_delete: boolean
+          can_edit: boolean
+          can_view: boolean
+          created_at: string
+          id: string
+          page_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          can_create?: boolean
+          can_delete?: boolean
+          can_edit?: boolean
+          can_view?: boolean
+          created_at?: string
+          id?: string
+          page_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          can_create?: boolean
+          can_delete?: boolean
+          can_edit?: boolean
+          can_view?: boolean
+          created_at?: string
+          id?: string
+          page_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1118,6 +1154,10 @@ export type Database = {
     }
     Functions: {
       can_access_customer_data: { Args: never; Returns: boolean }
+      check_user_permission: {
+        Args: { _page_name: string; _permission_type: string; _user_id: string }
+        Returns: boolean
+      }
       create_extract_journal_entry: {
         Args: {
           contractor_name: string

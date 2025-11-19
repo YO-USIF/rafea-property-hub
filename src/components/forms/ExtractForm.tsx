@@ -131,6 +131,17 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
     }
   }, [formData.amount, formData.tax_included]);
 
+  // حساب إجمالي المبلغ تلقائياً من المبلغ السابق + المبلغ المدفوع
+  useEffect(() => {
+    const total = (formData.previous_amount || 0) + (formData.current_amount || 0);
+    if (formData.amount !== total) {
+      setFormData(prev => ({
+        ...prev,
+        amount: total
+      }));
+    }
+  }, [formData.previous_amount, formData.current_amount]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -261,18 +272,6 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="amount">إجمالي قيمة المستخلص</Label>
-              <Input
-                id="amount"
-                type="number"
-                step="0.01"
-                value={formData.amount}
-                onChange={(e) => setFormData(prev => ({ ...prev, amount: parseFloat(e.target.value) || 0 }))}
-                required
-              />
-            </div>
-
             <div className="space-y-2 md:col-span-2">
               <div className="flex items-center space-x-2 space-x-reverse">
                 <Checkbox
@@ -355,6 +354,19 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                 value={formData.current_amount}
                 onChange={(e) => setFormData(prev => ({ ...prev, current_amount: parseFloat(e.target.value) || 0 }))}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="amount">إجمالي قيمة المستخلص</Label>
+              <Input
+                id="amount"
+                type="number"
+                step="0.01"
+                value={formData.amount}
+                disabled
+                className="bg-muted/50 font-bold text-primary"
+              />
+              <p className="text-xs text-muted-foreground">يحسب تلقائياً: المبلغ السابق + المبلغ المدفوع</p>
             </div>
 
             <div className="space-y-2 md:col-span-2">

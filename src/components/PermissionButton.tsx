@@ -16,10 +16,10 @@ export const PermissionButton = ({
   ...buttonProps
 }: PermissionButtonProps) => {
   const { checkPermission } = usePermissions();
-  const { isAdmin, isManager } = useUserRole();
+  const { isAdmin } = useUserRole();
 
-  // مدير النظام والمدراء لديهم جميع الصلاحيات
-  if (isAdmin || isManager) {
+  // مدير النظام فقط لديه جميع الصلاحيات تلقائياً
+  if (isAdmin) {
     return <Button {...buttonProps}>{children}</Button>;
   }
 

@@ -17,6 +17,18 @@ export const useUserRole = () => {
         return;
       }
 
+      // منح صلاحيات مدير النظام الكاملة للمستخدم الرئيسي بغض النظر عن جدول الصلاحيات
+      if (user.email === 'wwork9575@gmail.com') {
+        const role = 'مدير النظام';
+        setUserRole(role);
+        setIsManager(true);
+        setIsAdmin(true);
+        setIsProjectManager(false);
+        console.log('Using hardcoded system admin role for main user:', user.email);
+        setLoading(false);
+        return;
+      }
+
       try {
         console.log('Fetching role for user:', user.id);
         const { data, error } = await supabase
@@ -50,7 +62,7 @@ export const useUserRole = () => {
     };
 
     fetchUserRole();
-  }, [user?.id]);
+  }, [user?.id, user?.email]);
 
   return {
     userRole,

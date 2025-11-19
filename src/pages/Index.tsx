@@ -17,6 +17,7 @@ import ReportsPage from '../components/ReportsPage';
 import SettingsPage from '../components/SettingsPage';
 import NotificationsManagement from '../components/NotificationsManagement';
 import { WarehousePage } from '../components/WarehousePage';
+import { PermissionsManagement } from '../components/PermissionsManagement';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -52,6 +53,8 @@ const Index = () => {
         return <ReportsPage />;
       case 'notifications':
         return <NotificationsManagement />;
+      case 'permissions':
+        return <PermissionsManagement />;
       case 'settings':
         return <SettingsPage />;
       default:

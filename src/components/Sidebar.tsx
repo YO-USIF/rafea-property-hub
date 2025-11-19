@@ -19,7 +19,8 @@ import {
   LogOut,
   Calculator,
   Receipt,
-  Package
+  Package,
+  Shield
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -48,6 +49,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
     { id: 'tasks', name: 'المهام اليومية', icon: ClipboardList },
     { id: 'reports', name: 'التقارير', icon: BarChart3 },
     { id: 'notifications', name: 'إدارة الإشعارات', icon: Bell, adminOnly: true },
+    { id: 'permissions', name: 'إدارة الصلاحيات', icon: Shield, adminOnly: true },
     { id: 'settings', name: 'الإعدادات', icon: Settings },
   ];
 

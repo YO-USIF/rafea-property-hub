@@ -237,7 +237,7 @@ export const WarehousePage = () => {
         </TabsList>
 
         <TabsContent value="inventory" className="space-y-4">
-          {isManagerOrAdmin && (
+          {hasAccess && (
             <div className="flex gap-2">
               <Dialog open={isAddItemOpen} onOpenChange={setIsAddItemOpen}>
                 <DialogTrigger asChild>
@@ -346,7 +346,7 @@ export const WarehousePage = () => {
         </TabsContent>
 
         <TabsContent value="transactions" className="space-y-4">
-          {isManagerOrAdmin && (
+          {hasAccess && (
             <div className="flex gap-2">
               <Dialog open={isAddInOpen} onOpenChange={setIsAddInOpen}>
                 <DialogTrigger asChild>

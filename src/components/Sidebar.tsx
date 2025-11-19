@@ -72,7 +72,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
       return false; // فقط مدير النظام
     }
     if (item.managerOnly) {
-      return isManager; // المدراء فقط
+      // السماح بالوصول إما للمدراء أو للمستخدمين الذين لديهم صلاحيات صريحة
+      return isManager || canAccessPage(item.id);
     }
     
     // الجميع (بما في ذلك المدراء) يخضعون لنظام الصلاحيات

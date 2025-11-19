@@ -134,18 +134,18 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
     setLoading(true);
 
     try {
-      const extractPayload = {
-        extract_number: formData.extract_number,
+      const extractPayload: any = {
+        ...(formData.extract_number && { extract_number: formData.extract_number }),
         contractor_name: formData.contractor_name,
         project_name: formData.project_name,
-        project_id: formData.project_id === "none" || formData.project_id === "multiple" ? null : formData.project_id,
+        project_id: formData.project_id === "none" ? null : (formData.project_id === "multiple" ? null : formData.project_id),
+        extract_date: formData.extract_date,
         amount: formData.amount,
         description: formData.description,
-        extract_date: formData.extract_date,
         status: formData.status,
-        percentage_completed: formData.percentage_completed,
-        current_amount: formData.current_amount,
-        previous_amount: formData.previous_amount,
+        percentage_completed: formData.percentage_completed || 0,
+        current_amount: formData.current_amount || 0,
+        previous_amount: formData.previous_amount || 0,
         attached_file_url: formData.attached_file_url,
         attached_file_name: formData.attached_file_name,
         tax_included: formData.tax_included,
@@ -188,8 +188,10 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                 id="extract_number"
                 value={formData.extract_number}
                 onChange={(e) => setFormData(prev => ({ ...prev, extract_number: e.target.value }))}
-                required
+                placeholder="سيتم إنشاؤه تلقائياً"
+                disabled={!extract?.id}
               />
+              <p className="text-xs text-muted-foreground">سيتم إنشاء الرقم تلقائياً عند الحفظ</p>
             </div>
 
             <div className="space-y-2">

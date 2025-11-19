@@ -14,7 +14,7 @@ export const useSales = () => {
   const { data: sales = [], isLoading } = useQuery({
     queryKey: ['sales'],
     queryFn: async () => {
-      // جلب المبيعات مع بيانات المشروع المرتبط
+      // جلب المبيعات مع بيانات المشروع والعميل المرتبط
       const { data, error } = await supabase
         .from('sales')
         .select(`
@@ -23,12 +23,27 @@ export const useSales = () => {
             id,
             name,
             expected_completion
+          ),
+          customers (
+            id,
+            customer_name,
+            customer_phone,
+            customer_id_number
           )
         `)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+      
+      // دمج بيانات العميل في كل عملية بيع لسهولة الوصول
+      const salesWithCustomers = data?.map(sale => ({
+        ...sale,
+        customer_name: sale.customers?.customer_name || sale.customer_name || '',
+        customer_phone: sale.customers?.customer_phone || sale.customer_phone || '',
+        customer_id_number: sale.customers?.customer_id_number || sale.customer_id_number || '',
+      }));
+      
+      return salesWithCustomers;
     },
     enabled: !!user?.id,
   });
@@ -48,9 +63,34 @@ export const useSales = () => {
         }
       }
 
+      // إنشاء أو تحديث بيانات العميل في جدول customers
+      let customerId = null;
+      if (saleData.customer_name) {
+        const customerData = {
+          customer_name: saleData.customer_name,
+          customer_phone: saleData.customer_phone || null,
+          customer_id_number: saleData.customer_id_number || null,
+          created_by: user?.id
+        };
+
+        const { data: customer, error: customerError } = await supabase
+          .from('customers')
+          .insert([customerData])
+          .select()
+          .single();
+
+        if (customerError) throw customerError;
+        customerId = customer.id;
+      }
+
+      // إنشاء المبيعة مع ربطها بالعميل
       const { data, error } = await supabase
         .from('sales')
-        .insert([{ ...saleData, user_id: user?.id }])
+        .insert([{ 
+          ...saleData,
+          customer_id: customerId,
+          user_id: user?.id 
+        }])
         .select()
         .single();
       

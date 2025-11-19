@@ -187,38 +187,16 @@ export const WarehouseTransactionForm = ({ onSubmit, transactionType, onCancel }
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="project_id">المشروع (اختياري)</Label>
-          <Select 
-            value={formData.project_id || "none"} 
-            onValueChange={(value) => {
-              if (value === "none") {
-                setFormData({ 
-                  ...formData, 
-                  project_id: "",
-                  project_name: ""
-                });
-              } else {
-                const project = projects.find(p => p.id === value);
-                setFormData({ 
-                  ...formData, 
-                  project_id: value,
-                  project_name: project?.name || ""
-                });
-              }
-            }}
-          >
-            <SelectTrigger id="project_id">
-              <SelectValue placeholder="اختر المشروع" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">بدون مشروع</SelectItem>
-              {projects.map((project) => (
-                <SelectItem key={project.id} value={project.id}>
-                  {project.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Label htmlFor="project_name">المشروع (اختياري)</Label>
+          <Input
+            id="project_name"
+            type="text"
+            value={formData.project_name}
+            onChange={(e) => setFormData({ ...formData, project_name: e.target.value, project_id: "" })}
+            placeholder="اكتب اسم المشروع"
+            maxLength={200}
+          />
+          {errors.project_name && <p className="text-sm text-destructive">{errors.project_name}</p>}
         </div>
       </div>
 

@@ -187,7 +187,7 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
             <div className="space-y-1.5">
               {extract.current_amount !== null && extract.current_amount !== undefined && (
                 <div className="flex justify-between items-center p-1.5 bg-background/60 rounded border border-muted">
-                  <span className="text-xs font-bold text-foreground/80">المبلغ الحالي:</span>
+                  <span className="text-xs font-bold text-foreground/80">المبلغ المدفوع:</span>
                   <span className="text-sm font-bold text-foreground">{formatCurrency(extract.current_amount)}</span>
                 </div>
               )}

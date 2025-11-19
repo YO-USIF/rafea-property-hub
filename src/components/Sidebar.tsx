@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
+import { usePermissions } from '@/hooks/usePermissions';
 import { 
   Home, 
   Building, 
@@ -32,6 +33,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { signOut, user } = useAuth();
   const { isAdmin, isManager, isProjectManager } = useUserRole();
+  const { canAccessPage } = usePermissions();
   const isManagerOrAdmin = isManager || isAdmin;
 
   const menuItems = [
@@ -59,13 +61,22 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
     if (isProjectManager) {
       return item.id === 'contractors' || item.id === 'extracts';
     }
+    
+    // التحقق من الصلاحيات الإدارية أولاً
     if (item.adminOnly) {
       return isAdmin;
     }
     if (item.managerOnly) {
       return isManagerOrAdmin;
     }
-    return true;
+    
+    // مدير النظام والمدراء يرون كل شيء
+    if (isAdmin || isManager) {
+      return true;
+    }
+    
+    // التحقق من صلاحيات الوصول للصفحة من نظام الصلاحيات المخصص
+    return canAccessPage(item.id);
   });
 
   return (

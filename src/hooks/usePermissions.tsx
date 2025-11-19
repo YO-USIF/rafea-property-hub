@@ -63,20 +63,30 @@ export const usePermissions = () => {
 
   // التحقق من صلاحية معينة
   const checkPermission = (pageName: string, permissionType: 'view' | 'create' | 'edit' | 'delete'): boolean => {
+    // التحقق من أن المستخدم مسجل دخول
+    if (!user?.id) return false;
+    
     const permission = myPermissions.find(p => p.page_name === pageName);
     
-    if (!permission) {
-      // الصلاحيات الافتراضية: عرض فقط
-      return permissionType === 'view';
+    // إذا وُجدت صلاحيات مخصصة، استخدمها
+    if (permission) {
+      switch (permissionType) {
+        case 'view': return permission.can_view;
+        case 'create': return permission.can_create;
+        case 'edit': return permission.can_edit;
+        case 'delete': return permission.can_delete;
+        default: return false;
+      }
     }
+    
+    // الصلاحيات الافتراضية بناءً على الدور
+    // إذا لم توجد صلاحيات مخصصة، استخدم الصلاحيات الافتراضية
+    return permissionType === 'view'; // العرض فقط بشكل افتراضي
+  };
 
-    switch (permissionType) {
-      case 'view': return permission.can_view;
-      case 'create': return permission.can_create;
-      case 'edit': return permission.can_edit;
-      case 'delete': return permission.can_delete;
-      default: return false;
-    }
+  // التحقق من إمكانية الوصول للصفحة
+  const canAccessPage = (pageName: string): boolean => {
+    return checkPermission(pageName, 'view');
   };
 
   // تحديث أو إنشاء صلاحيات
@@ -148,6 +158,7 @@ export const usePermissions = () => {
     isLoadingAll,
     isLoadingMy,
     checkPermission,
+    canAccessPage,
     upsertPermission,
     deletePermission,
   };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SaleForm from '@/components/forms/SaleForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PermissionButton } from "@/components/PermissionButton";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -166,13 +167,15 @@ const SalesPage = () => {
           <h1 className="text-3xl font-bold text-gray-900">مبيعات الشقق</h1>
           <p className="text-gray-600 mt-2">إدارة مبيعات الشقق والعقود والعملاء</p>
         </div>
-        <Button 
+        <PermissionButton
+          pageName="sales"
+          requirePermission="create"
           className="bg-primary hover:bg-primary/90"
           onClick={() => setShowForm(true)}
         >
           <Plus className="w-4 h-4 ml-2" />
           إضافة عملية بيع
-        </Button>
+        </PermissionButton>
       </div>
 
       {/* Statistics Cards */}
@@ -364,7 +367,9 @@ const SalesPage = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex gap-2">
-                              <Button 
+                              <PermissionButton
+                                pageName="sales"
+                                requirePermission="edit"
                                 size="sm" 
                                 variant="outline"
                                 onClick={() => {
@@ -373,7 +378,7 @@ const SalesPage = () => {
                                 }}
                               >
                                 <Edit className="w-4 h-4" />
-                              </Button>
+                              </PermissionButton>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -483,7 +488,9 @@ const SalesPage = () => {
                     <TableCell>{sale.sale_date || 'غير محدد'}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button 
+                        <PermissionButton
+                          pageName="sales"
+                          requirePermission="edit"
                           size="sm" 
                           variant="outline"
                           onClick={() => {
@@ -492,7 +499,7 @@ const SalesPage = () => {
                           }}
                         >
                           <Edit className="w-4 h-4" />
-                        </Button>
+                        </PermissionButton>
                         <Button 
                           size="sm" 
                           variant="outline"

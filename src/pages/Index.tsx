@@ -18,6 +18,7 @@ import SettingsPage from '../components/SettingsPage';
 import NotificationsManagement from '../components/NotificationsManagement';
 import { WarehousePage } from '../components/WarehousePage';
 import { PermissionsManagement } from '../components/PermissionsManagement';
+import { ProtectedPage } from '../components/ProtectedPage';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -26,39 +27,95 @@ const Index = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard />;
+        return (
+          <ProtectedPage pageName="dashboard">
+            <Dashboard />
+          </ProtectedPage>
+        );
       case 'projects':
-        return <ProjectsPage />;
+        return (
+          <ProtectedPage pageName="projects">
+            <ProjectsPage />
+          </ProtectedPage>
+        );
       case 'sales':
-        return <SalesPage />;
+        return (
+          <ProtectedPage pageName="sales">
+            <SalesPage />
+          </ProtectedPage>
+        );
       case 'contractors':
-        return <ContractorsPage />;
+        return (
+          <ProtectedPage pageName="contractors">
+            <ContractorsPage />
+          </ProtectedPage>
+        );
       case 'suppliers':
-        return <SuppliersPage />;
+        return (
+          <ProtectedPage pageName="suppliers">
+            <SuppliersPage />
+          </ProtectedPage>
+        );
       case 'purchases':
-        return <PurchasesPage />;
+        return (
+          <ProtectedPage pageName="purchases">
+            <PurchasesPage />
+          </ProtectedPage>
+        );
       case 'warehouse':
         return <WarehousePage />;
       case 'extracts':
-        return <ExtractsPage />;
+        return (
+          <ProtectedPage pageName="extracts">
+            <ExtractsPage />
+          </ProtectedPage>
+        );
       case 'accounting':
-        return <AccountingPage />;
+        return (
+          <ProtectedPage pageName="accounting">
+            <AccountingPage />
+          </ProtectedPage>
+        );
       case 'invoices':
-        return <InvoicesPage />;
+        return (
+          <ProtectedPage pageName="invoices">
+            <InvoicesPage />
+          </ProtectedPage>
+        );
       case 'maintenance':
-        return <MaintenancePage />;
+        return (
+          <ProtectedPage pageName="maintenance">
+            <MaintenancePage />
+          </ProtectedPage>
+        );
       case 'tasks':
-        return <TasksPage />;
+        return (
+          <ProtectedPage pageName="tasks">
+            <TasksPage />
+          </ProtectedPage>
+        );
       case 'reports':
-        return <ReportsPage />;
+        return (
+          <ProtectedPage pageName="reports">
+            <ReportsPage />
+          </ProtectedPage>
+        );
       case 'notifications':
         return <NotificationsManagement />;
       case 'permissions':
         return <PermissionsManagement />;
       case 'settings':
-        return <SettingsPage />;
+        return (
+          <ProtectedPage pageName="settings">
+            <SettingsPage />
+          </ProtectedPage>
+        );
       default:
-        return <Dashboard />;
+        return (
+          <ProtectedPage pageName="dashboard">
+            <Dashboard />
+          </ProtectedPage>
+        );
     }
   };
 

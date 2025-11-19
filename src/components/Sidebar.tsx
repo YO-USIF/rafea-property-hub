@@ -70,12 +70,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
       return isManagerOrAdmin;
     }
     
-    // مدير النظام والمدراء يرون كل شيء
-    if (isAdmin || isManager) {
-      return true;
-    }
-    
-    // التحقق من صلاحيات الوصول للصفحة من نظام الصلاحيات المخصص
+    // جميع المستخدمين (بما في ذلك المدراء) يجب أن يكون لديهم صلاحيات في جدول الصلاحيات
+    // باستثناء صفحات adminOnly و managerOnly التي تم التحقق منها أعلاه
     return canAccessPage(item.id);
   });
 

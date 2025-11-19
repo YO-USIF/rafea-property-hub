@@ -131,7 +131,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
     }
   }, [formData.amount, formData.tax_included]);
 
-  // حساب إجمالي المبلغ تلقائياً من المبلغ السابق + المبلغ المدفوع
+  // حساب إجمالي المبلغ تلقائياً من المبلغ المدفوع سابقاً + قيمة المستخلص الحالي
   useEffect(() => {
     const total = (formData.previous_amount || 0) + (formData.current_amount || 0);
     if (formData.amount !== total) {
@@ -335,7 +335,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="previous_amount">المبلغ السابق</Label>
+              <Label htmlFor="previous_amount">المبلغ المدفوع سابقاً</Label>
               <Input
                 id="previous_amount"
                 type="number"
@@ -346,7 +346,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="current_amount">المبلغ المدفوع</Label>
+              <Label htmlFor="current_amount">قيمة المستخلص الحالي</Label>
               <Input
                 id="current_amount"
                 type="number"
@@ -357,7 +357,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="amount">إجمالي قيمة المستخلص</Label>
+              <Label htmlFor="amount">إجمالي المبلغ</Label>
               <Input
                 id="amount"
                 type="number"
@@ -366,7 +366,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                 disabled
                 className="bg-muted/50 font-bold text-primary"
               />
-              <p className="text-xs text-muted-foreground">يحسب تلقائياً: المبلغ السابق + المبلغ المدفوع</p>
+              <p className="text-xs text-muted-foreground">يحسب تلقائياً: المبلغ المدفوع سابقاً + قيمة المستخلص الحالي</p>
             </div>
 
             <div className="space-y-2 md:col-span-2">

@@ -25,17 +25,12 @@ export const ProtectedPage = ({
     );
   }
 
-  // مدير النظام لديه جميع الصلاحيات
+  // مدير النظام فقط لديه جميع الصلاحيات
   if (isAdmin) {
     return <>{children}</>;
   }
 
-  // المدراء لديهم جميع الصلاحيات
-  if (isManager) {
-    return <>{children}</>;
-  }
-
-  // الموظفون العاديون: التحقق من الصلاحية المطلوبة
+  // الجميع (بما في ذلك المدراء): التحقق من الصلاحية المطلوبة
   const hasPermission = checkPermission(pageName, requirePermission);
 
   if (!hasPermission) {

@@ -246,7 +246,7 @@ const ExtractsPage = () => {
                     <TableCell className="font-medium">{extract.extract_number}</TableCell>
                     <TableCell>{extract.project_name}</TableCell>
                     <TableCell>{extract.contractor_name}</TableCell>
-                    <TableCell>{new Date(extract.extract_date).toLocaleDateString('ar-SA')}</TableCell>
+                    <TableCell>{new Date(extract.extract_date).toLocaleDateString('en-GB')}</TableCell>
                     <TableCell>{extract.percentage_completed}%</TableCell>
                     <TableCell className="font-semibold text-gray-600">{formatCurrency(extract.previous_amount || 0)}</TableCell>
                     <TableCell className="font-semibold text-blue-600">{formatCurrency(extract.current_amount || 0)}</TableCell>

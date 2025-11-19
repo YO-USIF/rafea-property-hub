@@ -43,10 +43,10 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
   };
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('ar-SA', {
+    return new Date(date).toLocaleDateString('en-GB', {
       year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+      month: '2-digit',
+      day: '2-digit'
     });
   };
 
@@ -125,9 +125,8 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
               )}
               
               <div className="text-[10px] text-foreground/70 font-medium">
-                <p>{settings?.company_address || 'المملكة العربية السعودية'}</p>
+                <p>المدينة المنورة - المملكة العربية السعودية</p>
                 <div className="flex justify-center gap-3 mt-0.5">
-                  <span>📞 {settings?.company_phone || '+966 XX XXX XXXX'}</span>
                   <span>✉️ {settings?.company_email || 'info@company.com'}</span>
                 </div>
               </div>

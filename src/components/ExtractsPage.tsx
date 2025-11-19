@@ -232,7 +232,8 @@ const ExtractsPage = () => {
                   <TableHead>المقاول</TableHead>
                   <TableHead>التاريخ</TableHead>
                   <TableHead>نسبة الإنجاز</TableHead>
-                  <TableHead>المبلغ المدفوع</TableHead>
+                  <TableHead>المبلغ المدفوع سابقاً</TableHead>
+                  <TableHead>قيمة المستخلص الحالي</TableHead>
                   <TableHead>إجمالي المبلغ</TableHead>
                   <TableHead>الحالة</TableHead>
                   <TableHead>الملف المرفق</TableHead>
@@ -247,7 +248,8 @@ const ExtractsPage = () => {
                     <TableCell>{extract.contractor_name}</TableCell>
                     <TableCell>{new Date(extract.extract_date).toLocaleDateString('ar-SA')}</TableCell>
                     <TableCell>{extract.percentage_completed}%</TableCell>
-                    <TableCell className="font-semibold text-blue-600">{formatCurrency(extract.current_amount)}</TableCell>
+                    <TableCell className="font-semibold text-gray-600">{formatCurrency(extract.previous_amount || 0)}</TableCell>
+                    <TableCell className="font-semibold text-blue-600">{formatCurrency(extract.current_amount || 0)}</TableCell>
                     <TableCell className="font-bold text-green-600">{formatCurrency(extract.amount)}</TableCell>
                     <TableCell>{getStatusBadge(extract.status)}</TableCell>
                     <TableCell>

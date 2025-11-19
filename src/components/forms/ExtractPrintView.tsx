@@ -185,9 +185,16 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
             <h3 className="text-base font-bold mb-2 text-primary text-center pb-1.5 border-b border-primary/40">التفاصيل المالية</h3>
             
             <div className="space-y-1.5">
+              {extract.previous_amount !== null && extract.previous_amount !== undefined && extract.previous_amount > 0 && (
+                <div className="flex justify-between items-center p-1.5 bg-background/60 rounded border border-muted">
+                  <span className="text-xs font-bold text-foreground/80">المبلغ المدفوع سابقاً:</span>
+                  <span className="text-sm font-bold text-foreground">{formatCurrency(extract.previous_amount)}</span>
+                </div>
+              )}
+              
               {extract.current_amount !== null && extract.current_amount !== undefined && (
                 <div className="flex justify-between items-center p-1.5 bg-background/60 rounded border border-muted">
-                  <span className="text-xs font-bold text-foreground/80">المبلغ المدفوع:</span>
+                  <span className="text-xs font-bold text-foreground/80">قيمة المستخلص الحالي (المبلغ المستحق):</span>
                   <span className="text-sm font-bold text-foreground">{formatCurrency(extract.current_amount)}</span>
                 </div>
               )}
@@ -206,7 +213,7 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
               )}
               
               <div className="flex justify-between items-center p-2 bg-gradient-to-r from-primary/20 to-primary/30 rounded border-2 border-primary/50 shadow-sm mt-1">
-                <span className="text-sm font-bold text-primary">إجمالي المبلغ المستحق:</span>
+                <span className="text-sm font-bold text-primary">إجمالي المبلغ:</span>
                 <span className="text-lg font-bold text-primary">{formatCurrency(extract.amount)}</span>
               </div>
             </div>

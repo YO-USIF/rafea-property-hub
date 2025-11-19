@@ -78,7 +78,10 @@ export const WarehousePage = () => {
     );
   }
 
-  if (!isManagerOrAdmin) {
+  // السماح بالوصول للمدراء والمدير عمار
+  const hasAccess = isManagerOrAdmin || isAmmarManager;
+  
+  if (!hasAccess) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">

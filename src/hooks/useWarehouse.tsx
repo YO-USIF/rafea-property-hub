@@ -112,9 +112,16 @@ export const useWarehouse = () => {
 
   const createTransaction = useMutation({
     mutationFn: async (transactionData: any) => {
+      const cleanedData = {
+        ...transactionData,
+        user_id: user?.id,
+        project_id: transactionData.project_id || null,
+        project_name: transactionData.project_name || null,
+      };
+
       const { data, error } = await supabase
         .from('warehouse_transactions')
-        .insert([{ ...transactionData, user_id: user?.id }])
+        .insert([cleanedData])
         .select()
         .single();
       

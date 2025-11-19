@@ -66,8 +66,9 @@ export const useExtracts = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['extracts'] });
-      queryClient.invalidateQueries({ queryKey: ['projects'] }); // لتحديث بيانات المشاريع
+      // إبطال جميع استعلامات المستخلصات لتحديث البيانات لجميع المستخدمين
+      queryClient.invalidateQueries({ queryKey: ['extracts'], refetchType: 'all' });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast({ title: "تم إنشاء المستخص بنجاح وخصم المبلغ من المبيعات" });
     },
     onError: (error) => {
@@ -91,7 +92,9 @@ export const useExtracts = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['extracts'] });
+      // إبطال جميع استعلامات المستخلصات لتحديث البيانات لجميع المستخدمين
+      queryClient.invalidateQueries({ queryKey: ['extracts'], refetchType: 'all' });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast({ title: "تم تحديث المستخص بنجاح" });
     },
     onError: (error) => {
@@ -114,7 +117,9 @@ export const useExtracts = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['extracts'] });
+      // إبطال جميع استعلامات المستخلصات لتحديث البيانات لجميع المستخدمين
+      queryClient.invalidateQueries({ queryKey: ['extracts'], refetchType: 'all' });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast({ title: "تم حذف المستخص بنجاح" });
     },
     onError: (error) => {

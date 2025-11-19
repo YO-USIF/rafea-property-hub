@@ -25,8 +25,6 @@ serve(async (req) => {
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
     // التحقق من المصادقة والحصول على المستخدم
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -36,11 +34,18 @@ serve(async (req) => {
       );
     }
 
-    // استخدام service role client للتحقق من المستخدم
     const token = authHeader.replace('Bearer ', '');
     
-    // التحقق من صحة التوكن باستخدام service role client
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+    // إنشاء client مع service role للتحقق من JWT
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
+    
+    // التحقق من صحة التوكن
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
     
     if (userError || !user) {
       console.error('User authentication error:', userError);
@@ -49,6 +54,9 @@ serve(async (req) => {
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // استخدام نفس service role client لباقي العمليات
+    const supabase = supabaseAdmin;
 
     // التحقق من أن المستخدم مدير نظام
     const { data: userRole, error: roleError } = await supabase

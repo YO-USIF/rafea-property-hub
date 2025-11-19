@@ -262,7 +262,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="amount">قيمة المستخلص</Label>
+              <Label htmlFor="amount">إجمالي قيمة المستخلص</Label>
               <Input
                 id="amount"
                 type="number"
@@ -347,7 +347,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="current_amount">المبلغ الحالي</Label>
+              <Label htmlFor="current_amount">المبلغ المدفوع</Label>
               <Input
                 id="current_amount"
                 type="number"

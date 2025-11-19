@@ -50,7 +50,8 @@ const ExtractsPage = () => {
 
   // حساب الإحصائيات
   const totalExtracts = extracts.length;
-  const totalAmount = extracts.reduce((sum, extract) => sum + (extract.current_amount || 0), 0);
+  const totalAmount = extracts.reduce((sum, extract) => sum + (extract.amount || 0), 0);
+  const totalPaidAmount = extracts.reduce((sum, extract) => sum + (extract.current_amount || 0), 0);
   const approvedExtracts = extracts.filter(extract => extract.status === 'معتمد').length;
   const pendingExtracts = extracts.filter(extract => extract.status === 'قيد المراجعة').length;
 
@@ -118,6 +119,13 @@ const ExtractsPage = () => {
       icon: DollarSign,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50'
+    },
+    {
+      title: 'المبالغ المدفوعة',
+      value: formatCurrency(totalPaidAmount),
+      icon: DollarSign,
+      color: 'text-emerald-600',
+      bgColor: 'bg-emerald-50'
     }
   ];
 
@@ -224,7 +232,8 @@ const ExtractsPage = () => {
                   <TableHead>المقاول</TableHead>
                   <TableHead>التاريخ</TableHead>
                   <TableHead>نسبة الإنجاز</TableHead>
-                  <TableHead>المبلغ الحالي</TableHead>
+                  <TableHead>المبلغ المدفوع</TableHead>
+                  <TableHead>إجمالي المبلغ</TableHead>
                   <TableHead>الحالة</TableHead>
                   <TableHead>الملف المرفق</TableHead>
                   <TableHead>الإجراءات</TableHead>
@@ -238,7 +247,8 @@ const ExtractsPage = () => {
                     <TableCell>{extract.contractor_name}</TableCell>
                     <TableCell>{new Date(extract.extract_date).toLocaleDateString('ar-SA')}</TableCell>
                     <TableCell>{extract.percentage_completed}%</TableCell>
-                    <TableCell>{formatCurrency(extract.current_amount)}</TableCell>
+                    <TableCell className="font-semibold text-blue-600">{formatCurrency(extract.current_amount)}</TableCell>
+                    <TableCell className="font-bold text-green-600">{formatCurrency(extract.amount)}</TableCell>
                     <TableCell>{getStatusBadge(extract.status)}</TableCell>
                     <TableCell>
                       {extract.attached_file_url && (

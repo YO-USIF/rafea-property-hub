@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ProjectDetailedReport } from '@/components/reports/ProjectDetailedReport';
 import { Printer, Eye, Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import suhailLogo from '@/assets/suhail-logo.jpeg';
 
 interface CustomReportFormProps {
   open: boolean;
@@ -38,11 +39,14 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
         .select('*')
         .eq('project_id', selectedProjectId);
       
-      if (startDate) query = query.gte('created_at', startDate);
-      if (endDate) query = query.lte('created_at', endDate);
+      if (startDate) query = query.gte('sale_date', startDate);
+      if (endDate) query = query.lte('sale_date', endDate);
       
       const { data, error } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching sales:', error);
+        return [];
+      }
       return data || [];
     },
     enabled: !!selectedProjectId && showReport,
@@ -110,22 +114,167 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
   const handlePrint = () => {
     if (printRef.current) {
       const printContent = printRef.current.innerHTML;
-      const printWindow = window.open('', '', 'height=600,width=800');
+      const printWindow = window.open('', '', 'height=842,width=595');
       
       if (printWindow) {
-        printWindow.document.write('<html><head><title>طباعة التقرير</title>');
+        printWindow.document.write('<!DOCTYPE html><html><head><title>تقرير تفصيلي - ' + (selectedProject?.name || '') + '</title>');
+        printWindow.document.write('<meta charset="utf-8">');
         printWindow.document.write('<style>');
         printWindow.document.write(`
-          body { font-family: Arial, sans-serif; direction: rtl; padding: 20px; }
-          .no-print { display: none; }
-          @media print {
-            .no-print { display: none !important; }
-            body { margin: 0; padding: 15px; }
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
           }
-          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-          th, td { border: 1px solid #ddd; padding: 8px; text-align: right; }
-          th { background-color: #f2f2f2; }
-          .page-break { page-break-after: always; }
+          
+          @page {
+            size: A4;
+            margin: 15mm;
+          }
+          
+          body { 
+            font-family: 'Arial', 'Segoe UI', Tahoma, sans-serif;
+            direction: rtl;
+            padding: 0;
+            background: white;
+            color: #1a1a1a;
+            line-height: 1.6;
+          }
+          
+          .print-header {
+            text-align: center;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+          }
+          
+          .company-logo {
+            width: 120px;
+            height: auto;
+            margin: 0 auto 15px;
+            display: block;
+          }
+          
+          .print-header h1 {
+            font-size: 24px;
+            color: #1e40af;
+            margin-bottom: 8px;
+            font-weight: bold;
+          }
+          
+          .print-header h2 {
+            font-size: 20px;
+            color: #374151;
+            margin-bottom: 12px;
+          }
+          
+          .print-header p {
+            font-size: 13px;
+            color: #6b7280;
+            margin: 4px 0;
+          }
+          
+          .no-print { 
+            display: none !important; 
+          }
+          
+          table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 15px 0;
+            font-size: 13px;
+          }
+          
+          th, td { 
+            border: 1px solid #d1d5db;
+            padding: 10px;
+            text-align: right;
+          }
+          
+          th { 
+            background-color: #f3f4f6;
+            font-weight: bold;
+            color: #1f2937;
+          }
+          
+          tr:nth-child(even) {
+            background-color: #f9fafb;
+          }
+          
+          .page-break { 
+            page-break-after: always; 
+          }
+          
+          .summary-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+          }
+          
+          .summary-card h3 {
+            font-size: 16px;
+            color: #1f2937;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e5e7eb;
+          }
+          
+          .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+          }
+          
+          .stat-box {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+          }
+          
+          .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 6px;
+          }
+          
+          .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1f2937;
+          }
+          
+          .profit { color: #059669; }
+          .loss { color: #dc2626; }
+          .income { color: #2563eb; }
+          .expense { color: #ea580c; }
+          
+          @media print {
+            body { 
+              padding: 0;
+              font-size: 12px;
+            }
+            
+            .no-print { 
+              display: none !important; 
+            }
+            
+            .page-break {
+              page-break-after: always;
+            }
+            
+            table {
+              font-size: 11px;
+            }
+            
+            th, td {
+              padding: 8px;
+            }
+          }
         `);
         printWindow.document.write('</style></head><body>');
         printWindow.document.write(printContent);
@@ -134,7 +283,7 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
         
         setTimeout(() => {
           printWindow.print();
-        }, 250);
+        }, 500);
       }
     }
   };
@@ -258,22 +407,43 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
           {showReport && selectedProject && (
             <div ref={printRef} className="space-y-4">
               <div className="text-center mb-6 print-header">
-                <h1 className="text-2xl font-bold mb-2">تقرير تفصيلي عن المشروع</h1>
-                <h2 className="text-xl text-gray-600">{selectedProject.name}</h2>
-                {startDate && endDate && (
-                  <p className="text-sm text-gray-500 mt-2">
-                    الفترة: من {new Date(startDate).toLocaleDateString('ar-SA')} إلى {new Date(endDate).toLocaleDateString('ar-SA')}
+                <img 
+                  src={suhailLogo} 
+                  alt="شعار شركة سهيل طيبة" 
+                  className="company-logo"
+                />
+                <h1 className="text-2xl font-bold mb-2 text-primary">تقرير تفصيلي عن المشروع</h1>
+                <h2 className="text-xl text-gray-700 font-semibold">{selectedProject.name}</h2>
+                <div className="mt-3 text-sm text-gray-600">
+                  <p className="font-medium">شركة سهيل طيبة للتطوير العقاري</p>
+                  {startDate && endDate && (
+                    <p className="mt-2">
+                      <span className="font-semibold">فترة التقرير:</span> من {new Date(startDate).toLocaleDateString('ar-SA')} إلى {new Date(endDate).toLocaleDateString('ar-SA')}
+                    </p>
+                  )}
+                  {!startDate && !endDate && (
+                    <p className="mt-2">
+                      <span className="font-semibold">فترة التقرير:</span> جميع الفترات
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-400 mt-2">
+                    تاريخ الإصدار: {new Date().toLocaleDateString('ar-SA', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
                   </p>
-                )}
-                <p className="text-xs text-gray-400 mt-1">
-                  تاريخ الطباعة: {new Date().toLocaleDateString('ar-SA')}
-                </p>
+                </div>
               </div>
 
               <ProjectDetailedReport 
                 data={reportData} 
                 period="custom"
               />
+
+              <div className="text-center text-xs text-gray-400 mt-8 pt-4 border-t">
+                <p>© {new Date().getFullYear()} شركة سهيل طيبة للتطوير العقاري - جميع الحقوق محفوظة</p>
+              </div>
             </div>
           )}
 

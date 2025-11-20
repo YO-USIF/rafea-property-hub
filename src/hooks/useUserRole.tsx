@@ -18,30 +18,25 @@ export const useUserRole = () => {
       }
 
       try {
-        console.log('Fetching role for user:', user.id);
         const { data, error } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
-          .maybeSingle(); // تغيير من single إلى maybeSingle
+          .maybeSingle();
 
         if (error) {
-          console.error('Error fetching user role:', error);
           setLoading(false);
           return;
         }
 
-        console.log('User role data:', data);
         const role = data?.role || null;
         setUserRole(role);
         const isManagerRole = role === 'مدير' || role === 'مدير النظام';
         const isAdminRole = role === 'مدير النظام';
-        // استخدام string للتحقق من مدير المشروع لتجنب خطأ TypeScript
         const isProjectManagerRole = (role as string) === 'مدير مشروع';
         setIsManager(isManagerRole);
         setIsAdmin(isAdminRole);
         setIsProjectManager(isProjectManagerRole);
-        console.log('Role processed:', { role, isManagerRole, isAdminRole, isProjectManagerRole });
       } catch (error) {
         console.error('Error fetching user role:', error);
       } finally {

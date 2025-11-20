@@ -286,6 +286,13 @@ const SalesPage = () => {
             <Card key={projectData.projectId}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
+                  {projectData.projectName?.includes('سهيل طيبة 5') && (
+                    <img 
+                      src="/src/assets/suhail-logo.jpeg" 
+                      alt="شعار سهيل" 
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  )}
                   <Building2 className="h-5 w-5" />
                   {projectData.projectName}
                 </CardTitle>
@@ -325,6 +332,7 @@ const SalesPage = () => {
                         <TableHead className="text-right">السعر</TableHead>
                         <TableHead className="text-right">العميل</TableHead>
                         <TableHead className="text-right">الحالة</TableHead>
+                        <TableHead className="text-right">طريقة السداد</TableHead>
                         <TableHead className="text-right">حالة التسليم</TableHead>
                         <TableHead className="text-right">الإجراءات</TableHead>
                       </TableRow>
@@ -343,6 +351,9 @@ const SalesPage = () => {
                             </div>
                           </TableCell>
                           <TableCell>{getStatusBadge(sale.status)}</TableCell>
+                          <TableCell>
+                            <span className="text-sm">{sale.payment_method || 'غير محدد'}</span>
+                          </TableCell>
                           <TableCell>
                             {(() => {
                               const deliveryStatus = getDeliveryStatus(sale);
@@ -439,6 +450,7 @@ const SalesPage = () => {
                   <TableHead className="text-right">السعر</TableHead>
                   <TableHead className="text-right">العميل</TableHead>
                   <TableHead className="text-right">الحالة</TableHead>
+                  <TableHead className="text-right">طريقة السداد</TableHead>
                   <TableHead className="text-right">حالة التسليم</TableHead>
                   <TableHead className="text-right">المبلغ المتبقي</TableHead>
                   <TableHead className="text-right">تاريخ البيع</TableHead>
@@ -448,7 +460,18 @@ const SalesPage = () => {
               <TableBody>
                 {filteredSales.map((sale) => (
                   <TableRow key={sale.id}>
-                    <TableCell className="font-medium">{sale.project_name}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {sale.project_name?.includes('سهيل طيبة 5') && (
+                          <img 
+                            src="/src/assets/suhail-logo.jpeg" 
+                            alt="شعار سهيل" 
+                            className="w-6 h-6 rounded-full object-cover"
+                          />
+                        )}
+                        <span>{sale.project_name}</span>
+                      </div>
+                    </TableCell>
                     <TableCell>{sale.unit_number}</TableCell>
                     <TableCell>{sale.unit_type}</TableCell>
                     <TableCell>{sale.area} م²</TableCell>
@@ -460,6 +483,9 @@ const SalesPage = () => {
                       </div>
                     </TableCell>
                     <TableCell>{getStatusBadge(sale.status)}</TableCell>
+                    <TableCell>
+                      <span className="text-sm">{sale.payment_method || 'غير محدد'}</span>
+                    </TableCell>
                     <TableCell>
                       {(() => {
                         const deliveryStatus = getDeliveryStatus(sale);

@@ -616,6 +616,30 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_access_logs: {
+        Row: {
+          accessed_at: string | null
+          accessed_by: string
+          action: string
+          id: string
+          profile_id: string
+        }
+        Insert: {
+          accessed_at?: string | null
+          accessed_by: string
+          action: string
+          id?: string
+          profile_id: string
+        }
+        Update: {
+          accessed_at?: string | null
+          accessed_by?: string
+          action?: string
+          id?: string
+          profile_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

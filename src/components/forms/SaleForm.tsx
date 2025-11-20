@@ -9,6 +9,7 @@ import { useSales } from '@/hooks/useSales';
 import { useProjects } from '@/hooks/useProjects';
 import { saleFormSchema, type SaleFormData } from '@/lib/validationSchemas';
 import { ZodError } from 'zod';
+import { FileUpload } from '@/components/ui/file-upload';
 
 interface Sale {
   id?: string;
@@ -26,6 +27,9 @@ interface Sale {
   status: string;
   sale_date?: string;
   installment_plan?: string;
+  payment_method?: string;
+  attached_file_url?: string;
+  attached_file_name?: string;
 }
 
 interface SaleFormProps {
@@ -54,7 +58,10 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
     remaining_amount: 0,
     status: 'متاح',
     sale_date: '',
-    installment_plan: ''
+    installment_plan: '',
+    payment_method: '',
+    attached_file_url: '',
+    attached_file_name: ''
   });
 
   // تحديث النموذج عند فتح الحوار أو تغيير البيانات
@@ -76,7 +83,10 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
           remaining_amount: sale.remaining_amount || 0,
           status: sale.status || 'متاح',
           sale_date: sale.sale_date || '',
-          installment_plan: sale.installment_plan || ''
+          installment_plan: sale.installment_plan || '',
+          payment_method: sale.payment_method || '',
+          attached_file_url: sale.attached_file_url || '',
+          attached_file_name: sale.attached_file_name || ''
         });
       } else {
         // وضع الإضافة - إعادة تعيين النموذج
@@ -94,7 +104,10 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
           remaining_amount: 0,
           status: 'متاح',
           sale_date: '',
-          installment_plan: ''
+          installment_plan: '',
+          payment_method: '',
+          attached_file_url: '',
+          attached_file_name: ''
         });
       }
     }
@@ -319,6 +332,49 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
                 placeholder="مثال: 24 شهر"
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="payment_method">طريقة السداد</Label>
+              <Select
+                value={formData.payment_method}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, payment_method: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر طريقة السداد" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="نقدي">نقدي</SelectItem>
+                  <SelectItem value="تحويل بنكي">تحويل بنكي</SelectItem>
+                  <SelectItem value="شيك">شيك</SelectItem>
+                  <SelectItem value="تقسيط">تقسيط</SelectItem>
+                  <SelectItem value="أخرى">أخرى</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>إرفاق ملف</Label>
+            <FileUpload
+              onFileUploaded={(url, fileName) => {
+                setFormData(prev => ({
+                  ...prev,
+                  attached_file_url: url,
+                  attached_file_name: fileName
+                }));
+              }}
+              currentFileUrl={formData.attached_file_url}
+              currentFileName={formData.attached_file_name}
+              onFileRemoved={() => {
+                setFormData(prev => ({
+                  ...prev,
+                  attached_file_url: '',
+                  attached_file_name: ''
+                }));
+              }}
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              maxSizeMB={10}
+            />
           </div>
 
           <div className="flex justify-end space-x-2 space-x-reverse pt-4">

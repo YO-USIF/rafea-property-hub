@@ -74,6 +74,14 @@ export const saleFormSchema = z.object({
     .max(500, { message: errorMessages.maxLength(500) })
     .optional()
     .or(z.literal('')),
+  
+  payment_method: z.string()
+    .max(100, { message: errorMessages.maxLength(100) })
+    .optional()
+    .or(z.literal('')),
+  
+  attached_file_url: z.string().optional(),
+  attached_file_name: z.string().optional(),
 });
 
 // نظام التحقق من صحة نموذج الفواتير

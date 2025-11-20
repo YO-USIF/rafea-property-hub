@@ -836,6 +836,8 @@ export type Database = {
       sales: {
         Row: {
           area: number
+          attached_file_name: string | null
+          attached_file_url: string | null
           created_at: string
           customer_id: string | null
           customer_id_number: string | null
@@ -844,6 +846,7 @@ export type Database = {
           id: string
           installment_plan: string | null
           marketer_name: string | null
+          payment_method: string | null
           price: number
           project_id: string | null
           project_name: string
@@ -857,6 +860,8 @@ export type Database = {
         }
         Insert: {
           area: number
+          attached_file_name?: string | null
+          attached_file_url?: string | null
           created_at?: string
           customer_id?: string | null
           customer_id_number?: string | null
@@ -865,6 +870,7 @@ export type Database = {
           id?: string
           installment_plan?: string | null
           marketer_name?: string | null
+          payment_method?: string | null
           price: number
           project_id?: string | null
           project_name: string
@@ -878,6 +884,8 @@ export type Database = {
         }
         Update: {
           area?: number
+          attached_file_name?: string | null
+          attached_file_url?: string | null
           created_at?: string
           customer_id?: string | null
           customer_id_number?: string | null
@@ -886,6 +894,7 @@ export type Database = {
           id?: string
           installment_plan?: string | null
           marketer_name?: string | null
+          payment_method?: string | null
           price?: number
           project_id?: string | null
           project_name?: string

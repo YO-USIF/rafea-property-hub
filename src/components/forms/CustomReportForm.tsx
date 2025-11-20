@@ -129,7 +129,7 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
           
           @page {
             size: A4;
-            margin: 15mm;
+            margin: 12mm 15mm;
           }
           
           body { 
@@ -138,40 +138,42 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
             padding: 0;
             background: white;
             color: #1a1a1a;
-            line-height: 1.6;
+            line-height: 1.4;
+            font-size: 11px;
           }
           
           .print-header {
             text-align: center;
-            border-bottom: 3px solid #2563eb;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
           }
           
           .company-logo {
-            width: 120px;
+            width: 80px;
             height: auto;
-            margin: 0 auto 15px;
+            margin: 0 auto 10px;
             display: block;
           }
           
           .print-header h1 {
-            font-size: 24px;
+            font-size: 18px;
             color: #1e40af;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             font-weight: bold;
           }
           
           .print-header h2 {
-            font-size: 20px;
+            font-size: 16px;
             color: #374151;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
           }
           
           .print-header p {
-            font-size: 13px;
+            font-size: 10px;
             color: #6b7280;
-            margin: 4px 0;
+            margin: 2px 0;
+            line-height: 1.3;
           }
           
           .no-print { 
@@ -181,13 +183,19 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
           table { 
             width: 100%; 
             border-collapse: collapse; 
-            margin: 15px 0;
-            font-size: 13px;
+            margin: 12px 0;
+            font-size: 10px;
+            page-break-inside: auto;
+          }
+          
+          tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
           }
           
           th, td { 
             border: 1px solid #d1d5db;
-            padding: 10px;
+            padding: 6px 8px;
             text-align: right;
           }
           
@@ -195,6 +203,7 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
             background-color: #f3f4f6;
             font-weight: bold;
             color: #1f2937;
+            font-size: 10px;
           }
           
           tr:nth-child(even) {
@@ -208,44 +217,48 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
           .summary-card {
             background: #f9fafb;
             border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 12px 0;
+            page-break-inside: avoid;
           }
           
           .summary-card h3 {
-            font-size: 16px;
+            font-size: 13px;
             color: #1f2937;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e5e7eb;
           }
           
           .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin: 20px 0;
+            gap: 10px;
+            margin: 12px 0;
+            page-break-inside: avoid;
           }
           
           .stat-box {
             background: white;
             border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            padding: 12px;
+            border-radius: 4px;
+            padding: 8px;
             text-align: center;
           }
           
           .stat-label {
-            font-size: 12px;
+            font-size: 9px;
             color: #6b7280;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+            line-height: 1.2;
           }
           
           .stat-value {
-            font-size: 20px;
+            font-size: 14px;
             font-weight: bold;
             color: #1f2937;
+            line-height: 1.2;
           }
           
           .profit { color: #059669; }
@@ -256,7 +269,8 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
           @media print {
             body { 
               padding: 0;
-              font-size: 12px;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
             }
             
             .no-print { 
@@ -268,11 +282,20 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
             }
             
             table {
-              font-size: 11px;
+              page-break-inside: auto;
             }
             
-            th, td {
-              padding: 8px;
+            tr {
+              page-break-inside: avoid;
+              page-break-after: auto;
+            }
+            
+            thead {
+              display: table-header-group;
+            }
+            
+            tfoot {
+              display: table-footer-group;
             }
           }
         `);

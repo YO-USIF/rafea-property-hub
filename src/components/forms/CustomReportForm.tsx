@@ -121,6 +121,8 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
         printWindow.document.write('<meta charset="utf-8">');
         printWindow.document.write('<style>');
         printWindow.document.write(`
+          @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+          
           * {
             margin: 0;
             padding: 0;
@@ -129,63 +131,162 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
           
           @page {
             size: A4;
-            margin: 12mm 15mm;
+            margin: 15mm;
           }
           
           body { 
-            font-family: 'Arial', 'Segoe UI', Tahoma, sans-serif;
+            font-family: 'Tajawal', 'Arial', sans-serif;
             direction: rtl;
-            padding: 0;
             background: white;
-            color: #1a1a1a;
-            line-height: 1.4;
-            font-size: 11px;
+            color: #1e293b;
+            line-height: 1.6;
           }
           
           .print-header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
             text-align: center;
-            border-bottom: 2px solid #2563eb;
-            padding-bottom: 12px;
-            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
           }
           
           .company-logo {
-            width: 80px;
-            height: auto;
-            margin: 0 auto 10px;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
             display: block;
+            background: white;
+            padding: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           }
           
           .print-header h1 {
-            font-size: 18px;
-            color: #1e40af;
-            margin-bottom: 5px;
-            font-weight: bold;
+            font-size: 22px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
           }
           
           .print-header h2 {
-            font-size: 16px;
-            color: #374151;
-            margin-bottom: 8px;
+            font-size: 18px;
+            margin-bottom: 12px;
+            font-weight: 500;
+            opacity: 0.95;
           }
           
           .print-header p {
-            font-size: 10px;
-            color: #6b7280;
-            margin: 2px 0;
-            line-height: 1.3;
+            font-size: 12px;
+            opacity: 0.9;
+            margin: 3px 0;
           }
           
           .no-print { 
             display: none !important; 
           }
           
+          .summary-card {
+            background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            page-break-inside: avoid;
+          }
+          
+          .summary-card h3 {
+            font-size: 16px;
+            color: #1e40af;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3b82f6;
+            font-weight: 700;
+          }
+          
+          .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 15px 0;
+          }
+          
+          .stat-box {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+          }
+          
+          .stat-label {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.2;
+          }
+          
+          .profit { 
+            color: #059669;
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+          }
+          
+          .loss { 
+            color: #dc2626;
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+          }
+          
+          .income { 
+            color: #2563eb;
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+          }
+          
+          .expense { 
+            color: #ea580c;
+            background: linear-gradient(135deg, #fed7aa, #fdba74);
+          }
+          
           table { 
             width: 100%; 
-            border-collapse: collapse; 
-            margin: 12px 0;
-            font-size: 10px;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             page-break-inside: auto;
+          }
+          
+          thead {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+          }
+          
+          th { 
+            padding: 12px 15px;
+            text-align: right;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.3px;
+          }
+          
+          td { 
+            padding: 12px 15px;
+            text-align: right;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 11px;
           }
           
           tr {
@@ -193,82 +294,42 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
             page-break-after: auto;
           }
           
-          th, td { 
-            border: 1px solid #d1d5db;
-            padding: 6px 8px;
-            text-align: right;
+          tbody tr {
+            background: white;
+            transition: background 0.2s;
           }
           
-          th { 
-            background-color: #f3f4f6;
-            font-weight: bold;
-            color: #1f2937;
+          tbody tr:nth-child(even) {
+            background: #f8fafc;
+          }
+          
+          tbody tr:hover {
+            background: #f1f5f9;
+          }
+          
+          .page-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+            color: #64748b;
             font-size: 10px;
           }
           
-          tr:nth-child(even) {
-            background-color: #f9fafb;
+          .watermark {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0.05;
+            font-size: 80px;
+            font-weight: 700;
+            color: #1e40af;
+            z-index: -1;
           }
-          
-          .page-break { 
-            page-break-after: always; 
-          }
-          
-          .summary-card {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            padding: 10px;
-            margin: 12px 0;
-            page-break-inside: avoid;
-          }
-          
-          .summary-card h3 {
-            font-size: 13px;
-            color: #1f2937;
-            margin-bottom: 8px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid #e5e7eb;
-          }
-          
-          .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin: 12px 0;
-            page-break-inside: avoid;
-          }
-          
-          .stat-box {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 4px;
-            padding: 8px;
-            text-align: center;
-          }
-          
-          .stat-label {
-            font-size: 9px;
-            color: #6b7280;
-            margin-bottom: 4px;
-            line-height: 1.2;
-          }
-          
-          .stat-value {
-            font-size: 14px;
-            font-weight: bold;
-            color: #1f2937;
-            line-height: 1.2;
-          }
-          
-          .profit { color: #059669; }
-          .loss { color: #dc2626; }
-          .income { color: #2563eb; }
-          .expense { color: #ea580c; }
           
           @media print {
             body { 
-              padding: 0;
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
             }
@@ -294,8 +355,9 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
               display: table-header-group;
             }
             
-            tfoot {
-              display: table-footer-group;
+            .stat-box {
+              box-shadow: none;
+              border: 2px solid #e2e8f0;
             }
           }
         `);
@@ -429,27 +491,27 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
           {/* عرض التقرير */}
           {showReport && selectedProject && (
             <div ref={printRef} className="space-y-4">
-              <div className="text-center mb-6 print-header">
+              <div className="print-header">
                 <img 
                   src={suhailLogo} 
                   alt="شعار شركة سهيل طيبة" 
                   className="company-logo"
                 />
-                <h1 className="text-2xl font-bold mb-2 text-primary">تقرير تفصيلي عن المشروع</h1>
-                <h2 className="text-xl text-gray-700 font-semibold">{selectedProject.name}</h2>
-                <div className="mt-3 text-sm text-gray-600">
-                  <p className="font-medium">شركة سهيل طيبة للتطوير العقاري</p>
+                <h1>تقرير تفصيلي عن المشروع</h1>
+                <h2>{selectedProject.name}</h2>
+                <div style={{ marginTop: '12px' }}>
+                  <p>شركة سهيل طيبة للتطوير العقاري</p>
                   {startDate && endDate && (
-                    <p className="mt-2">
-                      <span className="font-semibold">فترة التقرير:</span> من {new Date(startDate).toLocaleDateString('ar-SA')} إلى {new Date(endDate).toLocaleDateString('ar-SA')}
+                    <p style={{ marginTop: '8px' }}>
+                      فترة التقرير: من {new Date(startDate).toLocaleDateString('ar-SA')} إلى {new Date(endDate).toLocaleDateString('ar-SA')}
                     </p>
                   )}
                   {!startDate && !endDate && (
-                    <p className="mt-2">
-                      <span className="font-semibold">فترة التقرير:</span> جميع الفترات
+                    <p style={{ marginTop: '8px' }}>
+                      فترة التقرير: جميع الفترات
                     </p>
                   )}
-                  <p className="text-xs text-gray-400 mt-2">
+                  <p style={{ marginTop: '8px', fontSize: '11px', opacity: '0.85' }}>
                     تاريخ الإصدار: {new Date().toLocaleDateString('ar-SA', { 
                       year: 'numeric', 
                       month: 'long', 
@@ -464,8 +526,9 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
                 period="custom"
               />
 
-              <div className="text-center text-xs text-gray-400 mt-8 pt-4 border-t">
+              <div className="page-footer">
                 <p>© {new Date().getFullYear()} شركة سهيل طيبة للتطوير العقاري - جميع الحقوق محفوظة</p>
+                <p style={{ marginTop: '5px' }}>المدينة المنورة - المملكة العربية السعودية</p>
               </div>
             </div>
           )}

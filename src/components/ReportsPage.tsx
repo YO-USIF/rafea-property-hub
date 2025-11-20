@@ -12,6 +12,7 @@ import PurchasesReport from '@/components/reports/PurchasesReport';
 import InvoicesReport from '@/components/reports/InvoicesReport';
 import ProfitLossReport from '@/components/reports/ProfitLossReport';
 import { ProjectCostCenterReport } from '@/components/reports/ProjectCostCenterReport';
+import { ProjectDetailedReport } from '@/components/reports/ProjectDetailedReport';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -45,6 +46,7 @@ const ReportsPage = () => {
       description: 'تقارير حالة المشاريع والتقدم',
       icon: Building2,
       reports: [
+        { name: 'تقرير تفصيلي عن المشروع', lastGenerated: '2024-01-20' },
         { name: 'تقرير تقدم المشاريع', lastGenerated: '2024-01-20' },
         { name: 'تقرير مركز تكلفة المشاريع', lastGenerated: '2024-01-19' },
         { name: 'تقرير التكاليف حسب المشروع', lastGenerated: '2024-01-19' },
@@ -229,6 +231,11 @@ const ReportsPage = () => {
         reportData = { salesData, invoicesData, purchasesData, extractsData };
         reportType = 'profit-loss';
         break;
+      case 'تقرير تفصيلي عن المشروع':
+        // إنشاء تقرير تفصيلي عن المشاريع
+        reportData = await generateProjectDetailedReport();
+        reportType = 'project-detailed';
+        break;
       case 'تقرير مركز تكلفة المشاريع':
       case 'تقرير التكاليف حسب المشروع':
         // إنشاء تقرير مركز التكلفة
@@ -247,6 +254,62 @@ const ReportsPage = () => {
       type: reportType
     });
     setShowReportViewer(true);
+  };
+
+  // دالة إنشاء التقرير التفصيلي للمشاريع
+  const generateProjectDetailedReport = async () => {
+    try {
+      const projectsDetailedData = projectsData.map(project => {
+        // فلترة المبيعات المرتبطة بهذا المشروع
+        const projectSales = salesData.filter(sale => sale.project_id === project.id);
+        const totalSales = projectSales.reduce((sum, sale) => sum + (sale.price || 0), 0);
+
+        // فلترة الفواتير المرتبطة بهذا المشروع
+        const projectInvoices = invoicesData.filter(invoice => {
+          if (invoice.project_id === project.id) return true;
+          const description = (invoice.description || '').toLowerCase();
+          const projectName = (project.name || '').toLowerCase();
+          return projectName && description.includes(projectName);
+        });
+        const totalInvoices = projectInvoices.reduce((sum, invoice) => sum + (invoice.amount || 0), 0);
+
+        // فلترة المستخلصات المرتبطة بهذا المشروع
+        const projectExtracts = extractsData.filter(extract => {
+          if (extract.project_id === project.id) return true;
+          const extractDescription = (extract.description || '').toLowerCase();
+          const projectName = (project.name || '').toLowerCase();
+          return projectName && extractDescription.includes(projectName);
+        });
+        const totalExtracts = projectExtracts.reduce((sum, extract) => sum + (extract.amount || 0), 0);
+
+        // حساب الربح/الخسارة
+        const netProfit = totalSales - (totalInvoices + totalExtracts);
+        const profitMargin = totalSales > 0 ? (netProfit / totalSales) * 100 : 0;
+
+        return {
+          id: project.id,
+          name: project.name,
+          totalSales,
+          salesCount: projectSales.length,
+          totalInvoices,
+          invoicesCount: projectInvoices.length,
+          totalExtracts,
+          extractsCount: projectExtracts.length,
+          netProfit,
+          profitMargin
+        };
+      });
+
+      return projectsDetailedData;
+    } catch (error) {
+      console.error('Error generating project detailed report:', error);
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء إنشاء التقرير التفصيلي",
+        variant: "destructive"
+      });
+      return [];
+    }
   };
 
   // دالة إنشاء تقرير مركز التكلفة للمشاريع
@@ -578,7 +641,9 @@ const ReportsPage = () => {
           </DialogHeader>
           
           <div className="overflow-y-auto max-h-[60vh] space-y-4">
-            {selectedReport?.type === 'project-cost-center' && selectedReport?.data ? (
+            {selectedReport?.type === 'project-detailed' && selectedReport?.data ? (
+              <ProjectDetailedReport data={selectedReport.data} period={selectedPeriod} />
+            ) : selectedReport?.type === 'project-cost-center' && selectedReport?.data ? (
               <ProjectCostCenterReport data={selectedReport.data} period={selectedPeriod} />
             ) : (
               <div>

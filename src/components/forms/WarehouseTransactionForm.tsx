@@ -53,11 +53,18 @@ export const WarehouseTransactionForm = ({ onSubmit, transactionType, onCancel }
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [isManualAmount, setIsManualAmount] = useState(false);
 
   useEffect(() => {
-    const total = (formData.quantity || 0) * (formData.unit_price || 0);
-    setFormData(prev => ({ ...prev, total_amount: total }));
-  }, [formData.quantity, formData.unit_price]);
+    // For steel items, allow manual amount entry
+    if (selectedItem?.category === "حديد") {
+      setIsManualAmount(true);
+    } else {
+      setIsManualAmount(false);
+      const total = (formData.quantity || 0) * (formData.unit_price || 0);
+      setFormData(prev => ({ ...prev, total_amount: total }));
+    }
+  }, [formData.quantity, formData.unit_price, selectedItem]);
 
   useEffect(() => {
     if (formData.inventory_item_id) {
@@ -176,14 +183,29 @@ export const WarehouseTransactionForm = ({ onSubmit, transactionType, onCancel }
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="total_amount">الإجمالي (ريال)</Label>
+          <Label htmlFor="total_amount">
+            الإجمالي (ريال) {isManualAmount && "*"}
+          </Label>
           <Input
             id="total_amount"
             type="number"
-            value={formData.total_amount.toFixed(2)}
-            disabled
-            className="bg-muted"
+            value={formData.total_amount}
+            onChange={(e) => setFormData({ ...formData, total_amount: parseFloat(e.target.value) || 0 })}
+            disabled={!isManualAmount}
+            className={!isManualAmount ? "bg-muted" : ""}
+            min="0"
+            step="0.01"
           />
+          {isManualAmount && (
+            <p className="text-sm text-blue-600">
+              💡 للحديد: أدخل المبلغ الإجمالي يدوياً
+            </p>
+          )}
+          {!isManualAmount && (
+            <p className="text-sm text-muted-foreground">
+              يتم الحساب تلقائياً (الكمية × السعر)
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">

@@ -103,6 +103,7 @@ export const InventoryItemForm = ({ onSubmit, initialData, onCancel }: Inventory
               <SelectValue placeholder="اختر التصنيف" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="حديد">حديد</SelectItem>
               <SelectItem value="مواد بناء">مواد بناء</SelectItem>
               <SelectItem value="كهرباء">كهرباء</SelectItem>
               <SelectItem value="سباكة">سباكة</SelectItem>

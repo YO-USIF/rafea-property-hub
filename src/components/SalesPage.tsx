@@ -103,6 +103,7 @@ const SalesPage = () => {
   const filteredSales = sales.filter(sale => {
     const matchesSearch = sale.project_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       sale.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sale.customer_id_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       sale.unit_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       sale.unit_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       sale.status?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -331,6 +332,7 @@ const SalesPage = () => {
                         <TableHead className="text-right">المساحة</TableHead>
                         <TableHead className="text-right">السعر</TableHead>
                         <TableHead className="text-right">العميل</TableHead>
+                        <TableHead className="text-right">رقم الهوية</TableHead>
                         <TableHead className="text-right">الحالة</TableHead>
                         <TableHead className="text-right">طريقة السداد</TableHead>
                         <TableHead className="text-right">حالة التسليم</TableHead>
@@ -349,6 +351,9 @@ const SalesPage = () => {
                               <div className="font-medium">{sale.customer_name}</div>
                               <div className="text-sm text-gray-500">{sale.customer_phone}</div>
                             </div>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm">{sale.customer_id_number || 'غير محدد'}</span>
                           </TableCell>
                           <TableCell>{getStatusBadge(sale.status)}</TableCell>
                           <TableCell>
@@ -419,10 +424,10 @@ const SalesPage = () => {
               />
             </div>
             <Button variant="outline" onClick={() => {
-              const headers = "المشروع,رقم الوحدة,النوع,المساحة,السعر,العميل,الحالة,المبلغ المتبقي,تاريخ البيع\n";
+              const headers = "المشروع,رقم الوحدة,النوع,المساحة,السعر,العميل,رقم الهوية,الحالة,المبلغ المتبقي,تاريخ البيع\n";
               const csvContent = headers + 
                 filteredSales.map(sale => 
-                  `${sale.project_name},${sale.unit_number},${sale.unit_type},${sale.area},${sale.price},${sale.customer_name},${sale.status},${sale.remaining_amount || 0},${sale.sale_date || 'غير محدد'}`
+                  `${sale.project_name},${sale.unit_number},${sale.unit_type},${sale.area},${sale.price},${sale.customer_name},${sale.customer_id_number || 'غير محدد'},${sale.status},${sale.remaining_amount || 0},${sale.sale_date || 'غير محدد'}`
                 ).join("\n");
               
               // إضافة BOM للتعامل مع الترميز العربي بشكل صحيح
@@ -449,6 +454,7 @@ const SalesPage = () => {
                   <TableHead className="text-right">المساحة</TableHead>
                   <TableHead className="text-right">السعر</TableHead>
                   <TableHead className="text-right">العميل</TableHead>
+                  <TableHead className="text-right">رقم الهوية</TableHead>
                   <TableHead className="text-right">الحالة</TableHead>
                   <TableHead className="text-right">طريقة السداد</TableHead>
                   <TableHead className="text-right">حالة التسليم</TableHead>
@@ -481,6 +487,9 @@ const SalesPage = () => {
                         <div className="font-medium">{sale.customer_name}</div>
                         <div className="text-sm text-gray-500">{sale.customer_phone}</div>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm">{sale.customer_id_number || 'غير محدد'}</span>
                     </TableCell>
                     <TableCell>{getStatusBadge(sale.status)}</TableCell>
                     <TableCell>

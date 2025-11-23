@@ -244,6 +244,7 @@ export type Database = {
         Row: {
           amount: number
           amount_before_tax: number | null
+          assignment_order: string | null
           attached_file_name: string | null
           attached_file_url: string | null
           contractor_name: string
@@ -253,6 +254,7 @@ export type Database = {
           extract_date: string
           extract_number: string
           id: string
+          is_external_project: boolean | null
           percentage_completed: number | null
           previous_amount: number | null
           project_id: string | null
@@ -266,6 +268,7 @@ export type Database = {
         Insert: {
           amount?: number
           amount_before_tax?: number | null
+          assignment_order?: string | null
           attached_file_name?: string | null
           attached_file_url?: string | null
           contractor_name: string
@@ -275,6 +278,7 @@ export type Database = {
           extract_date?: string
           extract_number: string
           id?: string
+          is_external_project?: boolean | null
           percentage_completed?: number | null
           previous_amount?: number | null
           project_id?: string | null
@@ -288,6 +292,7 @@ export type Database = {
         Update: {
           amount?: number
           amount_before_tax?: number | null
+          assignment_order?: string | null
           attached_file_name?: string | null
           attached_file_url?: string | null
           contractor_name?: string
@@ -297,6 +302,7 @@ export type Database = {
           extract_date?: string
           extract_number?: string
           id?: string
+          is_external_project?: boolean | null
           percentage_completed?: number | null
           previous_amount?: number | null
           project_id?: string | null

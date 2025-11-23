@@ -9,6 +9,7 @@ import ContractorsPage from '../components/ContractorsPage';
 import SuppliersPage from '../components/SuppliersPage';
 import PurchasesPage from '../components/PurchasesPage';
 import ExtractsPage from '../components/ExtractsPage';
+import AssignmentOrdersPage from '../components/AssignmentOrdersPage';
 import AccountingPage from '../components/AccountingPage';
 import InvoicesPage from '../components/InvoicesPage';
 import MaintenancePage from '../components/MaintenancePage';
@@ -68,6 +69,12 @@ const Index = () => {
         return (
           <ProtectedPage pageName="extracts">
             <ExtractsPage />
+          </ProtectedPage>
+        );
+      case 'assignment_orders':
+        return (
+          <ProtectedPage pageName="assignment_orders">
+            <AssignmentOrdersPage />
           </ProtectedPage>
         );
       case 'accounting':

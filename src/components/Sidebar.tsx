@@ -21,7 +21,8 @@ import {
   Calculator,
   Receipt,
   Package,
-  Shield
+  Shield,
+  Clipboard
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -45,6 +46,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
     { id: 'purchases', name: 'المشتريات', icon: FileText },
     { id: 'warehouse', name: 'المستودع', icon: Package, managerOnly: true },
     { id: 'extracts', name: 'المستخصات', icon: Receipt },
+    { id: 'assignment_orders', name: 'أوامر التكليف', icon: Clipboard },
     { id: 'invoices', name: 'الفواتير', icon: Receipt },
     { id: 'accounting', name: 'النظام المحاسبي', icon: Calculator },
     { id: 'maintenance', name: 'الصيانة', icon: Wrench },

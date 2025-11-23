@@ -13,6 +13,7 @@ import InvoicesReport from '@/components/reports/InvoicesReport';
 import ProfitLossReport from '@/components/reports/ProfitLossReport';
 import { ProjectCostCenterReport } from '@/components/reports/ProjectCostCenterReport';
 import { ProjectDetailedReport } from '@/components/reports/ProjectDetailedReport';
+import ExtractsAndOrdersReport from '@/components/reports/ExtractsAndOrdersReport';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -50,7 +51,8 @@ const ReportsPage = () => {
         { name: 'تقرير تقدم المشاريع', lastGenerated: '2024-01-20' },
         { name: 'تقرير مركز تكلفة المشاريع', lastGenerated: '2024-01-19' },
         { name: 'تقرير التكاليف حسب المشروع', lastGenerated: '2024-01-19' },
-        { name: 'تقرير المشاريع المتأخرة', lastGenerated: '2024-01-17' }
+        { name: 'تقرير المشاريع المتأخرة', lastGenerated: '2024-01-17' },
+        { name: 'تقرير المستخلصات وأوامر التكليف', lastGenerated: '2024-01-20' }
       ]
     },
     {
@@ -241,6 +243,9 @@ const ReportsPage = () => {
         // إنشاء تقرير مركز التكلفة
         reportData = await generateProjectCostCenterReport();
         reportType = 'project-cost-center';
+        break;
+      case 'تقرير المستخلصات وأوامر التكليف':
+        reportType = 'extracts-orders';
         break;
       default:
         reportData = null;
@@ -641,7 +646,9 @@ const ReportsPage = () => {
           </DialogHeader>
           
           <div className="overflow-y-auto max-h-[60vh] space-y-4">
-            {selectedReport?.type === 'project-detailed' && selectedReport?.data ? (
+            {selectedReport?.type === 'extracts-orders' ? (
+              <ExtractsAndOrdersReport />
+            ) : selectedReport?.type === 'project-detailed' && selectedReport?.data ? (
               <ProjectDetailedReport data={selectedReport.data} period={selectedPeriod} />
             ) : selectedReport?.type === 'project-cost-center' && selectedReport?.data ? (
               <ProjectCostCenterReport data={selectedReport.data} period={selectedPeriod} />

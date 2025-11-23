@@ -8,25 +8,23 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { FileUpload } from '@/components/ui/file-upload';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { useExtracts } from '@/hooks/useExtracts';
+import { useAssignmentOrders } from '@/hooks/useAssignmentOrders';
 import { useProjects } from '@/hooks/useProjects';
 import { useContractors } from '@/hooks/useContractors';
-import { extractFormSchema, type ExtractFormData } from '@/lib/validationSchemas';
-import { ZodError } from 'zod';
+import { assignmentOrderSchema, type AssignmentOrderFormData } from '@/lib/assignmentOrderSchemas';
 
-interface Extract {
+interface AssignmentOrder {
   id?: string;
-  extract_number: string;
+  order_number: string;
   contractor_name: string;
   project_name: string;
   project_id?: string;
   amount: number;
   description: string;
-  extract_date: string;
+  order_date: string;
   status: string;
-  percentage_completed?: number;
-  current_amount?: number;
-  previous_amount?: number;
+  work_type?: string;
+  duration_days?: number;
   attached_file_url?: string;
   attached_file_name?: string;
   tax_included?: boolean;
@@ -34,73 +32,68 @@ interface Extract {
   amount_before_tax?: number;
 }
 
-interface ExtractFormProps {
+interface AssignmentOrderFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  extract?: Extract;
+  order?: AssignmentOrder;
   onSuccess: () => void;
-  isProjectManager?: boolean;
 }
 
-const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager = false }: ExtractFormProps) => {
+const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: AssignmentOrderFormProps) => {
   const { toast } = useToast();
-  const { createExtract, updateExtract } = useExtracts();
+  const { createAssignmentOrder, updateAssignmentOrder } = useAssignmentOrders();
   const { projects } = useProjects();
   const { contractors } = useContractors();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<Extract>({
-    extract_number: extract?.extract_number || '',
-    contractor_name: extract?.contractor_name || '',
-    project_name: extract?.project_name || '',
-    project_id: extract?.project_id || "none",
-    amount: extract?.amount || 0,
-    description: extract?.description || '',
-    extract_date: extract?.extract_date || new Date().toISOString().split('T')[0],
-    status: extract?.status || 'قيد المراجعة',
-    percentage_completed: extract?.percentage_completed || 0,
-    current_amount: extract?.current_amount || 0,
-    previous_amount: extract?.previous_amount || 0,
-    attached_file_url: extract?.attached_file_url || '',
-    attached_file_name: extract?.attached_file_name || '',
-    tax_included: extract?.tax_included || false,
-    tax_amount: extract?.tax_amount || 0,
-    amount_before_tax: extract?.amount_before_tax || 0
+  const [formData, setFormData] = useState<AssignmentOrder>({
+    order_number: order?.order_number || '',
+    contractor_name: order?.contractor_name || '',
+    project_name: order?.project_name || '',
+    project_id: order?.project_id || "none",
+    amount: order?.amount || 0,
+    description: order?.description || '',
+    order_date: order?.order_date || new Date().toISOString().split('T')[0],
+    status: order?.status || 'قيد التنفيذ',
+    work_type: order?.work_type || '',
+    duration_days: order?.duration_days || 0,
+    attached_file_url: order?.attached_file_url || '',
+    attached_file_name: order?.attached_file_name || '',
+    tax_included: order?.tax_included || false,
+    tax_amount: order?.tax_amount || 0,
+    amount_before_tax: order?.amount_before_tax || 0
   });
 
-  // تحديث البيانات عند تغيير العنصر المرسل للتعديل
   useEffect(() => {
-    if (extract) {
+    if (order) {
       setFormData({
-        extract_number: extract.extract_number || '',
-        contractor_name: extract.contractor_name || '',
-        project_name: extract.project_name || '',
-        project_id: extract.project_id || "none",
-        amount: extract.amount || 0,
-        description: extract.description || '',
-        extract_date: extract.extract_date || new Date().toISOString().split('T')[0],
-        status: extract.status || 'قيد المراجعة',
-        percentage_completed: extract.percentage_completed || 0,
-        current_amount: extract.current_amount || 0,
-        previous_amount: extract.previous_amount || 0,
-        attached_file_url: extract.attached_file_url || '',
-        attached_file_name: extract.attached_file_name || '',
-        tax_included: extract.tax_included || false,
-        tax_amount: extract.tax_amount || 0,
-        amount_before_tax: extract.amount_before_tax || 0
+        order_number: order.order_number || '',
+        contractor_name: order.contractor_name || '',
+        project_name: order.project_name || '',
+        project_id: order.project_id || "none",
+        amount: order.amount || 0,
+        description: order.description || '',
+        order_date: order.order_date || new Date().toISOString().split('T')[0],
+        status: order.status || 'قيد التنفيذ',
+        work_type: order.work_type || '',
+        duration_days: order.duration_days || 0,
+        attached_file_url: order.attached_file_url || '',
+        attached_file_name: order.attached_file_name || '',
+        tax_included: order.tax_included || false,
+        tax_amount: order.tax_amount || 0,
+        amount_before_tax: order.amount_before_tax || 0
       });
     } else {
       setFormData({
-        extract_number: '',
+        order_number: '',
         contractor_name: '',
         project_name: '',
         project_id: "none",
         amount: 0,
         description: '',
-        extract_date: new Date().toISOString().split('T')[0],
-        status: 'قيد المراجعة',
-        percentage_completed: 0,
-        current_amount: 0,
-        previous_amount: 0,
+        order_date: new Date().toISOString().split('T')[0],
+        status: 'قيد التنفيذ',
+        work_type: '',
+        duration_days: 0,
         attached_file_url: '',
         attached_file_name: '',
         tax_included: false,
@@ -108,12 +101,10 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         amount_before_tax: 0
       });
     }
-  }, [extract]);
+  }, [order]);
 
-  // حساب الضريبة تلقائياً عند تغيير المبلغ أو حالة الضريبة
   useEffect(() => {
     if (formData.tax_included && formData.amount > 0) {
-      // إذا كان المبلغ شامل الضريبة، نحسب المبلغ قبل الضريبة
       const amountBeforeTax = formData.amount / 1.15;
       const taxAmount = formData.amount - amountBeforeTax;
       setFormData(prev => ({
@@ -122,7 +113,6 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         tax_amount: Math.round(taxAmount * 100) / 100
       }));
     } else if (!formData.tax_included && formData.amount > 0) {
-      // إذا كان المبلغ غير شامل الضريبة، المبلغ قبل الضريبة = المبلغ نفسه
       setFormData(prev => ({
         ...prev,
         amount_before_tax: formData.amount,
@@ -131,56 +121,42 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
     }
   }, [formData.amount, formData.tax_included]);
 
-  // حساب إجمالي المبلغ تلقائياً من المبلغ المدفوع سابقاً + قيمة المستخلص الحالي
-  useEffect(() => {
-    const total = (formData.previous_amount || 0) + (formData.current_amount || 0);
-    if (formData.amount !== total) {
-      setFormData(prev => ({
-        ...prev,
-        amount: total
-      }));
-    }
-  }, [formData.previous_amount, formData.current_amount]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const extractPayload = {
-        extract_number: formData.extract_number && formData.extract_number.trim() !== '' ? formData.extract_number : undefined,
+      const orderPayload = {
+        order_number: formData.order_number && formData.order_number.trim() !== '' ? formData.order_number : undefined,
         contractor_name: formData.contractor_name,
         project_name: formData.project_name,
-        project_id: formData.project_id === "none" || !formData.project_id ? null : formData.project_id,
+        project_id: formData.project_id === "none" || formData.project_id === "external" || !formData.project_id ? null : formData.project_id,
         amount: Number(formData.amount),
         amount_before_tax: formData.amount_before_tax ? Number(formData.amount_before_tax) : undefined,
         tax_amount: formData.tax_amount ? Number(formData.tax_amount) : undefined,
         tax_included: formData.tax_included,
         description: formData.description,
-        extract_date: formData.extract_date,
-        status: isProjectManager ? 'قيد المراجعة' : formData.status,
-        percentage_completed: formData.percentage_completed ? Number(formData.percentage_completed) : undefined,
-        current_amount: formData.current_amount ? Number(formData.current_amount) : undefined,
-        previous_amount: formData.previous_amount ? Number(formData.previous_amount) : undefined,
+        order_date: formData.order_date,
+        status: formData.status,
+        work_type: formData.work_type,
+        duration_days: formData.duration_days ? Number(formData.duration_days) : undefined,
         attached_file_url: formData.attached_file_url,
         attached_file_name: formData.attached_file_name,
       };
 
-      // التحقق من صحة البيانات باستخدام Zod
-      const validatedData = extractFormSchema.parse(extractPayload);
+      const validatedData = assignmentOrderSchema.parse(orderPayload);
 
-      if (extract?.id) {
-        await updateExtract.mutateAsync({ id: extract.id, ...validatedData });
+      if (order?.id) {
+        await updateAssignmentOrder.mutateAsync({ id: order.id, ...validatedData });
       } else {
-        await createExtract.mutateAsync(validatedData);
+        await createAssignmentOrder.mutateAsync(validatedData);
       }
       
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
-      console.error('Error saving extract:', error);
+      console.error('Error saving assignment order:', error);
       if (error.name === 'ZodError') {
-        // عرض أخطاء التحقق للمستخدم
         const errorMessage = error.errors.map((err: any) => `${err.path.join('.')}: ${err.message}`).join('\n');
         toast({
           title: 'بيانات غير صحيحة',
@@ -204,23 +180,23 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {extract ? 'تعديل المستخلص' : 'إضافة مستخلص جديد'}
+            {order ? 'تعديل أمر التكليف' : 'إضافة أمر تكليف جديد'}
           </DialogTitle>
           <DialogDescription>
-            {extract ? 'قم بتعديل بيانات المستخلص' : 'أدخل بيانات المستخلص الجديد'}
+            {order ? 'قم بتعديل بيانات أمر التكليف' : 'أدخل بيانات أمر التكليف الجديد'}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="extract_number">رقم المستخلص</Label>
+              <Label htmlFor="order_number">رقم أمر التكليف</Label>
               <Input
-                id="extract_number"
-                value={formData.extract_number}
-                onChange={(e) => setFormData(prev => ({ ...prev, extract_number: e.target.value }))}
+                id="order_number"
+                value={formData.order_number}
+                onChange={(e) => setFormData(prev => ({ ...prev, order_number: e.target.value }))}
                 placeholder="سيتم إنشاؤه تلقائياً"
-                disabled={!extract?.id}
+                disabled={!order?.id}
               />
               <p className="text-xs text-muted-foreground">سيتم إنشاء الرقم تلقائياً عند الحفظ</p>
             </div>
@@ -252,8 +228,8 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                   const selectedProject = projects.find((p: any) => p.id === value);
                   setFormData(prev => ({ 
                     ...prev, 
-                    project_id: value === "none" ? "" : value,
-                    project_name: value === "none" ? "" : value === "multiple" ? "المشروعين مع بعض" : (selectedProject ? selectedProject.name : "")
+                    project_id: value === "none" ? "" : value === "external" ? "external" : value,
+                    project_name: value === "none" ? "" : value === "external" ? "" : (selectedProject ? selectedProject.name : "")
                   }));
                 }}
               >
@@ -262,7 +238,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">بدون مشروع</SelectItem>
-                  <SelectItem value="multiple">المشروعين مع بعض</SelectItem>
+                  <SelectItem value="external">مشروع خارجي</SelectItem>
                   {projects.map((project: any) => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.name}
@@ -270,6 +246,51 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            {formData.project_id === "external" && (
+              <div className="space-y-2">
+                <Label htmlFor="external_project_name">اسم المشروع الخارجي</Label>
+                <Input
+                  id="external_project_name"
+                  value={formData.project_name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, project_name: e.target.value }))}
+                  placeholder="أدخل اسم المشروع الخارجي"
+                  required
+                />
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="order_date">تاريخ أمر التكليف</Label>
+              <Input
+                id="order_date"
+                type="date"
+                value={formData.order_date}
+                onChange={(e) => setFormData(prev => ({ ...prev, order_date: e.target.value }))}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="work_type">نوع العمل</Label>
+              <Input
+                id="work_type"
+                value={formData.work_type}
+                onChange={(e) => setFormData(prev => ({ ...prev, work_type: e.target.value }))}
+                placeholder="مثال: أعمال يومية، صيانة، إلخ"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="duration_days">مدة العمل (أيام)</Label>
+              <Input
+                id="duration_days"
+                type="number"
+                min="0"
+                value={formData.duration_days}
+                onChange={(e) => setFormData(prev => ({ ...prev, duration_days: parseInt(e.target.value) || 0 }))}
+              />
             </div>
 
             <div className="space-y-2 md:col-span-2">
@@ -285,6 +306,18 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                   شامل ضريبة القيمة المضافة 15%
                 </Label>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="amount">المبلغ</Label>
+              <Input
+                id="amount"
+                type="number"
+                step="0.01"
+                value={formData.amount}
+                onChange={(e) => setFormData(prev => ({ ...prev, amount: parseFloat(e.target.value) || 0 }))}
+                required
+              />
             </div>
 
             {formData.tax_included && formData.amount > 0 && (
@@ -311,83 +344,19 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
               </>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="extract_date">تاريخ المستخلص</Label>
-              <Input
-                id="extract_date"
-                type="date"
-                value={formData.extract_date}
-                onChange={(e) => setFormData(prev => ({ ...prev, extract_date: e.target.value }))}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="percentage_completed">نسبة الإنجاز (%)</Label>
-              <Input
-                id="percentage_completed"
-                type="number"
-                min="0"
-                max="100"
-                value={formData.percentage_completed}
-                onChange={(e) => setFormData(prev => ({ ...prev, percentage_completed: parseFloat(e.target.value) || 0 }))}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="previous_amount">المبلغ المدفوع سابقاً</Label>
-              <Input
-                id="previous_amount"
-                type="number"
-                step="0.01"
-                value={formData.previous_amount}
-                onChange={(e) => setFormData(prev => ({ ...prev, previous_amount: parseFloat(e.target.value) || 0 }))}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="current_amount">قيمة المستخلص الحالي</Label>
-              <Input
-                id="current_amount"
-                type="number"
-                step="0.01"
-                value={formData.current_amount}
-                onChange={(e) => setFormData(prev => ({ ...prev, current_amount: parseFloat(e.target.value) || 0 }))}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="amount">إجمالي المبلغ</Label>
-              <Input
-                id="amount"
-                type="number"
-                step="0.01"
-                value={formData.amount}
-                disabled
-                className="bg-muted/50 font-bold text-primary"
-              />
-              <p className="text-xs text-muted-foreground">يحسب تلقائياً: المبلغ المدفوع سابقاً + قيمة المستخلص الحالي</p>
-            </div>
-
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="status">الحالة</Label>
               <Select
                 value={formData.status}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
-                disabled={isProjectManager}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="قيد المراجعة">قيد المراجعة</SelectItem>
-                  {!isProjectManager && (
-                    <>
-                      <SelectItem value="معتمد">معتمد</SelectItem>
-                      <SelectItem value="مدفوع">مدفوع</SelectItem>
-                      <SelectItem value="مرفوض">مرفوض</SelectItem>
-                    </>
-                  )}
+                  <SelectItem value="قيد التنفيذ">قيد التنفيذ</SelectItem>
+                  <SelectItem value="مكتمل">مكتمل</SelectItem>
+                  <SelectItem value="ملغي">ملغي</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -400,7 +369,6 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               rows={3}
-              required
             />
           </div>
 
@@ -428,7 +396,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
               إلغاء
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? 'جارٍ الحفظ...' : (extract ? 'تحديث' : 'إنشاء')}
+              {loading ? 'جارٍ الحفظ...' : (order ? 'تحديث' : 'إنشاء')}
             </Button>
           </div>
         </form>
@@ -437,4 +405,4 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
   );
 };
 
-export default ExtractForm;
+export default AssignmentOrderForm;

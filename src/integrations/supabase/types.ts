@@ -14,6 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
+      assignment_orders: {
+        Row: {
+          amount: number
+          amount_before_tax: number | null
+          attached_file_name: string | null
+          attached_file_url: string | null
+          contractor_name: string
+          created_at: string
+          description: string | null
+          duration_days: number | null
+          id: string
+          order_date: string
+          order_number: string
+          project_id: string | null
+          project_name: string
+          status: string
+          tax_amount: number | null
+          tax_included: boolean | null
+          updated_at: string
+          user_id: string
+          work_type: string | null
+        }
+        Insert: {
+          amount?: number
+          amount_before_tax?: number | null
+          attached_file_name?: string | null
+          attached_file_url?: string | null
+          contractor_name: string
+          created_at?: string
+          description?: string | null
+          duration_days?: number | null
+          id?: string
+          order_date?: string
+          order_number: string
+          project_id?: string | null
+          project_name: string
+          status?: string
+          tax_amount?: number | null
+          tax_included?: boolean | null
+          updated_at?: string
+          user_id: string
+          work_type?: string | null
+        }
+        Update: {
+          amount?: number
+          amount_before_tax?: number | null
+          attached_file_name?: string | null
+          attached_file_url?: string | null
+          contractor_name?: string
+          created_at?: string
+          description?: string | null
+          duration_days?: number | null
+          id?: string
+          order_date?: string
+          order_number?: string
+          project_id?: string | null
+          project_name?: string
+          status?: string
+          tax_amount?: number | null
+          tax_included?: boolean | null
+          updated_at?: string
+          user_id?: string
+          work_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_assignment_orders_project"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       backup_logs: {
         Row: {
           backup_type: string
@@ -244,7 +318,6 @@ export type Database = {
         Row: {
           amount: number
           amount_before_tax: number | null
-          assignment_order: string | null
           attached_file_name: string | null
           attached_file_url: string | null
           contractor_name: string
@@ -254,7 +327,6 @@ export type Database = {
           extract_date: string
           extract_number: string
           id: string
-          is_external_project: boolean | null
           percentage_completed: number | null
           previous_amount: number | null
           project_id: string | null
@@ -268,7 +340,6 @@ export type Database = {
         Insert: {
           amount?: number
           amount_before_tax?: number | null
-          assignment_order?: string | null
           attached_file_name?: string | null
           attached_file_url?: string | null
           contractor_name: string
@@ -278,7 +349,6 @@ export type Database = {
           extract_date?: string
           extract_number: string
           id?: string
-          is_external_project?: boolean | null
           percentage_completed?: number | null
           previous_amount?: number | null
           project_id?: string | null
@@ -292,7 +362,6 @@ export type Database = {
         Update: {
           amount?: number
           amount_before_tax?: number | null
-          assignment_order?: string | null
           attached_file_name?: string | null
           attached_file_url?: string | null
           contractor_name?: string
@@ -302,7 +371,6 @@ export type Database = {
           extract_date?: string
           extract_number?: string
           id?: string
-          is_external_project?: boolean | null
           percentage_completed?: number | null
           previous_amount?: number | null
           project_id?: string | null

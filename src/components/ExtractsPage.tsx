@@ -232,7 +232,6 @@ const ExtractsPage = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>رقم المستخص</TableHead>
-                  <TableHead>أمر التكليف</TableHead>
                   <TableHead>المشروع</TableHead>
                   <TableHead>المقاول</TableHead>
                   <TableHead>التاريخ</TableHead>
@@ -249,23 +248,7 @@ const ExtractsPage = () => {
                 {filteredExtracts.map((extract) => (
                   <TableRow key={extract.id}>
                     <TableCell className="font-medium">{extract.extract_number}</TableCell>
-                    <TableCell>
-                      {extract.assignment_order ? (
-                        <Badge variant="outline" className="font-mono">
-                          {extract.assignment_order}
-                        </Badge>
-                      ) : (
-                        <span className="text-muted-foreground text-sm">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        {extract.project_name}
-                        {extract.is_external_project && (
-                          <Badge variant="secondary" className="mr-1 text-xs">خارجي</Badge>
-                        )}
-                      </div>
-                    </TableCell>
+                    <TableCell>{extract.project_name}</TableCell>
                     <TableCell>{extract.contractor_name}</TableCell>
                     <TableCell>{new Date(extract.extract_date).toLocaleDateString('en-GB')}</TableCell>
                     <TableCell>{extract.percentage_completed}%</TableCell>

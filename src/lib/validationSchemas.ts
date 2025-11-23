@@ -193,6 +193,14 @@ export const extractFormSchema = z.object({
   
   attached_file_url: z.string().optional(),
   attached_file_name: z.string().optional(),
+  
+  assignment_order: z.string()
+    .trim()
+    .max(100, { message: errorMessages.maxLength(100) })
+    .optional()
+    .or(z.literal('')),
+  
+  is_external_project: z.boolean().optional(),
 }).refine((data) => {
   // التحقق من أن المبلغ قبل الضريبة + الضريبة = المبلغ الإجمالي (إذا كانت الضريبة مفعلة)
   if (data.tax_included && data.amount_before_tax !== undefined && data.tax_amount !== undefined) {

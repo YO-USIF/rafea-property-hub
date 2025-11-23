@@ -32,6 +32,8 @@ interface Extract {
   tax_included?: boolean;
   tax_amount?: number;
   amount_before_tax?: number;
+  assignment_order?: string;
+  is_external_project?: boolean;
 }
 
 interface ExtractFormProps {
@@ -64,7 +66,9 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
     attached_file_name: extract?.attached_file_name || '',
     tax_included: extract?.tax_included || false,
     tax_amount: extract?.tax_amount || 0,
-    amount_before_tax: extract?.amount_before_tax || 0
+    amount_before_tax: extract?.amount_before_tax || 0,
+    assignment_order: extract?.assignment_order || '',
+    is_external_project: extract?.is_external_project || false
   });
 
   // تحديث البيانات عند تغيير العنصر المرسل للتعديل
@@ -86,7 +90,9 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         attached_file_name: extract.attached_file_name || '',
         tax_included: extract.tax_included || false,
         tax_amount: extract.tax_amount || 0,
-        amount_before_tax: extract.amount_before_tax || 0
+        amount_before_tax: extract.amount_before_tax || 0,
+        assignment_order: extract.assignment_order || '',
+        is_external_project: extract.is_external_project || false
       });
     } else {
       setFormData({
@@ -105,7 +111,9 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         attached_file_name: '',
         tax_included: false,
         tax_amount: 0,
-        amount_before_tax: 0
+        amount_before_tax: 0,
+        assignment_order: '',
+        is_external_project: false
       });
     }
   }, [extract]);
@@ -151,7 +159,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         extract_number: formData.extract_number && formData.extract_number.trim() !== '' ? formData.extract_number : undefined,
         contractor_name: formData.contractor_name,
         project_name: formData.project_name,
-        project_id: formData.project_id === "none" || !formData.project_id ? null : formData.project_id,
+        project_id: formData.project_id === "none" || formData.project_id === "external" || !formData.project_id ? null : formData.project_id,
         amount: Number(formData.amount),
         amount_before_tax: formData.amount_before_tax ? Number(formData.amount_before_tax) : undefined,
         tax_amount: formData.tax_amount ? Number(formData.tax_amount) : undefined,
@@ -164,6 +172,8 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         previous_amount: formData.previous_amount ? Number(formData.previous_amount) : undefined,
         attached_file_url: formData.attached_file_url,
         attached_file_name: formData.attached_file_name,
+        assignment_order: formData.assignment_order,
+        is_external_project: formData.is_external_project,
       };
 
       // التحقق من صحة البيانات باستخدام Zod
@@ -252,8 +262,9 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                   const selectedProject = projects.find((p: any) => p.id === value);
                   setFormData(prev => ({ 
                     ...prev, 
-                    project_id: value === "none" ? "" : value,
-                    project_name: value === "none" ? "" : value === "multiple" ? "المشروعين مع بعض" : (selectedProject ? selectedProject.name : "")
+                    project_id: value === "none" ? "" : value === "external" ? "external" : value,
+                    project_name: value === "none" ? "" : value === "multiple" ? "المشروعين مع بعض" : value === "external" ? "مشروع خارجي" : (selectedProject ? selectedProject.name : ""),
+                    is_external_project: value === "external"
                   }));
                 }}
               >
@@ -262,6 +273,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">بدون مشروع</SelectItem>
+                  <SelectItem value="external">مشروع خارجي</SelectItem>
                   <SelectItem value="multiple">المشروعين مع بعض</SelectItem>
                   {projects.map((project: any) => (
                     <SelectItem key={project.id} value={project.id}>
@@ -270,6 +282,30 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            {formData.is_external_project && (
+              <div className="space-y-2">
+                <Label htmlFor="external_project_name">اسم المشروع الخارجي</Label>
+                <Input
+                  id="external_project_name"
+                  value={formData.project_name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, project_name: e.target.value }))}
+                  placeholder="أدخل اسم المشروع الخارجي"
+                  required={formData.is_external_project}
+                />
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="assignment_order">رقم أمر التكليف</Label>
+              <Input
+                id="assignment_order"
+                value={formData.assignment_order}
+                onChange={(e) => setFormData(prev => ({ ...prev, assignment_order: e.target.value }))}
+                placeholder="أدخل رقم أمر التكليف (اختياري)"
+              />
+              <p className="text-xs text-muted-foreground">رقم أمر التكليف للأعمال اليومية في المشروع</p>
             </div>
 
             <div className="space-y-2 md:col-span-2">

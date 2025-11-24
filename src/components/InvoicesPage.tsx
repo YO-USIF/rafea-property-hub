@@ -210,10 +210,8 @@ const InvoicesPage = () => {
             تصدير
           </Button>
           <Button onClick={() => {
-            console.log('=== OPENING INVOICE FORM ===');
             setSelectedInvoice(null);
             setShowInvoiceForm(true);
-            console.log('Show invoice form state:', true);
           }}>
             <Plus className="w-4 h-4 ml-2" />
             فاتورة جديدة

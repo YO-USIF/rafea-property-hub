@@ -56,8 +56,6 @@ const SuppliersPage = () => {
           supplier.name?.includes(invoice.supplier_name)
         ) || [];
 
-        console.log(`Supplier: ${supplier.name}, Invoices found: ${supplierInvoices.length}`);
-
         const totalPurchases = supplierInvoices.reduce((sum, invoice) => sum + (Number(invoice.amount) || 0), 0);
         const outstandingBalance = supplierInvoices
           .filter(invoice => invoice.status === 'غير مدفوع' || invoice.status === 'متأخر' || invoice.status === 'مستحق')
@@ -71,9 +69,6 @@ const SuppliersPage = () => {
         };
       }
 
-      console.log('Supplier Stats:', stats);
-      console.log('Total purchases calculation:', Object.values(stats).reduce((sum: number, st: any) => sum + Number(st.totalPurchases || 0), 0));
-      console.log('Total outstanding balance calculation:', Object.values(stats).reduce((sum: number, st: any) => sum + Number(st.outstandingBalance || 0), 0));
       setSupplierStats(stats);
     } catch (error) {
       console.error('Error fetching invoices data:', error);

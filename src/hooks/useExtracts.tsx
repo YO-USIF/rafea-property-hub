@@ -15,24 +15,17 @@ export const useExtracts = () => {
   const { data: extracts = [], isLoading } = useQuery({
     queryKey: ['extracts', user?.id, isManagerOrAdmin],
     queryFn: async () => {
-      console.log('Fetching extracts for user:', user?.id);
-      console.log('isManager:', isManager, 'isAdmin:', isAdmin, 'isManagerOrAdmin:', isManagerOrAdmin);
       let query = supabase.from('extracts').select('*');
       
       if (!isManagerOrAdmin) {
         query = query.eq('user_id', user?.id);
-        console.log('Filtering by user_id:', user?.id);
-      } else {
-        console.log('Admin/Manager access - showing all extracts');
       }
       
       const { data, error } = await query.order('created_at', { ascending: false });
       
       if (error) {
-        console.error('Error fetching extracts:', error);
         throw error;
       }
-      console.log('Fetched extracts:', data);
       return data || [];
     },
     enabled: !!user?.id,

@@ -14,19 +14,34 @@ import {
   DollarSign,
   Download,
   Filter,
-  Calendar
+  Calendar,
+  Printer,
+  Trash2
 } from 'lucide-react';
 import { useAssignmentOrders } from '@/hooks/useAssignmentOrders';
 import { useAuth } from '@/hooks/useAuth';
 import AssignmentOrderForm from '@/components/forms/AssignmentOrderForm';
+import AssignmentOrderPrintView from '@/components/forms/AssignmentOrderPrintView';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const AssignmentOrdersPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingOrder, setEditingOrder] = useState<any>(null);
+  const [printingOrder, setPrintingOrder] = useState<any>(null);
+  const [deletingOrder, setDeletingOrder] = useState<any>(null);
   
   const { user } = useAuth();
-  const { assignmentOrders, isLoading } = useAssignmentOrders();
+  const { assignmentOrders, isLoading, deleteAssignmentOrder } = useAssignmentOrders();
 
   const filteredOrders = assignmentOrders.filter(order =>
     order.order_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -67,6 +82,17 @@ const AssignmentOrdersPage = () => {
   const handleFormSuccess = () => {
     setShowForm(false);
     setEditingOrder(null);
+  };
+
+  const handlePrint = (order: any) => {
+    setPrintingOrder(order);
+  };
+
+  const handleDelete = async () => {
+    if (deletingOrder) {
+      await deleteAssignmentOrder.mutateAsync(deletingOrder.id);
+      setDeletingOrder(null);
+    }
   };
 
   const quickStats = [
@@ -219,6 +245,14 @@ const AssignmentOrdersPage = () => {
                     <TableCell>{getStatusBadge(order.status)}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePrint(order)}
+                          title="طباعة أمر التكليف"
+                        >
+                          <Printer className="w-4 h-4" />
+                        </Button>
                         {order.attached_file_url && (
                           <Button variant="outline" size="sm" asChild>
                             <a href={order.attached_file_url} target="_blank" rel="noopener noreferrer">
@@ -233,6 +267,14 @@ const AssignmentOrdersPage = () => {
                           title="تعديل أمر التكليف"
                         >
                           <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => setDeletingOrder(order)}
+                          title="حذف أمر التكليف"
+                        >
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </TableCell>
@@ -256,6 +298,29 @@ const AssignmentOrdersPage = () => {
         order={editingOrder}
         onSuccess={handleFormSuccess}
       />
+
+      <AssignmentOrderPrintView
+        open={!!printingOrder}
+        onOpenChange={(open) => !open && setPrintingOrder(null)}
+        order={printingOrder}
+      />
+
+      <AlertDialog open={!!deletingOrder} onOpenChange={(open) => !open && setDeletingOrder(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>هل أنت متأكد من الحذف؟</AlertDialogTitle>
+            <AlertDialogDescription>
+              هذا الإجراء لا يمكن التراجع عنه. سيتم حذف أمر التكليف رقم {deletingOrder?.order_number} نهائياً.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

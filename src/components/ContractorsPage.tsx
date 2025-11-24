@@ -58,8 +58,6 @@ const ContractorsPage = () => {
                  contractor.name?.includes(extract.contractor_name);
         }) || [];
 
-        console.log(`Contractor: ${contractor.name}, Normalized: ${contractorNameNormalized}, Extracts found: ${contractorExtracts.length}`);
-
         const totalContracts = contractorExtracts.reduce((sum, extract) => sum + (Number(extract.amount) || 0), 0);
         const pendingPayments = contractorExtracts
           .filter(extract => extract.status !== 'مدفوع' && extract.status !== 'مكتمل')
@@ -76,9 +74,6 @@ const ContractorsPage = () => {
         };
       }
 
-      console.log('Contractor Stats:', stats);
-      console.log('Total contracts calculation:', Object.values(stats).reduce((sum: number, st: any) => sum + Number(st.totalContracts || 0), 0));
-      console.log('Total pending payments calculation:', Object.values(stats).reduce((sum: number, st: any) => sum + Number(st.pendingPayments || 0), 0));
       setContractorStats(stats);
     } catch (error) {
       console.error('Error fetching extracts data:', error);

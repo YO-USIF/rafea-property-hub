@@ -15,33 +15,21 @@ export const useInvoices = () => {
     queryKey: ['invoices', user?.id, isManagerOrAdmin],
     queryFn: async () => {
       try {
-        console.log('=== INVOICE FETCH DEBUG ===');
-        console.log('User:', user?.id);
-        console.log('Is Manager/Admin:', isManagerOrAdmin);
-        
         let query = supabase.from('invoices').select('*');
         
         // المديرون ومديرو النظام يمكنهم رؤية جميع الفواتير
         if (!isManagerOrAdmin) {
           query = query.eq('user_id', user?.id);
-          console.log('Adding user filter for:', user?.id);
-        } else {
-          console.log('Manager/Admin view - showing all invoices');
         }
         
         const { data, error } = await query.order('created_at', { ascending: false });
         
-        console.log('Query result:', { data: data?.length, error });
-        
         if (error) {
-          console.error('Error fetching invoices:', error);
           throw error;
         }
         
-        console.log('Returning invoices:', data);
         return data || [];
       } catch (err) {
-        console.error('Full error in invoice fetch:', err);
         throw err;
       }
     },

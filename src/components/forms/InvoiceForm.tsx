@@ -36,7 +36,6 @@ interface InvoiceFormProps {
 }
 
 const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProps) => {
-  console.log('=== INVOICE FORM COMPONENT LOADED ===', { open, invoice });
   const { toast } = useToast();
   const { createInvoice, updateInvoice } = useInvoices();
   const { projects } = useProjects();
@@ -90,10 +89,6 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('=== INVOICE FORM SUBMIT ===');
-    console.log('Form data:', formData);
-    console.log('User permissions:', { isManager, isAdmin });
-    console.log('Invoice being updated:', invoice);
     setLoading(true);
 
     try {
@@ -113,19 +108,12 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
       // التحقق من صحة البيانات باستخدام Zod
       const validatedData = invoiceFormSchema.parse(invoicePayload);
 
-      console.log('Validated invoice data:', validatedData);
-
       if (invoice?.id) {
-        console.log('Updating invoice with ID:', invoice.id);
-        const result = await updateInvoice.mutateAsync({ id: invoice.id, ...validatedData });
-        console.log('Update result:', result);
+        await updateInvoice.mutateAsync({ id: invoice.id, ...validatedData });
       } else {
-        console.log('Creating new invoice');
-        const result = await createInvoice.mutateAsync(validatedData);
-        console.log('Create result:', result);
+        await createInvoice.mutateAsync(validatedData);
       }
       
-      console.log('Invoice operation successful');
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {

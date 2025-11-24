@@ -34,14 +34,6 @@ const ExtractsPage = () => {
   const { userRole, isManager, isAdmin, isProjectManager, loading: roleLoading } = useUserRole();
   const { extracts, isLoading } = useExtracts();
 
-  // إضافة تسجيل للتشخيص
-  console.log('Current user:', user?.email);
-  console.log('User role:', userRole);
-  console.log('Is manager:', isManager);
-  console.log('Is admin:', isAdmin);
-  console.log('Role loading:', roleLoading);
-  console.log('Extracts count:', extracts.length);
-
   // تصفية المستخصات بناءً على البحث
   const filteredExtracts = extracts.filter(extract =>
     extract.extract_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -151,11 +143,6 @@ const ExtractsPage = () => {
       </div>
     );
   }
-
-  // إضافة تسجيل للتشخيص
-  console.log('Extracts data:', extracts);
-  console.log('Loading state:', isLoading);
-  console.log('Current user:', user);
 
   return (
     <div className="space-y-6">

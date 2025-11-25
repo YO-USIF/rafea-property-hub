@@ -265,9 +265,11 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
                 <div>هاتف: ${company.phone} | بريد: ${company.email}</div>
               </div>
             </div>
+            ${selectedCompany === 'suhail' ? `
             <div>
               <img src="/lovable-uploads/c6fbcf40-7e64-42f0-b1da-d735b0b632c8.png" alt="Company Logo" class="logo" />
             </div>
+            ` : ''}
           </div>
 
           <div class="title">
@@ -441,8 +443,9 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
                 <div className="text-xs text-gray-600 space-y-1">
                   <p>السجل التجاري: {company.cr}</p>
                   <p>الرقم الضريبي: {company.vat}</p>
-                </div>
               </div>
+            </div>
+            {selectedCompany === 'suhail' && (
               <div className="text-left">
                 <img 
                   src="/lovable-uploads/c6fbcf40-7e64-42f0-b1da-d735b0b632c8.png" 
@@ -450,6 +453,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
                   className="h-20 w-20 object-contain"
                 />
               </div>
+            )}
             </div>
           </div>
 

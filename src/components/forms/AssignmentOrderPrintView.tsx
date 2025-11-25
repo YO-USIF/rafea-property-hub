@@ -57,8 +57,9 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
           body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             direction: rtl;
-            padding: 20px;
+            padding: 15px;
             background: white;
+            font-size: 13px;
           }
           .container {
             max-width: 210mm;
@@ -66,9 +67,9 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             background: white;
           }
           .header {
-            border-bottom: 3px solid #3b82f6;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: start;
@@ -77,52 +78,53 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             text-align: right;
           }
           .company-name {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: bold;
             color: #3b82f6;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
           }
           .company-name-en {
-            font-size: 14px;
+            font-size: 11px;
             color: #6b7280;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
           }
           .company-details {
-            font-size: 12px;
+            font-size: 10px;
             color: #6b7280;
-            line-height: 1.6;
+            line-height: 1.4;
           }
           .logo {
-            height: 80px;
-            width: 80px;
+            height: 60px;
+            width: 60px;
             object-fit: contain;
           }
           .title {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
           }
           .title h1 {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: bold;
             color: #3b82f6;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
           }
           .title p {
-            font-size: 18px;
+            font-size: 14px;
             color: #6b7280;
           }
           .details-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
+            gap: 15px;
+            margin-bottom: 15px;
           }
           .detail-row {
             display: flex;
             justify-content: space-between;
             border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 8px;
-            margin-bottom: 12px;
+            padding-bottom: 4px;
+            margin-bottom: 6px;
+            font-size: 12px;
           }
           .detail-label {
             font-weight: 600;
@@ -136,102 +138,108 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             font-weight: bold;
           }
           .section {
-            margin-bottom: 30px;
+            margin-bottom: 15px;
           }
           .section-title {
-            font-size: 18px;
+            font-size: 15px;
             font-weight: bold;
             color: #3b82f6;
             border-bottom: 2px solid #3b82f6;
-            padding-bottom: 8px;
-            margin-bottom: 15px;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
           }
           .description-box {
             background: #f9fafb;
-            padding: 15px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.5;
           }
           .financial-box {
             background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
-            padding: 25px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 6px;
           }
           .financial-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
             color: #374151;
+            font-size: 13px;
           }
           .financial-row.total {
             border-top: 2px solid #3b82f6;
-            padding-top: 12px;
-            margin-top: 12px;
+            padding-top: 8px;
+            margin-top: 8px;
           }
           .financial-label {
             font-weight: 600;
           }
           .financial-value {
-            font-size: 20px;
+            font-size: 15px;
           }
           .financial-row.total .financial-label {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: bold;
             color: #3b82f6;
           }
           .financial-row.total .financial-value {
-            font-size: 28px;
+            font-size: 20px;
             font-weight: bold;
             color: #3b82f6;
           }
           .status-box {
             background: #f3f4f6;
-            padding: 15px;
-            border-radius: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
             display: inline-block;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
+            font-size: 12px;
           }
           .status-label {
             font-weight: 600;
             color: #374151;
-            margin-left: 8px;
+            margin-left: 6px;
           }
           .status-value {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: bold;
             color: #3b82f6;
           }
           .signatures {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 30px;
-            margin-top: 60px;
-            padding-top: 30px;
-            border-top: 2px solid #e5e7eb;
+            gap: 20px;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
           }
           .signature-box {
             text-align: center;
           }
           .signature-line {
-            border-top: 2px solid #9ca3af;
-            padding-top: 8px;
-            margin-top: 60px;
+            border-top: 1px solid #9ca3af;
+            padding-top: 6px;
+            margin-top: 35px;
+            font-size: 12px;
           }
           .signature-title {
             font-weight: 600;
             color: #374151;
           }
           .signature-title-en {
-            font-size: 12px;
+            font-size: 10px;
             color: #9ca3af;
-            margin-top: 4px;
+            margin-top: 2px;
           }
           .footer {
-            margin-top: 50px;
-            padding-top: 20px;
+            margin-top: 20px;
+            padding-top: 10px;
             border-top: 1px solid #e5e7eb;
             text-align: center;
-            font-size: 11px;
+            font-size: 9px;
             color: #9ca3af;
+            line-height: 1.4;
           }
           @media print {
             body {
@@ -239,7 +247,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             }
             @page {
               size: A4;
-              margin: 15mm;
+              margin: 12mm;
             }
           }
         </style>

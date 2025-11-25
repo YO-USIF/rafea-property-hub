@@ -86,7 +86,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
           </DialogTitle>
         </DialogHeader>
 
-        <div ref={printRef} className="bg-white p-8 print:p-12">
+        <div id="printable-content" ref={printRef} className="bg-white p-8 print:p-12">
           {/* Header with Company Info */}
           <div className="border-b-2 border-primary pb-6 mb-6">
             <div className="flex justify-between items-start">
@@ -239,11 +239,11 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             body * {
               visibility: hidden;
             }
-            ${printRef.current ? `#${printRef.current.id}` : ''}, 
-            ${printRef.current ? `#${printRef.current.id}` : ''} * {
+            #printable-content, 
+            #printable-content * {
               visibility: visible;
             }
-            ${printRef.current ? `#${printRef.current.id}` : ''} {
+            #printable-content {
               position: absolute;
               left: 0;
               top: 0;
@@ -252,6 +252,9 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             @page {
               size: A4;
               margin: 15mm;
+            }
+            .print\\:hidden {
+              display: none !important;
             }
           }
         `}</style>

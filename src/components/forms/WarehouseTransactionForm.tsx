@@ -4,12 +4,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useWarehouse } from "@/hooks/useWarehouse";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
@@ -54,6 +62,7 @@ export const WarehouseTransactionForm = ({ onSubmit, transactionType, onCancel }
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isManualAmount, setIsManualAmount] = useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     // For steel items, allow manual amount entry
@@ -110,21 +119,57 @@ export const WarehouseTransactionForm = ({ onSubmit, transactionType, onCancel }
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="inventory_item_id">الصنف *</Label>
-          <Select 
-            value={formData.inventory_item_id} 
-            onValueChange={(value) => setFormData({ ...formData, inventory_item_id: value })}
-          >
-            <SelectTrigger id="inventory_item_id">
-              <SelectValue placeholder="اختر الصنف" />
-            </SelectTrigger>
-            <SelectContent>
-              {inventory.map((item) => (
-                <SelectItem key={item.id} value={item.id}>
-                  {item.item_name} ({item.item_code}) - الكمية المتاحة: {item.current_quantity}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className="w-full justify-between"
+              >
+                {formData.inventory_item_id
+                  ? (() => {
+                      const item = inventory.find((i) => i.id === formData.inventory_item_id);
+                      return item ? `${item.item_name} (${item.item_code})` : "اختر الصنف";
+                    })()
+                  : "ابحث عن الصنف..."}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0" align="start">
+              <Command>
+                <CommandInput placeholder="ابحث بالاسم أو الكود..." />
+                <CommandList>
+                  <CommandEmpty>لا توجد نتائج</CommandEmpty>
+                  <CommandGroup>
+                    {inventory.map((item) => (
+                      <CommandItem
+                        key={item.id}
+                        value={`${item.item_name} ${item.item_code}`}
+                        onSelect={() => {
+                          setFormData({ ...formData, inventory_item_id: item.id });
+                          setOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            formData.inventory_item_id === item.id ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        <div className="flex flex-col">
+                          <span>{item.item_name} ({item.item_code})</span>
+                          <span className="text-xs text-muted-foreground">
+                            الكمية المتاحة: {item.current_quantity} {item.unit}
+                          </span>
+                        </div>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
           {errors.inventory_item_id && <p className="text-sm text-destructive">{errors.inventory_item_id}</p>}
         </div>
 

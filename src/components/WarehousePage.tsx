@@ -28,7 +28,9 @@ import { Badge } from "@/components/ui/badge";
 import { useWarehouse } from "@/hooks/useWarehouse";
 import { InventoryItemForm } from "./forms/InventoryItemForm";
 import { WarehouseTransactionForm } from "./forms/WarehouseTransactionForm";
-import { Plus, Package, TrendingUp, TrendingDown, Edit, Trash2, AlertTriangle } from "lucide-react";
+import { MultiItemTransactionForm } from "./forms/MultiItemTransactionForm";
+import { WarehouseInventoryReport } from "./reports/WarehouseInventoryReport";
+import { Plus, Package, TrendingUp, TrendingDown, Edit, Trash2, AlertTriangle, FileText } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -63,6 +65,8 @@ export const WarehousePage = () => {
   const [isAddItemOpen, setIsAddItemOpen] = useState(false);
   const [isAddInOpen, setIsAddInOpen] = useState(false);
   const [isAddOutOpen, setIsAddOutOpen] = useState(false);
+  const [isMultiAddInOpen, setIsMultiAddInOpen] = useState(false);
+  const [isMultiAddOutOpen, setIsMultiAddOutOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
   const [deletingItem, setDeletingItem] = useState<any>(null);
   const [deletingTransaction, setDeletingTransaction] = useState<any>(null);
@@ -124,6 +128,19 @@ export const WarehousePage = () => {
         setIsAddOutOpen(false);
       },
     });
+  };
+
+  const handleMultiAddTransaction = async (items: any[]) => {
+    try {
+      // Process all transactions sequentially
+      for (const item of items) {
+        await createTransaction.mutateAsync(item);
+      }
+      setIsMultiAddInOpen(false);
+      setIsMultiAddOutOpen(false);
+    } catch (error) {
+      console.error("Error creating transactions:", error);
+    }
   };
 
   const handleDeleteTransaction = () => {
@@ -234,6 +251,7 @@ export const WarehousePage = () => {
         <TabsList>
           <TabsTrigger value="inventory">المخزون</TabsTrigger>
           <TabsTrigger value="transactions">الحركات</TabsTrigger>
+          <TabsTrigger value="report">تقرير الأصناف</TabsTrigger>
         </TabsList>
 
         <TabsContent value="inventory" className="space-y-4">
@@ -347,12 +365,12 @@ export const WarehousePage = () => {
 
         <TabsContent value="transactions" className="space-y-4">
           {hasAccess && (
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Dialog open={isAddInOpen} onOpenChange={setIsAddInOpen}>
                 <DialogTrigger asChild>
                   <Button variant="default">
                     <TrendingUp className="ml-2 h-4 w-4" />
-                    تسجيل دخول بضاعة
+                    دخول صنف واحد
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -367,11 +385,30 @@ export const WarehousePage = () => {
                 </DialogContent>
               </Dialog>
 
+              <Dialog open={isMultiAddInOpen} onOpenChange={setIsMultiAddInOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="default">
+                    <Plus className="ml-2 h-4 w-4" />
+                    دخول عدة أصناف
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>تسجيل دخول عدة أصناف للمستودع</DialogTitle>
+                  </DialogHeader>
+                  <MultiItemTransactionForm
+                    transactionType="دخول"
+                    onSubmit={handleMultiAddTransaction}
+                    onCancel={() => setIsMultiAddInOpen(false)}
+                  />
+                </DialogContent>
+              </Dialog>
+
               <Dialog open={isAddOutOpen} onOpenChange={setIsAddOutOpen}>
                 <DialogTrigger asChild>
                   <Button variant="outline">
                     <TrendingDown className="ml-2 h-4 w-4" />
-                    تسجيل خروج بضاعة
+                    خروج صنف واحد
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -382,6 +419,25 @@ export const WarehousePage = () => {
                     transactionType="خروج"
                     onSubmit={handleAddTransaction}
                     onCancel={() => setIsAddOutOpen(false)}
+                  />
+                </DialogContent>
+              </Dialog>
+
+              <Dialog open={isMultiAddOutOpen} onOpenChange={setIsMultiAddOutOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline">
+                    <Plus className="ml-2 h-4 w-4" />
+                    خروج عدة أصناف
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>تسجيل خروج عدة أصناف من المستودع</DialogTitle>
+                  </DialogHeader>
+                  <MultiItemTransactionForm
+                    transactionType="خروج"
+                    onSubmit={handleMultiAddTransaction}
+                    onCancel={() => setIsMultiAddOutOpen(false)}
                   />
                 </DialogContent>
               </Dialog>
@@ -458,6 +514,10 @@ export const WarehousePage = () => {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="report" className="space-y-4">
+          <WarehouseInventoryReport />
         </TabsContent>
       </Tabs>
 

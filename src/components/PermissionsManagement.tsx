@@ -50,6 +50,7 @@ const AVAILABLE_PAGES = [
   { name: "purchases", label: "المشتريات" },
   { name: "invoices", label: "الفواتير" },
   { name: "extracts", label: "المستخلصات" },
+  { name: "assignment_orders", label: "أوامر التكليف" },
   { name: "contractors", label: "المقاولون" },
   { name: "suppliers", label: "الموردون" },
   { name: "maintenance", label: "الصيانة" },

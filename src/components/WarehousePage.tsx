@@ -169,7 +169,7 @@ export const WarehousePage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">إجمالي الأصناف</CardTitle>
@@ -191,61 +191,7 @@ export const WarehousePage = () => {
             <p className="text-xs text-muted-foreground">القيمة الإجمالية</p>
           </CardContent>
         </Card>
-
-        <Card className={lowStockItems.length > 0 ? "border-destructive" : ""}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">تنبيهات المخزون</CardTitle>
-            <AlertTriangle className={`h-4 w-4 ${lowStockItems.length > 0 ? "text-destructive animate-pulse" : "text-muted-foreground"}`} />
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${lowStockItems.length > 0 ? "text-destructive" : ""}`}>
-              {lowStockItems.length}
-            </div>
-            <p className="text-xs text-muted-foreground">صنف أقل من الحد الأدنى</p>
-          </CardContent>
-        </Card>
       </div>
-
-      {lowStockItems.length > 0 && (
-        <Card className="border-destructive bg-destructive/5">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-destructive">
-              <AlertTriangle className="h-5 w-5" />
-              تنبيه: أصناف تحتاج إعادة طلب
-            </CardTitle>
-            <CardDescription>
-              الأصناف التالية وصلت للحد الأدنى أو أقل ويجب إعادة طلبها
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {lowStockItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between p-3 bg-background rounded-lg border"
-                >
-                  <div className="flex-1">
-                    <div className="font-medium">{item.item_name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      كود: {item.item_code} | التصنيف: {item.category}
-                    </div>
-                  </div>
-                  <div className="text-left">
-                    <div className="text-sm">
-                      <span className="font-bold text-destructive">{item.current_quantity}</span>
-                      <span className="text-muted-foreground"> / {item.minimum_quantity}</span>
-                      <span className="text-muted-foreground"> {item.unit}</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {item.location || "بدون موقع محدد"}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       <Tabs defaultValue="inventory" className="space-y-4">
         <TabsList>
@@ -520,6 +466,47 @@ export const WarehousePage = () => {
           <WarehouseInventoryReport />
         </TabsContent>
       </Tabs>
+
+      {lowStockItems.length > 0 && (
+        <Card className="border-destructive bg-destructive/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-5 w-5" />
+              تنبيه: أصناف تحتاج إعادة طلب
+            </CardTitle>
+            <CardDescription>
+              الأصناف التالية وصلت للحد الأدنى أو أقل ويجب إعادة طلبها
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {lowStockItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-3 bg-background rounded-lg border"
+                >
+                  <div className="flex-1">
+                    <div className="font-medium">{item.item_name}</div>
+                    <div className="text-sm text-muted-foreground">
+                      كود: {item.item_code} | التصنيف: {item.category}
+                    </div>
+                  </div>
+                  <div className="text-left">
+                    <div className="text-sm">
+                      <span className="font-bold text-destructive">{item.current_quantity}</span>
+                      <span className="text-muted-foreground"> / {item.minimum_quantity}</span>
+                      <span className="text-muted-foreground"> {item.unit}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {item.location || "بدون موقع محدد"}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Dialog open={!!editingItem} onOpenChange={(open) => !open && setEditingItem(null)}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">

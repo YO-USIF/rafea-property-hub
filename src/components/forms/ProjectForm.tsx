@@ -190,14 +190,18 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="total_cost">التكلفة الإجمالية</Label>
+              <Label htmlFor="total_cost">التكلفة الإجمالية (يتم حسابها تلقائياً)</Label>
               <Input
                 id="total_cost"
                 type="number"
                 value={formData.total_cost}
                 onChange={(e) => setFormData(prev => ({ ...prev, total_cost: parseInt(e.target.value) || 0 }))}
-                required
+                disabled
+                className="bg-muted"
               />
+              <p className="text-xs text-muted-foreground">
+                يتم حساب التكلفة تلقائياً من المستخلصات والفواتير وأوامر التكليف
+              </p>
             </div>
 
             <div className="space-y-2">

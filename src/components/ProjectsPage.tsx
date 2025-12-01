@@ -18,7 +18,9 @@ interface Project {
   location: string;
   total_units: number;
   sold_units: number;
-  total_cost: number;
+  total_cost: number; // الحقل الأساسي في قاعدة البيانات
+  total_sales: number; // إجمالي المبيعات (محسوب)
+  total_expenses: number; // التكلفة الإجمالية من المصروفات (محسوب)
   progress: number;
   start_date: string;
   expected_completion: string;
@@ -50,14 +52,35 @@ const ProjectsPage = () => {
 
       if (projectsError) throw projectsError;
 
-      // جلب بيانات المبيعات لحساب التكلفة من المبيعات
+      // جلب بيانات المبيعات
       const { data: salesData, error: salesError } = await supabase
         .from('sales')
         .select('project_id, price, status');
 
       if (salesError) throw salesError;
 
-      // حساب إجمالي مبيعات كل مشروع باستخدام project_id
+      // جلب بيانات المستخلصات
+      const { data: extractsData, error: extractsError } = await supabase
+        .from('extracts')
+        .select('project_id, amount');
+
+      if (extractsError) throw extractsError;
+
+      // جلب بيانات الفواتير
+      const { data: invoicesData, error: invoicesError } = await supabase
+        .from('invoices')
+        .select('project_id, amount');
+
+      if (invoicesError) throw invoicesError;
+
+      // جلب بيانات أوامر التكليف
+      const { data: assignmentOrdersData, error: assignmentOrdersError } = await supabase
+        .from('assignment_orders')
+        .select('project_id, amount');
+
+      if (assignmentOrdersError) throw assignmentOrdersError;
+
+      // حساب إجمالي مبيعات كل مشروع
       const salesByProject = salesData?.reduce((acc: any, sale: any) => {
         if (sale.status === 'مباع' && sale.project_id) {
           if (!acc[sale.project_id]) {
@@ -68,10 +91,44 @@ const ProjectsPage = () => {
         return acc;
       }, {});
 
-      // تحديث تكلفة كل مشروع بناءً على المبيعات
-      const updatedProjects = projectsData?.map((project: Project) => ({
+      // حساب إجمالي المصروفات لكل مشروع (مستخلصات + فواتير + أوامر تكليف)
+      const expensesByProject: any = {};
+
+      // إضافة المستخلصات
+      extractsData?.forEach((extract: any) => {
+        if (extract.project_id) {
+          if (!expensesByProject[extract.project_id]) {
+            expensesByProject[extract.project_id] = 0;
+          }
+          expensesByProject[extract.project_id] += Number(extract.amount) || 0;
+        }
+      });
+
+      // إضافة الفواتير
+      invoicesData?.forEach((invoice: any) => {
+        if (invoice.project_id) {
+          if (!expensesByProject[invoice.project_id]) {
+            expensesByProject[invoice.project_id] = 0;
+          }
+          expensesByProject[invoice.project_id] += Number(invoice.amount) || 0;
+        }
+      });
+
+      // إضافة أوامر التكليف
+      assignmentOrdersData?.forEach((order: any) => {
+        if (order.project_id) {
+          if (!expensesByProject[order.project_id]) {
+            expensesByProject[order.project_id] = 0;
+          }
+          expensesByProject[order.project_id] += Number(order.amount) || 0;
+        }
+      });
+
+      // تحديث بيانات كل مشروع
+      const updatedProjects = projectsData?.map((project: any) => ({
         ...project,
-        total_cost: salesByProject?.[project.id] || 0
+        total_sales: salesByProject?.[project.id] || 0,
+        total_expenses: expensesByProject?.[project.id] || 0
       }));
 
       setProjects(updatedProjects || []);
@@ -137,7 +194,8 @@ const ProjectsPage = () => {
   const totalProjects = projects.length;
   const activeProjects = projects.filter(p => p.status === 'قيد التنفيذ').length;
   const completedProjects = projects.filter(p => p.status === 'مكتمل').length;
-  const totalInvestment = projects.reduce((sum, p) => sum + p.total_cost, 0);
+  const totalSales = projects.reduce((sum, p) => sum + p.total_sales, 0);
+  const totalExpenses = projects.reduce((sum, p) => sum + p.total_expenses, 0);
 
   if (loading) {
     return (
@@ -200,11 +258,22 @@ const ProjectsPage = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي الاستثمار</CardTitle>
-            <MapPin className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">إجمالي المبيعات</CardTitle>
+            <MapPin className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(totalInvestment / 1000000).toFixed(1)}م</div>
+            <div className="text-2xl font-bold text-green-600">{(totalSales / 1000000).toFixed(1)}م</div>
+            <p className="text-xs text-muted-foreground">ريال سعودي</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">إجمالي المصروفات</CardTitle>
+            <TrendingUp className="h-4 w-4 text-red-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">{(totalExpenses / 1000000).toFixed(1)}م</div>
             <p className="text-xs text-muted-foreground">ريال سعودي</p>
           </CardContent>
         </Card>
@@ -228,10 +297,10 @@ const ProjectsPage = () => {
               />
             </div>
             <Button variant="outline" onClick={() => {
-              const headers = "اسم المشروع,النوع,الموقع,الوحدات المباعة,إجمالي الوحدات,نسبة الإنجاز,التكلفة الإجمالية,الحالة,تاريخ الانتهاء المتوقع\n";
+              const headers = "اسم المشروع,النوع,الموقع,الوحدات المباعة,إجمالي الوحدات,نسبة الإنجاز,إجمالي المبيعات,التكلفة الإجمالية,الحالة,تاريخ الانتهاء المتوقع\n";
               const csvContent = headers + 
                 filteredProjects.map(project => 
-                  `${project.name},${project.type},${project.location},${project.sold_units},${project.total_units},${project.progress}%,${project.total_cost},${project.status},${project.expected_completion}`
+                  `${project.name},${project.type},${project.location},${project.sold_units},${project.total_units},${project.progress}%,${project.total_sales},${project.total_expenses},${project.status},${project.expected_completion}`
                 ).join("\n");
               
               // إضافة BOM للتعامل مع الترميز العربي بشكل صحيح
@@ -257,6 +326,7 @@ const ProjectsPage = () => {
                   <TableHead className="text-right">الموقع</TableHead>
                   <TableHead className="text-right">الوحدات</TableHead>
                   <TableHead className="text-right">نسبة الإنجاز</TableHead>
+                  <TableHead className="text-right">إجمالي المبيعات</TableHead>
                   <TableHead className="text-right">التكلفة الإجمالية</TableHead>
                   <TableHead className="text-right">الحالة</TableHead>
                   <TableHead className="text-right">تاريخ الانتهاء المتوقع</TableHead>
@@ -281,7 +351,8 @@ const ProjectsPage = () => {
                         <span className="text-sm">{project.progress}%</span>
                       </div>
                     </TableCell>
-                    <TableCell>{project.total_cost.toLocaleString()} ر.س</TableCell>
+                    <TableCell className="text-green-600 font-medium">{project.total_sales.toLocaleString()} ر.س</TableCell>
+                    <TableCell className="text-red-600 font-medium">{project.total_expenses.toLocaleString()} ر.س</TableCell>
                     <TableCell>{getStatusBadge(project.status)}</TableCell>
                     <TableCell>{project.expected_completion}</TableCell>
                     <TableCell>

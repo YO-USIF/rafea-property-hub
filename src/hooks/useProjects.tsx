@@ -22,14 +22,35 @@ export const useProjects = () => {
       
       if (projectsError) throw projectsError;
 
-      // جلب بيانات المبيعات لحساب التكلفة من المبيعات
+      // جلب بيانات المبيعات
       const { data: salesData, error: salesError } = await supabase
         .from('sales')
         .select('project_id, price, status');
 
       if (salesError) throw salesError;
 
-      // حساب إجمالي مبيعات كل مشروع باستخدام project_id
+      // جلب بيانات المستخلصات
+      const { data: extractsData, error: extractsError } = await supabase
+        .from('extracts')
+        .select('project_id, amount');
+
+      if (extractsError) throw extractsError;
+
+      // جلب بيانات الفواتير
+      const { data: invoicesData, error: invoicesError } = await supabase
+        .from('invoices')
+        .select('project_id, amount');
+
+      if (invoicesError) throw invoicesError;
+
+      // جلب بيانات أوامر التكليف
+      const { data: assignmentOrdersData, error: assignmentOrdersError } = await supabase
+        .from('assignment_orders')
+        .select('project_id, amount');
+
+      if (assignmentOrdersError) throw assignmentOrdersError;
+
+      // حساب إجمالي مبيعات كل مشروع
       const salesByProject = salesData?.reduce((acc: any, sale: any) => {
         if (sale.status === 'مباع' && sale.project_id) {
           if (!acc[sale.project_id]) {
@@ -40,10 +61,44 @@ export const useProjects = () => {
         return acc;
       }, {});
 
-      // تحديث تكلفة كل مشروع بناءً على المبيعات
+      // حساب إجمالي المصروفات لكل مشروع
+      const expensesByProject: any = {};
+
+      // إضافة المستخلصات
+      extractsData?.forEach((extract: any) => {
+        if (extract.project_id) {
+          if (!expensesByProject[extract.project_id]) {
+            expensesByProject[extract.project_id] = 0;
+          }
+          expensesByProject[extract.project_id] += Number(extract.amount) || 0;
+        }
+      });
+
+      // إضافة الفواتير
+      invoicesData?.forEach((invoice: any) => {
+        if (invoice.project_id) {
+          if (!expensesByProject[invoice.project_id]) {
+            expensesByProject[invoice.project_id] = 0;
+          }
+          expensesByProject[invoice.project_id] += Number(invoice.amount) || 0;
+        }
+      });
+
+      // إضافة أوامر التكليف
+      assignmentOrdersData?.forEach((order: any) => {
+        if (order.project_id) {
+          if (!expensesByProject[order.project_id]) {
+            expensesByProject[order.project_id] = 0;
+          }
+          expensesByProject[order.project_id] += Number(order.amount) || 0;
+        }
+      });
+
+      // تحديث بيانات كل مشروع
       const updatedProjects = projectsData?.map((project: any) => ({
         ...project,
-        total_cost: salesByProject?.[project.id] || 0
+        total_sales: salesByProject?.[project.id] || 0,
+        total_expenses: expensesByProject?.[project.id] || 0
       }));
 
       return updatedProjects;

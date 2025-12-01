@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,17 +34,47 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Project>({
-    name: project?.name || '',
-    type: project?.type || 'سكني',
-    location: project?.location || '',
-    total_units: project?.total_units || 0,
-    sold_units: project?.sold_units || 0,
-    total_cost: project?.total_cost || 0,
-    progress: project?.progress || 0,
-    start_date: project?.start_date || '',
-    expected_completion: project?.expected_completion || '',
-    status: project?.status || 'قيد التنفيذ'
+    name: '',
+    type: 'سكني',
+    location: '',
+    total_units: 0,
+    sold_units: 0,
+    total_cost: 0,
+    progress: 0,
+    start_date: '',
+    expected_completion: '',
+    status: 'قيد التنفيذ'
   });
+
+  useEffect(() => {
+    if (project) {
+      setFormData({
+        name: project.name || '',
+        type: project.type || 'سكني',
+        location: project.location || '',
+        total_units: project.total_units || 0,
+        sold_units: project.sold_units || 0,
+        total_cost: project.total_cost || 0,
+        progress: project.progress || 0,
+        start_date: project.start_date || '',
+        expected_completion: project.expected_completion || '',
+        status: project.status || 'قيد التنفيذ'
+      });
+    } else {
+      setFormData({
+        name: '',
+        type: 'سكني',
+        location: '',
+        total_units: 0,
+        sold_units: 0,
+        total_cost: 0,
+        progress: 0,
+        start_date: '',
+        expected_completion: '',
+        status: 'قيد التنفيذ'
+      });
+    }
+  }, [project, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

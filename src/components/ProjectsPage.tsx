@@ -53,18 +53,17 @@ const ProjectsPage = () => {
       // جلب بيانات المبيعات لحساب التكلفة من المبيعات
       const { data: salesData, error: salesError } = await supabase
         .from('sales')
-        .select('project_name, price, status');
+        .select('project_id, price, status');
 
       if (salesError) throw salesError;
 
-      // حساب إجمالي مبيعات كل مشروع
+      // حساب إجمالي مبيعات كل مشروع باستخدام project_id
       const salesByProject = salesData?.reduce((acc: any, sale: any) => {
-        if (sale.status === 'مباع') {
-          const projectName = sale.project_name?.trim();
-          if (!acc[projectName]) {
-            acc[projectName] = 0;
+        if (sale.status === 'مباع' && sale.project_id) {
+          if (!acc[sale.project_id]) {
+            acc[sale.project_id] = 0;
           }
-          acc[projectName] += Number(sale.price) || 0;
+          acc[sale.project_id] += Number(sale.price) || 0;
         }
         return acc;
       }, {});
@@ -72,7 +71,7 @@ const ProjectsPage = () => {
       // تحديث تكلفة كل مشروع بناءً على المبيعات
       const updatedProjects = projectsData?.map((project: Project) => ({
         ...project,
-        total_cost: salesByProject?.[project.name?.trim()] || 0
+        total_cost: salesByProject?.[project.id] || 0
       }));
 
       setProjects(updatedProjects || []);

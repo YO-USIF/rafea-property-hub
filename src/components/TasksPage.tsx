@@ -326,7 +326,7 @@ const TasksPage = () => {
                     <h3 className="font-semibold text-lg">{report.title}</h3>
                     <div className="flex gap-2">
                       <span className="text-sm text-gray-500">
-                        {new Date(report.report_date).toLocaleDateString('ar-SA')}
+                        {new Date(report.report_date).toLocaleDateString('en-GB')}
                       </span>
                       {isAdmin && (
                         <>

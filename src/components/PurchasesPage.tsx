@@ -400,7 +400,7 @@ const PurchasesPage = () => {
                                     </div>
                                     
                                     <div class="footer">
-                                      <p>📅 تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</p>
+                                      <p>📅 تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')}</p>
                                       <p>🏢 شركة سهيل طيبة للتطوير العقاري</p>
                                     </div>
                                   </body>

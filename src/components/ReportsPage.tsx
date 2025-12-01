@@ -432,7 +432,7 @@ const ReportsPage = () => {
     const profit = totalRevenue - totalExpenses;
     
     return `تقرير: ${reportName}
-تاريخ الإنشاء: ${new Date().toLocaleDateString('ar-SA')}
+تاريخ الإنشاء: ${new Date().toLocaleDateString('en-GB')}
 الفترة: ${selectedPeriod}
 
 =====================================
@@ -451,7 +451,7 @@ const ReportsPage = () => {
 
 ملاحظات:
 هذا تقرير يحتوي على بيانات حقيقية من نظام إدارة العقارات.
-جميع البيانات محدثة حتى تاريخ: ${new Date().toLocaleDateString('ar-SA')}
+جميع البيانات محدثة حتى تاريخ: ${new Date().toLocaleDateString('en-GB')}
 `;
   };
 
@@ -713,7 +713,7 @@ const ReportsPage = () => {
                   <div className="prose prose-sm max-w-none">
                     <p>هذا عرض تفصيلي للتقرير المختار. يمكنك مراجعة البيانات والإحصائيات بالتفصيل.</p>
                     <ul>
-                      <li>تم إنشاء التقرير في: {new Date().toLocaleDateString('ar-SA')}</li>
+                      <li>تم إنشاء التقرير في: {new Date().toLocaleDateString('en-GB')}</li>
                       <li>الفترة الزمنية: {selectedPeriod}</li>
                       <li>نوع التقرير: {selectedReport?.category}</li>
                       <li>حالة البيانات: محدثة</li>

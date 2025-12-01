@@ -152,7 +152,7 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, onClose }
                       </p>
                       <div className="flex items-center mt-2 text-xs text-gray-400">
                         <Clock className="w-3 h-3 ml-1" />
-                        {new Date(notification.created_at).toLocaleDateString('ar-SA', {
+                        {new Date(notification.created_at).toLocaleDateString('en-GB', {
                           year: 'numeric',
                           month: 'short',
                           day: 'numeric',

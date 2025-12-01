@@ -67,7 +67,7 @@ const InvoicesReport: React.FC<InvoicesReportProps> = ({ data, period }) => {
   // بيانات الفواتير حسب الشهر (افتراضية بناءً على تاريخ الإنشاء)
   const invoicesByMonth = data.reduce((acc: any, invoice) => {
     const date = new Date(invoice.invoice_date || invoice.created_at);
-    const month = date.toLocaleDateString('ar-SA', { year: 'numeric', month: 'short' });
+    const month = date.toLocaleDateString('en-GB', { year: 'numeric', month: 'short' });
     if (!acc[month]) {
       acc[month] = { name: month, amount: 0, count: 0 };
     }

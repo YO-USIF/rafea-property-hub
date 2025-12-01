@@ -156,7 +156,7 @@ export const WarehouseInventoryReport = () => {
       <body>
         <div class="header">
           <h1>تقرير أصناف المستودع</h1>
-          <p>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</p>
+          <p>تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')}</p>
           ${categoryFilter !== 'all' ? `<p>التصنيف: ${categoryFilter}</p>` : ''}
           ${stockFilter !== 'all' ? `<p>حالة المخزون: ${stockFilter === 'low' ? 'نواقص' : 'عادي'}</p>` : ''}
         </div>

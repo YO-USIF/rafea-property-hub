@@ -121,19 +121,19 @@ export const useDashboardData = () => {
     ...(projects?.slice(0, 2).map(project => ({
       id: project.id,
       title: `إضافة مشروع جديد: ${project.name}`,
-      time: new Date(project.created_at).toLocaleDateString('ar-SA'),
+      time: new Date(project.created_at).toLocaleDateString('en-GB'),
       type: 'project'
     })) || []),
     ...(maintenanceRequests?.slice(0, 2).map(request => ({
       id: request.id,
       title: `طلب صيانة جديد: ${request.issue_type} - ${request.building_name}`,
-      time: new Date(request.created_at).toLocaleDateString('ar-SA'),
+      time: new Date(request.created_at).toLocaleDateString('en-GB'),
       type: 'maintenance'
     })) || []),
     ...(tasks?.slice(0, 2).map(task => ({
       id: task.id,
       title: `إضافة مهمة جديدة: ${task.title}`,
-      time: new Date(task.created_at).toLocaleDateString('ar-SA'),
+      time: new Date(task.created_at).toLocaleDateString('en-GB'),
       type: 'task'
     })) || [])
   ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 5);
@@ -144,7 +144,7 @@ export const useDashboardData = () => {
   ).slice(0, 3).map(task => ({
     id: task.id,
     title: task.title,
-    due: task.due_date ? new Date(task.due_date).toLocaleDateString('ar-SA') : 'غير محدد',
+    due: task.due_date ? new Date(task.due_date).toLocaleDateString('en-GB') : 'غير محدد',
     priority: task.priority === 'عالية' || task.priority === 'عاجلة' ? 'high' : 
               task.priority === 'متوسطة' ? 'medium' : 'low'
   })) || [];
@@ -154,7 +154,7 @@ export const useDashboardData = () => {
   ).slice(0, 2).map(req => ({
     id: `maintenance-${req.id}`,
     title: `صيانة ${req.issue_type} - ${req.building_name}`,
-    due: new Date(req.reported_date).toLocaleDateString('ar-SA'),
+    due: new Date(req.reported_date).toLocaleDateString('en-GB'),
     priority: req.priority === 'عالية' || req.priority === 'عاجلة' ? 'high' : 'medium'
   })) || [];
 

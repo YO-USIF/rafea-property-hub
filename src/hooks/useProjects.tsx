@@ -14,16 +14,39 @@ export const useProjects = () => {
   const { data: projects = [], isLoading } = useQuery({
     queryKey: ['projects', isManagerOrAdmin],
     queryFn: async () => {
-      let query = supabase
+      // جلب المشاريع
+      const { data: projectsData, error: projectsError } = await supabase
         .from('projects')
-        .select('*');
+        .select('*')
+        .order('created_at', { ascending: false });
       
-      // جلب جميع المشاريع
-      
-      const { data, error } = await query.order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data;
+      if (projectsError) throw projectsError;
+
+      // جلب بيانات المبيعات لحساب التكلفة من المبيعات
+      const { data: salesData, error: salesError } = await supabase
+        .from('sales')
+        .select('project_id, price, status');
+
+      if (salesError) throw salesError;
+
+      // حساب إجمالي مبيعات كل مشروع باستخدام project_id
+      const salesByProject = salesData?.reduce((acc: any, sale: any) => {
+        if (sale.status === 'مباع' && sale.project_id) {
+          if (!acc[sale.project_id]) {
+            acc[sale.project_id] = 0;
+          }
+          acc[sale.project_id] += Number(sale.price) || 0;
+        }
+        return acc;
+      }, {});
+
+      // تحديث تكلفة كل مشروع بناءً على المبيعات
+      const updatedProjects = projectsData?.map((project: any) => ({
+        ...project,
+        total_cost: salesByProject?.[project.id] || 0
+      }));
+
+      return updatedProjects;
     },
     enabled: !!user?.id,
   });

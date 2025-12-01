@@ -357,7 +357,7 @@ const SuppliersPage = () => {
           <div class="header">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
               <img src="/lovable-uploads/c6fbcf40-7e64-42f0-b1da-d735b0b632c8.png" alt="شعار الشركة" style="height: 60px; object-fit: contain;" />
-              <div class="print-date">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</div>
+              <div class="print-date">تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')}</div>
             </div>
             <h1>كشف حساب المورد</h1>
             <div class="subtitle">تقرير مفصل للمعاملات المالية</div>
@@ -425,10 +425,10 @@ const SuppliersPage = () => {
                 ${supplierInvoices.length > 0 ? supplierInvoices.map(invoice => `
                   <tr>
                     <td>${invoice.invoice_number || 'غير محدد'}</td>
-                    <td>${new Date(invoice.invoice_date).toLocaleDateString('ar-SA')}</td>
+                    <td>${new Date(invoice.invoice_date).toLocaleDateString('en-GB')}</td>
                     <td>${invoice.description || 'غير محدد'}</td>
                     <td>${Number(invoice.amount).toLocaleString()} ر.س</td>
-                    <td>${invoice.due_date ? new Date(invoice.due_date).toLocaleDateString('ar-SA') : 'غير محدد'}</td>
+                    <td>${invoice.due_date ? new Date(invoice.due_date).toLocaleDateString('en-GB') : 'غير محدد'}</td>
                     <td>
                       <span class="status-badge ${invoice.status === 'مدفوع' ? 'status-paid' : invoice.status === 'غير مدفوع' ? 'status-unpaid' : 'status-review'}">
                         ${invoice.status || 'غير محدد'}
@@ -799,7 +799,7 @@ const SuppliersPage = () => {
                                   <div class="header">
                                     <h1>بيانات المورد</h1>
                                     <h2>${supplier.name}</h2>
-                                    <div class="date">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</div>
+                                    <div class="date">تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')}</div>
                                   </div>
                                   
                                   <div class="section">

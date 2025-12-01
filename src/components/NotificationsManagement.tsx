@@ -164,7 +164,7 @@ const NotificationsManagement: React.FC = () => {
                       </p>
                       <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                         <span>
-                          {new Date(notification.created_at).toLocaleDateString('ar-SA', {
+                          {new Date(notification.created_at).toLocaleDateString('en-GB', {
                             year: 'numeric',
                             month: 'short',
                             day: 'numeric',

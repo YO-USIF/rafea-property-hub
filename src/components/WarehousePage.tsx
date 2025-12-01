@@ -421,7 +421,7 @@ export const WarehousePage = () => {
                     <TableBody>
                       {transactions.map((transaction: any) => (
                         <TableRow key={transaction.id}>
-                          <TableCell>{new Date(transaction.transaction_date).toLocaleDateString('ar-SA')}</TableCell>
+                          <TableCell>{new Date(transaction.transaction_date).toLocaleDateString('en-GB')}</TableCell>
                           <TableCell>
                             <Badge
                               variant={transaction.transaction_type === "دخول" ? "default" : "secondary"}

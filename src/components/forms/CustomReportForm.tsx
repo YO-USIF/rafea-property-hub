@@ -269,7 +269,7 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
 
               {startDate && endDate && (
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-700">
-                  <strong>فترة التقرير:</strong> من {new Date(startDate).toLocaleDateString('ar-SA')} إلى {new Date(endDate).toLocaleDateString('ar-SA')}
+                  <strong>فترة التقرير:</strong> من {new Date(startDate).toLocaleDateString('en-GB')} إلى {new Date(endDate).toLocaleDateString('en-GB')}
                 </div>
               )}
             </CardContent>
@@ -290,7 +290,7 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
                   <p className="font-medium">شركة سهيل طيبة للتطوير العقاري</p>
                   {startDate && endDate && (
                     <p>
-                      <span className="font-semibold">فترة التقرير:</span> من {new Date(startDate).toLocaleDateString('ar-SA')} إلى {new Date(endDate).toLocaleDateString('ar-SA')}
+                      <span className="font-semibold">فترة التقرير:</span> من {new Date(startDate).toLocaleDateString('en-GB')} إلى {new Date(endDate).toLocaleDateString('en-GB')}
                     </p>
                   )}
                   {!startDate && !endDate && (
@@ -299,7 +299,7 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
                     </p>
                   )}
                   <p className="text-xs">
-                    تاريخ الإصدار: {new Date().toLocaleDateString('ar-SA', { 
+                    تاريخ الإصدار: {new Date().toLocaleDateString('en-GB', { 
                       year: 'numeric', 
                       month: 'long', 
                       day: 'numeric' 

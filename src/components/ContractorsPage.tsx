@@ -352,7 +352,7 @@ const ContractorsPage = () => {
           <div class="header">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
               <img src="/lovable-uploads/c6fbcf40-7e64-42f0-b1da-d735b0b632c8.png" alt="شعار الشركة" style="height: 60px; object-fit: contain;" />
-              <div class="print-date">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</div>
+              <div class="print-date">تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')}</div>
             </div>
             <h1>كشف حساب المقاول</h1>
             <div class="subtitle">تقرير مفصل للمستخلصات والمدفوعات</div>
@@ -420,7 +420,7 @@ const ContractorsPage = () => {
                 ${contractorExtracts.length > 0 ? contractorExtracts.map(extract => `
                   <tr>
                     <td>${extract.extract_number || 'غير محدد'}</td>
-                    <td>${new Date(extract.extract_date).toLocaleDateString('ar-SA')}</td>
+                    <td>${new Date(extract.extract_date).toLocaleDateString('en-GB')}</td>
                     <td>${extract.project_name || 'غير محدد'}</td>
                     <td>${Number(extract.amount).toLocaleString()} ر.س</td>
                     <td>${extract.percentage_completed || 0}%</td>

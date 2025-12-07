@@ -11,6 +11,29 @@ export const useAssignmentOrders = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  // جلب اسم مدير النظام (المعتمد)
+  const { data: approverName } = useQuery({
+    queryKey: ['approver-name'],
+    queryFn: async () => {
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'مدير النظام')
+        .limit(1);
+      
+      if (roleData && roleData.length > 0) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('user_id', roleData[0].user_id)
+          .single();
+        
+        return profileData?.full_name || 'مدير النظام';
+      }
+      return 'مدير النظام';
+    },
+  });
+
   const { data: assignmentOrders = [], isLoading } = useQuery({
     queryKey: ['assignment_orders', user?.id, isManagerOrAdmin],
     queryFn: async () => {
@@ -26,6 +49,24 @@ export const useAssignmentOrders = () => {
         console.error('Error fetching assignment orders:', error);
         throw error;
       }
+      
+      // جلب أسماء المستخدمين الذين أنشأوا أوامر التكليف
+      if (data && data.length > 0) {
+        const userIds = [...new Set(data.map(e => e.user_id))];
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, full_name')
+          .in('user_id', userIds);
+        
+        const profileMap = new Map(profiles?.map(p => [p.user_id, p.full_name]) || []);
+        
+        return data.map(order => ({
+          ...order,
+          created_by_name: profileMap.get(order.user_id) || 'غير معروف',
+          approver_name: approverName || 'مدير النظام'
+        }));
+      }
+      
       return data || [];
     },
     enabled: !!user?.id,
@@ -106,5 +147,6 @@ export const useAssignmentOrders = () => {
     createAssignmentOrder,
     updateAssignmentOrder,
     deleteAssignmentOrder,
+    approverName: approverName || 'مدير النظام',
   };
 };

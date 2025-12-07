@@ -229,19 +229,22 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
           {/* Signatures Section - Professional Layout */}
           <div className="grid grid-cols-3 gap-3 mb-3 mt-4">
             <div className="text-center p-2 bg-muted/30 rounded border border-muted-foreground/20">
-              <div className="h-12 border-b border-foreground/30 mb-1.5"></div>
-              <p className="font-bold text-xs text-foreground">المعد</p>
-              <p className="text-[10px] text-foreground/60 mt-0.5">الاسم والتوقيع</p>
+              <p className="font-bold text-xs text-primary mb-1">{extract.created_by_name || 'غير معروف'}</p>
+              <div className="h-10 border-b border-foreground/30 mb-1.5"></div>
+              <p className="font-bold text-xs text-foreground">المُعد</p>
+              <p className="text-[10px] text-foreground/60 mt-0.5">التوقيع</p>
             </div>
             <div className="text-center p-2 bg-muted/30 rounded border border-muted-foreground/20">
-              <div className="h-12 border-b border-foreground/30 mb-1.5"></div>
+              <p className="font-bold text-xs text-primary mb-1">المراجع</p>
+              <div className="h-10 border-b border-foreground/30 mb-1.5"></div>
               <p className="font-bold text-xs text-foreground">المراجع</p>
-              <p className="text-[10px] text-foreground/60 mt-0.5">الاسم والتوقيع</p>
+              <p className="text-[10px] text-foreground/60 mt-0.5">التوقيع</p>
             </div>
             <div className="text-center p-2 bg-muted/30 rounded border border-muted-foreground/20">
-              <div className="h-12 border-b border-foreground/30 mb-1.5"></div>
-              <p className="font-bold text-xs text-foreground">المعتمد</p>
-              <p className="text-[10px] text-foreground/60 mt-0.5">الاسم والتوقيع</p>
+              <p className="font-bold text-xs text-primary mb-1">{extract.approver_name || 'مدير النظام'}</p>
+              <div className="h-10 border-b border-foreground/30 mb-1.5"></div>
+              <p className="font-bold text-xs text-foreground">المُعتمد</p>
+              <p className="text-[10px] text-foreground/60 mt-0.5">التوقيع</p>
             </div>
           </div>
 

@@ -232,6 +232,12 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             color: #9ca3af;
             margin-top: 2px;
           }
+          .signature-name {
+            font-size: 13px;
+            font-weight: bold;
+            color: #3b82f6;
+            margin-bottom: 4px;
+          }
           .footer {
             margin-top: 20px;
             padding-top: 10px;
@@ -349,21 +355,24 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
 
           <div class="signatures">
             <div class="signature-box">
+              <div class="signature-name">${order.created_by_name || 'غير معروف'}</div>
               <div class="signature-line">
-                <div class="signature-title">مدير المشروع</div>
-                <div class="signature-title-en">Project Manager</div>
+                <div class="signature-title">المُعد</div>
+                <div class="signature-title-en">Preparer</div>
               </div>
             </div>
             <div class="signature-box">
+              <div class="signature-name">${order.contractor_name}</div>
               <div class="signature-line">
                 <div class="signature-title">المقاول</div>
                 <div class="signature-title-en">Contractor</div>
               </div>
             </div>
             <div class="signature-box">
+              <div class="signature-name">${order.approver_name || 'مدير النظام'}</div>
               <div class="signature-line">
-                <div class="signature-title">المدير التنفيذي</div>
-                <div class="signature-title-en">Executive Manager</div>
+                <div class="signature-title">المُعتمد</div>
+                <div class="signature-title-en">Approver</div>
               </div>
             </div>
           </div>
@@ -549,21 +558,24 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
 
           <div className="grid grid-cols-3 gap-8 mt-16 pt-8 border-t-2">
             <div className="text-center">
-              <div className="border-t-2 border-gray-400 pt-2 mt-16">
-                <p className="font-semibold text-gray-700">مدير المشروع</p>
-                <p className="text-sm text-gray-500">Project Manager</p>
+              <p className="font-bold text-primary mb-2">{order.created_by_name || 'غير معروف'}</p>
+              <div className="border-t-2 border-gray-400 pt-2 mt-12">
+                <p className="font-semibold text-gray-700">المُعد</p>
+                <p className="text-sm text-gray-500">Preparer</p>
               </div>
             </div>
             <div className="text-center">
-              <div className="border-t-2 border-gray-400 pt-2 mt-16">
+              <p className="font-bold text-primary mb-2">{order.contractor_name}</p>
+              <div className="border-t-2 border-gray-400 pt-2 mt-12">
                 <p className="font-semibold text-gray-700">المقاول</p>
                 <p className="text-sm text-gray-500">Contractor</p>
               </div>
             </div>
             <div className="text-center">
-              <div className="border-t-2 border-gray-400 pt-2 mt-16">
-                <p className="font-semibold text-gray-700">المدير التنفيذي</p>
-                <p className="text-sm text-gray-500">Executive Manager</p>
+              <p className="font-bold text-primary mb-2">{order.approver_name || 'مدير النظام'}</p>
+              <div className="border-t-2 border-gray-400 pt-2 mt-12">
+                <p className="font-semibold text-gray-700">المُعتمد</p>
+                <p className="text-sm text-gray-500">Approver</p>
               </div>
             </div>
           </div>

@@ -11,7 +11,30 @@ export const useExtracts = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // جلب المستخصات
+  // جلب اسم مدير النظام (المعتمد)
+  const { data: approverName } = useQuery({
+    queryKey: ['approver-name'],
+    queryFn: async () => {
+      // جلب user_id لمدير النظام أولاً
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'مدير النظام')
+        .limit(1);
+      
+      if (roleData && roleData.length > 0) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('user_id', roleData[0].user_id)
+          .single();
+        
+        return profileData?.full_name || 'مدير النظام';
+      }
+      return 'مدير النظام';
+    },
+  });
+
   const { data: extracts = [], isLoading } = useQuery({
     queryKey: ['extracts', user?.id, isManagerOrAdmin],
     queryFn: async () => {
@@ -26,6 +49,24 @@ export const useExtracts = () => {
       if (error) {
         throw error;
       }
+      
+      // جلب أسماء المستخدمين الذين أنشأوا المستخلصات
+      if (data && data.length > 0) {
+        const userIds = [...new Set(data.map(e => e.user_id))];
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, full_name')
+          .in('user_id', userIds);
+        
+        const profileMap = new Map(profiles?.map(p => [p.user_id, p.full_name]) || []);
+        
+        return data.map(extract => ({
+          ...extract,
+          created_by_name: profileMap.get(extract.user_id) || 'غير معروف',
+          approver_name: approverName || 'مدير النظام'
+        }));
+      }
+      
       return data || [];
     },
     enabled: !!user?.id,
@@ -127,5 +168,6 @@ export const useExtracts = () => {
     createExtract,
     updateExtract,
     deleteExtract,
+    approverName: approverName || 'مدير النظام',
   };
 };

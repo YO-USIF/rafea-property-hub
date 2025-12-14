@@ -132,7 +132,7 @@ const Index = () => {
         activeTab={activeTab} 
         setActiveTab={setActiveTab}
       />
-      <Header sidebarCollapsed={sidebarCollapsed} />
+      <Header sidebarCollapsed={sidebarCollapsed} setActiveTab={setActiveTab} />
       
       <main className="transition-all duration-300 pt-16 pr-64 pl-6 pb-6">
         <div className="max-w-7xl mx-auto py-6">

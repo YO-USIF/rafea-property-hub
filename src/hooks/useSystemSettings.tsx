@@ -30,6 +30,7 @@ export interface SecuritySettings {
 export const useBackupLogs = () => {
   const [logs, setLogs] = useState<BackupLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
   const { toast } = useToast();
 
   const fetchLogs = async () => {
@@ -83,6 +84,56 @@ export const useBackupLogs = () => {
     }
   };
 
+  const downloadBackup = async () => {
+    try {
+      setDownloading(true);
+      
+      toast({
+        title: "جارٍ إنشاء النسخة الاحتياطية",
+        description: "يرجى الانتظار...",
+      });
+
+      const { data, error } = await supabase.functions.invoke('create-backup');
+      
+      if (error) throw error;
+
+      // Create and download the file
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      // Log the backup
+      await supabase.from('backup_logs').insert({
+        backup_type: 'قاعدة البيانات',
+        status: 'مكتمل',
+        file_size: blob.size,
+        completed_at: new Date().toISOString(),
+      });
+
+      toast({
+        title: "تم تحميل النسخة الاحتياطية",
+        description: "تم تنزيل ملف النسخة الاحتياطية بنجاح",
+      });
+
+      fetchLogs();
+    } catch (error) {
+      console.error('Error downloading backup:', error);
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء تحميل النسخة الاحتياطية",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   useEffect(() => {
     fetchLogs();
   }, []);
@@ -90,8 +141,10 @@ export const useBackupLogs = () => {
   return {
     logs,
     loading,
+    downloading,
     fetchLogs,
     createBackup,
+    downloadBackup,
   };
 };
 

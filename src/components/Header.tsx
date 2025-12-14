@@ -129,14 +129,16 @@ const Header: React.FC<HeaderProps> = ({ sidebarCollapsed, setActiveTab }) => {
             <RefreshCw className="w-5 h-5 text-gray-600" />
           </button>
 
-          {/* Settings */}
-          <button 
-            onClick={() => setActiveTab?.('settings')}
-            className="p-2 hover:bg-muted rounded-lg transition-colors"
-            title="الإعدادات"
-          >
-            <Settings className="w-5 h-5 text-muted-foreground" />
-          </button>
+          {/* Settings - Only for System Admin */}
+          {userRole === 'مدير النظام' && (
+            <button 
+              onClick={() => setActiveTab?.('settings')}
+              className="p-2 hover:bg-muted rounded-lg transition-colors"
+              title="الإعدادات"
+            >
+              <Settings className="w-5 h-5 text-muted-foreground" />
+            </button>
+          )}
 
           {/* Logout */}
           <button 

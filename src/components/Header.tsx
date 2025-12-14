@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Bell, Search, User, Settings, LogOut, RefreshCw } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
@@ -10,35 +9,35 @@ import NotificationPanel from './NotificationPanel';
 
 interface HeaderProps {
   sidebarCollapsed: boolean;
+  setActiveTab?: (tab: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ sidebarCollapsed }) => {
+const Header: React.FC<HeaderProps> = ({ sidebarCollapsed, setActiveTab }) => {
   const { user, signOut } = useAuth();
   const { userRole } = useUserRole();
   const { toast } = useToast();
   const { unreadCount } = useNotifications();
-  const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const searchOptions = [
-    { label: 'لوحة التحكم', path: '/', keywords: ['لوحة', 'تحكم', 'رئيسية', 'dashboard'] },
-    { label: 'المشاريع', path: '/projects', keywords: ['مشاريع', 'مشروع', 'projects'] },
-    { label: 'المبيعات', path: '/sales', keywords: ['مبيعات', 'بيع', 'sales'] },
-    { label: 'المشتريات', path: '/purchases', keywords: ['مشتريات', 'شراء', 'purchases'] },
-    { label: 'المستخلصات', path: '/extracts', keywords: ['مستخلصات', 'مستخلص', 'extracts'] },
-    { label: 'أوامر التكليف', path: '/assignment-orders', keywords: ['تكليف', 'أوامر', 'assignment'] },
-    { label: 'الفواتير', path: '/invoices', keywords: ['فواتير', 'فاتورة', 'invoices'] },
-    { label: 'المقاولين', path: '/contractors', keywords: ['مقاولين', 'مقاول', 'contractors'] },
-    { label: 'الموردين', path: '/suppliers', keywords: ['موردين', 'مورد', 'suppliers'] },
-    { label: 'المستودع', path: '/warehouse', keywords: ['مستودع', 'مخزن', 'warehouse'] },
-    { label: 'المهام', path: '/tasks', keywords: ['مهام', 'مهمة', 'tasks'] },
-    { label: 'الصيانة', path: '/maintenance', keywords: ['صيانة', 'maintenance'] },
-    { label: 'التقارير', path: '/reports', keywords: ['تقارير', 'تقرير', 'reports'] },
-    { label: 'المحاسبة', path: '/accounting', keywords: ['محاسبة', 'حسابات', 'accounting'] },
-    { label: 'الإشعارات', path: '/notifications', keywords: ['إشعارات', 'تنبيهات', 'notifications'] },
-    { label: 'الصلاحيات', path: '/permissions', keywords: ['صلاحيات', 'أذونات', 'permissions'] },
-    { label: 'الإعدادات', path: '/settings', keywords: ['إعدادات', 'ضبط', 'settings'] },
+    { label: 'لوحة التحكم', tab: 'dashboard', keywords: ['لوحة', 'تحكم', 'رئيسية', 'dashboard'] },
+    { label: 'المشاريع', tab: 'projects', keywords: ['مشاريع', 'مشروع', 'projects'] },
+    { label: 'المبيعات', tab: 'sales', keywords: ['مبيعات', 'بيع', 'sales'] },
+    { label: 'المشتريات', tab: 'purchases', keywords: ['مشتريات', 'شراء', 'purchases'] },
+    { label: 'المستخلصات', tab: 'extracts', keywords: ['مستخلصات', 'مستخلص', 'extracts'] },
+    { label: 'أوامر التكليف', tab: 'assignment_orders', keywords: ['تكليف', 'أوامر', 'assignment'] },
+    { label: 'الفواتير', tab: 'invoices', keywords: ['فواتير', 'فاتورة', 'invoices'] },
+    { label: 'المقاولين', tab: 'contractors', keywords: ['مقاولين', 'مقاول', 'contractors'] },
+    { label: 'الموردين', tab: 'suppliers', keywords: ['موردين', 'مورد', 'suppliers'] },
+    { label: 'المستودع', tab: 'warehouse', keywords: ['مستودع', 'مخزن', 'warehouse'] },
+    { label: 'المهام', tab: 'tasks', keywords: ['مهام', 'مهمة', 'tasks'] },
+    { label: 'الصيانة', tab: 'maintenance', keywords: ['صيانة', 'maintenance'] },
+    { label: 'التقارير', tab: 'reports', keywords: ['تقارير', 'تقرير', 'reports'] },
+    { label: 'المحاسبة', tab: 'accounting', keywords: ['محاسبة', 'حسابات', 'accounting'] },
+    { label: 'الإشعارات', tab: 'notifications', keywords: ['إشعارات', 'تنبيهات', 'notifications'] },
+    { label: 'الصلاحيات', tab: 'permissions', keywords: ['صلاحيات', 'أذونات', 'permissions'] },
+    { label: 'الإعدادات', tab: 'settings', keywords: ['إعدادات', 'ضبط', 'settings'] },
   ];
 
   const filteredOptions = searchQuery.trim() 
@@ -48,8 +47,8 @@ const Header: React.FC<HeaderProps> = ({ sidebarCollapsed }) => {
       )
     : [];
 
-  const handleSearch = (path: string) => {
-    navigate(path);
+  const handleSearch = (tab: string) => {
+    setActiveTab?.(tab);
     setSearchQuery('');
   };
 
@@ -87,8 +86,8 @@ const Header: React.FC<HeaderProps> = ({ sidebarCollapsed }) => {
               <div className="absolute top-full right-0 left-0 mt-1 bg-background border border-border rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
                 {filteredOptions.map((option) => (
                   <button
-                    key={option.path}
-                    onClick={() => handleSearch(option.path)}
+                    key={option.tab}
+                    onClick={() => handleSearch(option.tab)}
                     className="w-full text-right px-4 py-2 hover:bg-muted transition-colors text-foreground"
                   >
                     {option.label}
@@ -132,7 +131,7 @@ const Header: React.FC<HeaderProps> = ({ sidebarCollapsed }) => {
 
           {/* Settings */}
           <button 
-            onClick={() => navigate('/settings')}
+            onClick={() => setActiveTab?.('settings')}
             className="p-2 hover:bg-muted rounded-lg transition-colors"
             title="الإعدادات"
           >

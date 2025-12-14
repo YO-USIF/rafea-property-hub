@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, User, Shield, Bell, Database, Key, Users, Mail, Edit, Trash2 } from 'lucide-react';
+import { Settings, User, Shield, Bell, Database, Key, Users, Mail, Edit, Trash2, Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useCompanySettings } from '@/hooks/useCompanySettings';
@@ -22,7 +22,7 @@ const SettingsPage = () => {
   const { profiles, loading: profilesLoading, updateProfile, updateUserRole, deleteProfile } = useProfiles();
   const { settings, loading: settingsLoading, updateSettings } = useCompanySettings();
   const { settings: notificationSettings, updateSettings: updateNotificationSettings } = useNotificationSettings();
-  const { logs: backupLogs, createBackup } = useBackupLogs();
+  const { logs: backupLogs, createBackup, downloadBackup, downloading } = useBackupLogs();
   const { settings: securitySettings, updateSettings: updateSecuritySettings } = useSecuritySettings();
 
   const settingsTabs = [
@@ -390,12 +390,13 @@ const SettingsPage = () => {
               <CardDescription>إدارة النسخ الاحتياطية للنظام</CardDescription>
             </div>
             <div className="flex gap-2">
-              <Button onClick={() => createBackup('قاعدة البيانات')}>
-                <Database className="w-4 h-4 ml-2" />
-                نسخة احتياطية للبيانات
-              </Button>
-              <Button variant="outline" onClick={() => createBackup('ملفات النظام')}>
-                نسخة احتياطية للملفات
+              <Button onClick={downloadBackup} disabled={downloading}>
+                {downloading ? (
+                  <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                ) : (
+                  <Download className="w-4 h-4 ml-2" />
+                )}
+                {downloading ? 'جارٍ التحميل...' : 'تحميل نسخة احتياطية'}
               </Button>
             </div>
           </div>

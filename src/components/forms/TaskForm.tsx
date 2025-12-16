@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { FileUpload } from '@/components/ui/file-upload';
 import { useToast } from '@/hooks/use-toast';
 import { useTasks } from '@/hooks/useTasks';
+import { useProfiles } from '@/hooks/useProfiles';
 
 interface Task {
   id?: string;
@@ -32,6 +33,7 @@ interface TaskFormProps {
 
 const TaskForm = ({ open, onOpenChange, task, onSuccess }: TaskFormProps) => {
   const { createTask, updateTask } = useTasks();
+  const { profiles } = useProfiles();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Task>({
@@ -46,6 +48,9 @@ const TaskForm = ({ open, onOpenChange, task, onSuccess }: TaskFormProps) => {
     file_url: '',
     file_name: ''
   });
+
+  // تصفية المستخدمين الذين لديهم أرقام جوال مسجلة
+  const usersWithPhone = profiles.filter(p => p.phone && p.phone.trim() !== '');
 
   useEffect(() => {
     if (task) {
@@ -126,12 +131,36 @@ const TaskForm = ({ open, onOpenChange, task, onSuccess }: TaskFormProps) => {
 
             <div className="space-y-2">
               <Label htmlFor="assigned_to">المسؤول</Label>
-              <Input
-                id="assigned_to"
+              <Select
                 value={formData.assigned_to}
-                onChange={(e) => setFormData(prev => ({ ...prev, assigned_to: e.target.value }))}
-                required
-              />
+                onValueChange={(value) => setFormData(prev => ({ ...prev, assigned_to: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر المسؤول..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {usersWithPhone.map((profile) => (
+                    <SelectItem key={profile.id} value={profile.full_name || profile.email || ''}>
+                      {profile.full_name || profile.email?.split('@')[0]}
+                      {profile.phone && (
+                        <span className="text-xs text-muted-foreground mr-2">
+                          ({profile.phone})
+                        </span>
+                      )}
+                    </SelectItem>
+                  ))}
+                  {usersWithPhone.length === 0 && (
+                    <SelectItem value="" disabled>
+                      لا يوجد مستخدمين بأرقام جوال مسجلة
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+              {usersWithPhone.length === 0 && (
+                <p className="text-xs text-amber-600">
+                  تنبيه: لا يوجد مستخدمين بأرقام جوال مسجلة لإرسال رسائل WhatsApp
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">

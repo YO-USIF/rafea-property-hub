@@ -8,12 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, ClipboardList, User, Calendar, CheckCircle2, Trash2, Edit, Printer, FileText, Eye, File, ExternalLink, Paperclip, MessageCircle } from 'lucide-react';
+import { Plus, Search, ClipboardList, User, Calendar, CheckCircle2, Trash2, Edit, Printer, FileText, Eye, File, ExternalLink, Paperclip } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useTaskReports } from '@/hooks/useTaskReports';
 import { useProfiles } from '@/hooks/useProfiles';
-import { useWhatsApp } from '@/hooks/useWhatsApp';
+
 
 const TasksPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -28,34 +28,10 @@ const TasksPage = () => {
   const { isAdmin, isManager } = useUserRole();
   const { reports, deleteReport } = useTaskReports();
   const { profiles } = useProfiles();
-  const { sendWhatsAppMessage, isSending } = useWhatsApp();
+  
   
   const isManagerOrAdmin = isAdmin || isManager;
 
-  // دالة إرسال رسالة WhatsApp للمدير المُكلف بالمهمة
-  const handleSendWhatsApp = async (task: any) => {
-    // البحث عن رقم جوال المدير المُكلف بالمهمة
-    const assignedProfile = profiles.find(
-      p => p.full_name === task.assigned_to || p.email?.split('@')[0] === task.assigned_to
-    );
-    
-    if (!assignedProfile?.phone) {
-      alert('لا يوجد رقم جوال مسجل لهذا المستخدم');
-      return;
-    }
-
-    const message = `📋 تحديث حول المهمة
-
-العنوان: ${task.title}
-الحالة: ${task.status}
-نسبة الإنجاز: ${task.progress}%
-تاريخ الاستحقاق: ${task.due_date}
-${task.description ? `\nالوصف: ${task.description}` : ''}
-
-يرجى مراجعة التفاصيل في النظام.`;
-
-    await sendWhatsAppMessage({ to: assignedProfile.phone, message });
-  };
 
   if (isLoading) {
     return (
@@ -297,16 +273,6 @@ ${task.description ? `\nالوصف: ${task.description}` : ''}
                     {isManagerOrAdmin && (
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => handleSendWhatsApp(task)}
-                            disabled={isSending}
-                            title="إرسال رسالة WhatsApp"
-                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                          >
-                            <MessageCircle className="w-4 h-4" />
-                          </Button>
                           <Button 
                             size="sm" 
                             variant="outline"

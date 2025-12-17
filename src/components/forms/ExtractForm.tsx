@@ -110,37 +110,31 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
     }
   }, [extract]);
 
-  // حساب الضريبة تلقائياً عند تغيير المبلغ أو حالة الضريبة
+  // حساب المبلغ قبل الضريبة من المبلغ المدفوع سابقاً + قيمة المستخلص الحالي
+  // ثم حساب الضريبة وإجمالي المبلغ
   useEffect(() => {
-    if (formData.tax_included && formData.amount > 0) {
-      // إذا كان المبلغ شامل الضريبة، نحسب المبلغ قبل الضريبة
-      const amountBeforeTax = formData.amount / 1.15;
-      const taxAmount = formData.amount - amountBeforeTax;
+    const amountBeforeTax = (formData.previous_amount || 0) + (formData.current_amount || 0);
+    
+    if (formData.tax_included && amountBeforeTax > 0) {
+      // المبلغ المدخل هو قبل الضريبة، نضيف الضريبة للإجمالي
+      const taxAmount = amountBeforeTax * 0.15;
+      const total = amountBeforeTax + taxAmount;
       setFormData(prev => ({
         ...prev,
         amount_before_tax: Math.round(amountBeforeTax * 100) / 100,
-        tax_amount: Math.round(taxAmount * 100) / 100
+        tax_amount: Math.round(taxAmount * 100) / 100,
+        amount: Math.round(total * 100) / 100
       }));
-    } else if (!formData.tax_included && formData.amount > 0) {
-      // إذا كان المبلغ غير شامل الضريبة، المبلغ قبل الضريبة = المبلغ نفسه
+    } else {
+      // بدون ضريبة، الإجمالي = المبلغ قبل الضريبة
       setFormData(prev => ({
         ...prev,
-        amount_before_tax: formData.amount,
-        tax_amount: 0
+        amount_before_tax: amountBeforeTax,
+        tax_amount: 0,
+        amount: amountBeforeTax
       }));
     }
-  }, [formData.amount, formData.tax_included]);
-
-  // حساب إجمالي المبلغ تلقائياً من المبلغ المدفوع سابقاً + قيمة المستخلص الحالي
-  useEffect(() => {
-    const total = (formData.previous_amount || 0) + (formData.current_amount || 0);
-    if (formData.amount !== total) {
-      setFormData(prev => ({
-        ...prev,
-        amount: total
-      }));
-    }
-  }, [formData.previous_amount, formData.current_amount]);
+  }, [formData.previous_amount, formData.current_amount, formData.tax_included]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -357,7 +351,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="amount">إجمالي المبلغ</Label>
+              <Label htmlFor="amount">إجمالي المبلغ {formData.tax_included ? '(شامل الضريبة)' : ''}</Label>
               <Input
                 id="amount"
                 type="number"
@@ -366,7 +360,11 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                 disabled
                 className="bg-muted/50 font-bold text-primary"
               />
-              <p className="text-xs text-muted-foreground">يحسب تلقائياً: المبلغ المدفوع سابقاً + قيمة المستخلص الحالي</p>
+              <p className="text-xs text-muted-foreground">
+                {formData.tax_included 
+                  ? 'يحسب تلقائياً: (المدفوع سابقاً + المستخلص الحالي) + ضريبة 15%'
+                  : 'يحسب تلقائياً: المبلغ المدفوع سابقاً + قيمة المستخلص الحالي'}
+              </p>
             </div>
 
             <div className="space-y-2 md:col-span-2">

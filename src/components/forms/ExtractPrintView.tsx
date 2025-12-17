@@ -198,20 +198,30 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
                 </div>
               )}
               
-              {extract.tax_included && extract.amount_before_tax && (
+              {extract.tax_included && (
                 <>
-                  <div className="flex justify-between items-center p-1.5 bg-primary/10 rounded border border-primary/30">
-                    <span className="text-xs font-bold text-foreground/80">إجمالي المبلغ قبل الضريبة:</span>
-                    <span className="text-sm font-bold text-foreground">{formatCurrency(extract.amount_before_tax)}</span>
-                  </div>
-                  <div className="flex justify-between items-center p-1.5 bg-background/60 rounded border border-muted">
-                    <span className="text-xs font-bold text-foreground/80">ضريبة القيمة المضافة (15%):</span>
-                    <span className="text-sm font-bold text-foreground">{formatCurrency(extract.tax_amount || 0)}</span>
-                  </div>
-                  <div className="flex justify-between items-center p-2 bg-gradient-to-r from-primary/20 to-primary/30 rounded border-2 border-primary/50 shadow-sm mt-1">
-                    <span className="text-sm font-bold text-primary">إجمالي المبلغ شامل الضريبة:</span>
-                    <span className="text-lg font-bold text-primary">{formatCurrency(extract.amount)}</span>
-                  </div>
+                  {(() => {
+                    // حساب المبالغ ديناميكياً لضمان الدقة
+                    const amountBeforeTax = (extract.previous_amount || 0) + (extract.current_amount || 0);
+                    const taxAmount = amountBeforeTax * 0.15;
+                    const totalWithTax = amountBeforeTax + taxAmount;
+                    return (
+                      <>
+                        <div className="flex justify-between items-center p-1.5 bg-primary/10 rounded border border-primary/30">
+                          <span className="text-xs font-bold text-foreground/80">إجمالي المبلغ قبل الضريبة:</span>
+                          <span className="text-sm font-bold text-foreground">{formatCurrency(amountBeforeTax)}</span>
+                        </div>
+                        <div className="flex justify-between items-center p-1.5 bg-background/60 rounded border border-muted">
+                          <span className="text-xs font-bold text-foreground/80">ضريبة القيمة المضافة (15%):</span>
+                          <span className="text-sm font-bold text-foreground">{formatCurrency(taxAmount)}</span>
+                        </div>
+                        <div className="flex justify-between items-center p-2 bg-gradient-to-r from-primary/20 to-primary/30 rounded border-2 border-primary/50 shadow-sm mt-1">
+                          <span className="text-sm font-bold text-primary">إجمالي المبلغ شامل الضريبة:</span>
+                          <span className="text-lg font-bold text-primary">{formatCurrency(totalWithTax)}</span>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </>
               )}
               

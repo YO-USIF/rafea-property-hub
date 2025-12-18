@@ -370,7 +370,10 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             </div>
             <div class="signature-box">
               <div class="signature-name">${order.approver_name || 'مدير النظام'}</div>
-              <div class="signature-line">
+              <div style="height: 40px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
+                <img src="/lovable-uploads/admin-signature.jpeg" alt="توقيع المعتمد" style="height: 35px; object-fit: contain;" />
+              </div>
+              <div class="signature-line" style="margin-top: 0;">
                 <div class="signature-title">المُعتمد</div>
                 <div class="signature-title-en">Approver</div>
               </div>

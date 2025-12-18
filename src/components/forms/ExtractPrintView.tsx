@@ -4,7 +4,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Printer, X } from 'lucide-react';
 import { useCompanySettings } from '@/hooks/useCompanySettings';
 import suhailLogo from '@/assets/suhail-logo.jpeg';
-import adminSignature from '@/assets/admin-signature.jpeg';
 interface ExtractPrintViewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -258,8 +257,21 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
             </div>
             <div className="text-center p-2 bg-muted/30 rounded border border-muted-foreground/20">
               <p className="font-bold text-xs text-primary mb-1">{extract.approver_name || 'مدير النظام'}</p>
-              <div className="h-12 flex items-center justify-center mb-1.5">
-                <img src={adminSignature} alt="توقيع المعتمد" className="h-10 object-contain" />
+              <div className="h-12 flex items-center justify-center mb-1.5 relative">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <svg viewBox="0 0 120 40" className="w-24 h-10">
+                    <path 
+                      d="M10 30 Q20 10, 40 20 T70 15 Q90 10, 110 25" 
+                      fill="none" 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth="1.5" 
+                      strokeLinecap="round"
+                    />
+                    <text x="35" y="28" fontFamily="cursive" fontSize="14" fill="hsl(var(--primary))" fontStyle="italic">
+                      Yousi
+                    </text>
+                  </svg>
+                </div>
               </div>
               <p className="font-bold text-xs text-foreground">المُعتمد</p>
               <p className="text-[10px] text-foreground/60 mt-0.5">التوقيع</p>

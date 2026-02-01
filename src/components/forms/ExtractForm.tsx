@@ -32,6 +32,7 @@ interface Extract {
   tax_included?: boolean;
   tax_amount?: number;
   amount_before_tax?: number;
+  is_external_project?: boolean;
 }
 
 interface ExtractFormProps {
@@ -64,17 +65,19 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
     attached_file_name: extract?.attached_file_name || '',
     tax_included: extract?.tax_included || false,
     tax_amount: extract?.tax_amount || 0,
-    amount_before_tax: extract?.amount_before_tax || 0
+    amount_before_tax: extract?.amount_before_tax || 0,
+    is_external_project: extract?.is_external_project || false
   });
 
   // تحديث البيانات عند تغيير العنصر المرسل للتعديل
   useEffect(() => {
     if (extract) {
+      const isExternal = !extract.project_id || extract.project_id === "none" || extract.project_id === "external";
       setFormData({
         extract_number: extract.extract_number || '',
         contractor_name: extract.contractor_name || '',
         project_name: extract.project_name || '',
-        project_id: extract.project_id || "none",
+        project_id: isExternal ? "external" : (extract.project_id || "none"),
         amount: extract.amount || 0,
         description: extract.description || '',
         extract_date: extract.extract_date || new Date().toISOString().split('T')[0],
@@ -86,7 +89,8 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         attached_file_name: extract.attached_file_name || '',
         tax_included: extract.tax_included || false,
         tax_amount: extract.tax_amount || 0,
-        amount_before_tax: extract.amount_before_tax || 0
+        amount_before_tax: extract.amount_before_tax || 0,
+        is_external_project: isExternal && extract.project_name ? true : false
       });
     } else {
       setFormData({
@@ -105,7 +109,8 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         attached_file_name: '',
         tax_included: false,
         tax_amount: 0,
-        amount_before_tax: 0
+        amount_before_tax: 0,
+        is_external_project: false
       });
     }
   }, [extract]);
@@ -247,7 +252,8 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                   setFormData(prev => ({ 
                     ...prev, 
                     project_id: value === "none" ? "" : value,
-                    project_name: value === "none" ? "" : value === "multiple" ? "المشروعين مع بعض" : (selectedProject ? selectedProject.name : "")
+                    project_name: value === "none" ? "" : value === "multiple" ? "المشروعين مع بعض" : value === "external" ? prev.project_name : (selectedProject ? selectedProject.name : ""),
+                    is_external_project: value === "external"
                   }));
                 }}
               >
@@ -256,6 +262,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">بدون مشروع</SelectItem>
+                  <SelectItem value="external">مشروع خارجي</SelectItem>
                   <SelectItem value="multiple">المشروعين مع بعض</SelectItem>
                   {projects.map((project: any) => (
                     <SelectItem key={project.id} value={project.id}>
@@ -265,6 +272,19 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                 </SelectContent>
               </Select>
             </div>
+
+            {formData.project_id === "external" && (
+              <div className="space-y-2">
+                <Label htmlFor="external_project_name">اسم المشروع الخارجي</Label>
+                <Input
+                  id="external_project_name"
+                  value={formData.project_name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, project_name: e.target.value }))}
+                  placeholder="أدخل اسم المشروع الخارجي"
+                  required
+                />
+              </div>
+            )}
 
             <div className="space-y-2 md:col-span-2">
               <div className="flex items-center space-x-2 space-x-reverse">

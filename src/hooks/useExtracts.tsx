@@ -113,14 +113,28 @@ export const useExtracts = () => {
 
   // تحديث مستخص
   const updateExtract = useMutation({
-    mutationFn: async ({ id, ...updateData }: any) => {
-      let query = supabase.from('extracts').update(updateData).eq('id', id);
+    mutationFn: async (extractData: any) => {
+      const { id, ...updateData } = extractData;
       
-      if (!isManagerOrAdmin) {
-        query = query.eq('user_id', user?.id);
+      // تنظيف البيانات قبل الإرسال
+      const cleanedData: Record<string, any> = {};
+      for (const [key, value] of Object.entries(updateData)) {
+        if (value !== undefined) {
+          cleanedData[key] = value;
+        }
       }
       
-      const { data, error } = await query.select().single();
+      // التأكد من أن project_id هو null إذا كان غير UUID صالح
+      if (cleanedData.project_id === "none" || cleanedData.project_id === "external" || cleanedData.project_id === "multiple" || cleanedData.project_id === "") {
+        cleanedData.project_id = null;
+      }
+      
+      const { data, error } = await supabase
+        .from('extracts')
+        .update(cleanedData)
+        .eq('id', id)
+        .select()
+        .single();
       
       if (error) throw error;
       return data;
@@ -131,9 +145,9 @@ export const useExtracts = () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast({ title: "تم تحديث المستخص بنجاح" });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error updating extract:', error);
-      toast({ title: "خطأ في تحديث المستخص", variant: "destructive" });
+      toast({ title: "خطأ في تحديث المستخص", description: error.message, variant: "destructive" });
     },
   });
 

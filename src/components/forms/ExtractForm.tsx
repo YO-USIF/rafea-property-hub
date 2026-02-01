@@ -150,7 +150,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         extract_number: formData.extract_number && formData.extract_number.trim() !== '' ? formData.extract_number : undefined,
         contractor_name: formData.contractor_name,
         project_name: formData.project_name,
-        project_id: formData.project_id === "none" || !formData.project_id ? null : formData.project_id,
+        project_id: formData.project_id === "none" || formData.project_id === "external" || formData.project_id === "multiple" || !formData.project_id ? null : formData.project_id,
         amount: Number(formData.amount),
         amount_before_tax: formData.amount_before_tax ? Number(formData.amount_before_tax) : undefined,
         tax_amount: formData.tax_amount ? Number(formData.tax_amount) : undefined,

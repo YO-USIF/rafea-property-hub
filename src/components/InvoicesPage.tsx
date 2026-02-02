@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { escapeHtml } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -335,7 +336,7 @@ const InvoicesPage = () => {
                               printWindow.document.write(`
                                 <html dir="rtl">
                                   <head>
-                                    <title>فاتورة ${invoice.invoice_number}</title>
+                                    <title>فاتورة ${escapeHtml(invoice.invoice_number)}</title>
                                     <style>
                                       * { margin: 0; padding: 0; box-sizing: border-box; }
                                       body { 
@@ -438,11 +439,11 @@ const InvoicesPage = () => {
                                       <div class="invoice-info">
                                         <div class="info-item">
                                           <div class="info-label">رقم الفاتورة</div>
-                                          <div class="info-value">${invoice.invoice_number}</div>
+                                          <div class="info-value">${escapeHtml(invoice.invoice_number)}</div>
                                         </div>
                                         <div class="info-item">
                                           <div class="info-label">اسم المورد</div>
-                                          <div class="info-value">${invoice.supplier_name}</div>
+                                          <div class="info-value">${escapeHtml(invoice.supplier_name)}</div>
                                         </div>
                                         <div class="info-item">
                                           <div class="info-label">تاريخ الفاتورة</div>
@@ -462,14 +463,14 @@ const InvoicesPage = () => {
                                       <div class="info-item">
                                         <div class="info-label">حالة الدفع</div>
                                         <div class="info-value">
-                                          <span class="status">${invoice.status}</span>
+                                          <span class="status">${escapeHtml(invoice.status)}</span>
                                         </div>
                                       </div>
                                       
                                       ${invoice.description ? `
                                         <div class="description">
                                           <div class="info-label">تفاصيل الفاتورة</div>
-                                          <div class="info-value">${invoice.description}</div>
+                                          <div class="info-value">${escapeHtml(invoice.description)}</div>
                                         </div>
                                       ` : ''}
                                     </div>

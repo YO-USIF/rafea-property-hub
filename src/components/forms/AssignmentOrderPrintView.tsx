@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { escapeHtml } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -47,7 +48,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>أمر تكليف - ${order.order_number}</title>
+        <title>أمر تكليف - ${escapeHtml(order.order_number)}</title>
         <style>
           * {
             margin: 0;
@@ -262,13 +263,13 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
         <div class="container">
           <div class="header">
             <div class="company-info">
-              <div class="company-name">${company.name}</div>
-              <div class="company-name-en">${company.nameEn}</div>
+              <div class="company-name">${escapeHtml(company.name)}</div>
+              <div class="company-name-en">${escapeHtml(company.nameEn)}</div>
               <div class="company-details">
-                <div>السجل التجاري: ${company.cr}</div>
-                <div>الرقم الضريبي: ${company.vat}</div>
-                <div>${company.address}</div>
-                <div>هاتف: ${company.phone} | بريد: ${company.email}</div>
+                <div>السجل التجاري: ${escapeHtml(company.cr)}</div>
+                <div>الرقم الضريبي: ${escapeHtml(company.vat)}</div>
+                <div>${escapeHtml(company.address)}</div>
+                <div>هاتف: ${escapeHtml(company.phone)} | بريد: ${escapeHtml(company.email)}</div>
               </div>
             </div>
             ${selectedCompany === 'suhail' ? `
@@ -287,7 +288,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             <div>
               <div class="detail-row">
                 <span class="detail-label">رقم الأمر:</span>
-                <span class="detail-value primary">${order.order_number}</span>
+                <span class="detail-value primary">${escapeHtml(order.order_number)}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">التاريخ:</span>
@@ -295,17 +296,17 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
               </div>
               <div class="detail-row">
                 <span class="detail-label">اسم المقاول:</span>
-                <span class="detail-value">${order.contractor_name}</span>
+                <span class="detail-value">${escapeHtml(order.contractor_name)}</span>
               </div>
             </div>
             <div>
               <div class="detail-row">
                 <span class="detail-label">المشروع:</span>
-                <span class="detail-value">${order.project_name}</span>
+                <span class="detail-value">${escapeHtml(order.project_name)}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">نوع العمل:</span>
-                <span class="detail-value">${order.work_type || '-'}</span>
+                <span class="detail-value">${escapeHtml(order.work_type) || '-'}</span>
               </div>
               ${order.duration_days ? `
               <div class="detail-row">
@@ -319,7 +320,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
           ${order.description ? `
           <div class="section">
             <div class="section-title">وصف الأعمال</div>
-            <div class="description-box">${order.description.replace(/\n/g, '<br>')}</div>
+            <div class="description-box">${escapeHtml(order.description).replace(/\n/g, '<br>')}</div>
           </div>
           ` : ''}
 
@@ -350,26 +351,26 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
 
           <div class="status-box">
             <span class="status-label">حالة الأمر:</span>
-            <span class="status-value">${order.status}</span>
+            <span class="status-value">${escapeHtml(order.status)}</span>
           </div>
 
           <div class="signatures">
             <div class="signature-box">
-              <div class="signature-name">${order.created_by_name || 'غير معروف'}</div>
+              <div class="signature-name">${escapeHtml(order.created_by_name) || 'غير معروف'}</div>
               <div class="signature-line">
                 <div class="signature-title">المُعد</div>
                 <div class="signature-title-en">Preparer</div>
               </div>
             </div>
             <div class="signature-box">
-              <div class="signature-name">${order.contractor_name}</div>
+              <div class="signature-name">${escapeHtml(order.contractor_name)}</div>
               <div class="signature-line">
                 <div class="signature-title">المقاول</div>
                 <div class="signature-title-en">Contractor</div>
               </div>
             </div>
             <div class="signature-box">
-              <div class="signature-name">${order.approver_name || 'مدير النظام'}</div>
+              <div class="signature-name">${escapeHtml(order.approver_name) || 'مدير النظام'}</div>
               <div style="height: 40px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
                 <svg viewBox="0 0 120 40" style="width: 100px; height: 35px;">
                   <path 

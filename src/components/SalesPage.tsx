@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { escapeHtml } from '@/lib/utils';
 import SaleForm from '@/components/forms/SaleForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -544,7 +545,7 @@ const SalesPage = () => {
                               printWindow.document.write(`
                                 <html dir="rtl">
                                   <head>
-                                    <title>عقد بيع - ${sale.project_name} - وحدة ${sale.unit_number}</title>
+                                    <title>عقد بيع - ${escapeHtml(sale.project_name)} - وحدة ${escapeHtml(sale.unit_number)}</title>
                                     <style>
                                       * { margin: 0; padding: 0; box-sizing: border-box; }
                                       body { 
@@ -681,15 +682,15 @@ const SalesPage = () => {
                                       <div class="sale-info">
                                         <div class="info-item">
                                           <div class="info-label">المشروع</div>
-                                          <div class="info-value">${sale.project_name}</div>
+                                          <div class="info-value">${escapeHtml(sale.project_name)}</div>
                                         </div>
                                         <div class="info-item">
                                           <div class="info-label">رقم الوحدة</div>
-                                          <div class="info-value">${sale.unit_number}</div>
+                                          <div class="info-value">${escapeHtml(sale.unit_number)}</div>
                                         </div>
                                         <div class="info-item">
                                           <div class="info-label">نوع الوحدة</div>
-                                          <div class="info-value">${sale.unit_type}</div>
+                                          <div class="info-value">${escapeHtml(sale.unit_type)}</div>
                                         </div>
                                         <div class="info-item">
                                           <div class="info-label">المساحة</div>
@@ -708,11 +709,11 @@ const SalesPage = () => {
                                         <div class="customer-info">
                                           <div>
                                             <div class="info-label" style="color: rgba(255,255,255,0.8);">الاسم</div>
-                                            <div class="info-value" style="color: white;">${sale.customer_name}</div>
+                                            <div class="info-value" style="color: white;">${escapeHtml(sale.customer_name)}</div>
                                           </div>
                                           <div>
                                             <div class="info-label" style="color: rgba(255,255,255,0.8);">رقم الهاتف</div>
-                                            <div class="info-value" style="color: white;">${sale.customer_phone || 'غير محدد'}</div>
+                                            <div class="info-value" style="color: white;">${escapeHtml(sale.customer_phone) || 'غير محدد'}</div>
                                           </div>
                                         </div>
                                       </div>

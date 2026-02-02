@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { escapeHtml } from '@/lib/utils';
 import SupplierForm from '@/components/forms/SupplierForm';
 import InvoiceForm from '@/components/forms/InvoiceForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -368,23 +369,23 @@ const SuppliersPage = () => {
               <h2 style="margin-bottom: 20px; color: #2c3e50;">بيانات المورد</h2>
               <div class="info-row">
                 <span class="label">اسم المورد:</span>
-                <span class="value">${supplier.name || 'غير محدد'}</span>
+                <span class="value">${escapeHtml(supplier.name) || 'غير محدد'}</span>
               </div>
               <div class="info-row">
                 <span class="label">الشركة:</span>
-                <span class="value">${supplier.company || 'غير محدد'}</span>
+                <span class="value">${escapeHtml(supplier.company) || 'غير محدد'}</span>
               </div>
               <div class="info-row">
                 <span class="label">الفئة:</span>
-                <span class="value">${supplier.category || 'غير محدد'}</span>
+                <span class="value">${escapeHtml(supplier.category) || 'غير محدد'}</span>
               </div>
               <div class="info-row">
                 <span class="label">الهاتف:</span>
-                <span class="value">${supplier.phone || 'غير محدد'}</span>
+                <span class="value">${escapeHtml(supplier.phone) || 'غير محدد'}</span>
               </div>
               <div class="info-row">
                 <span class="label">البريد الإلكتروني:</span>
-                <span class="value">${supplier.email || 'غير محدد'}</span>
+                <span class="value">${escapeHtml(supplier.email) || 'غير محدد'}</span>
               </div>
             </div>
 
@@ -424,14 +425,14 @@ const SuppliersPage = () => {
               <tbody>
                 ${supplierInvoices.length > 0 ? supplierInvoices.map(invoice => `
                   <tr>
-                    <td>${invoice.invoice_number || 'غير محدد'}</td>
+                    <td>${escapeHtml(invoice.invoice_number) || 'غير محدد'}</td>
                     <td>${new Date(invoice.invoice_date).toLocaleDateString('en-GB')}</td>
-                    <td>${invoice.description || 'غير محدد'}</td>
+                    <td>${escapeHtml(invoice.description) || 'غير محدد'}</td>
                     <td>${Number(invoice.amount).toLocaleString()} ر.س</td>
                     <td>${invoice.due_date ? new Date(invoice.due_date).toLocaleDateString('en-GB') : 'غير محدد'}</td>
                     <td>
                       <span class="status-badge ${invoice.status === 'مدفوع' ? 'status-paid' : invoice.status === 'غير مدفوع' ? 'status-unpaid' : 'status-review'}">
-                        ${invoice.status || 'غير محدد'}
+                        ${escapeHtml(invoice.status) || 'غير محدد'}
                       </span>
                     </td>
                   </tr>

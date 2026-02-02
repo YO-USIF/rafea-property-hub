@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { escapeHtml } from '@/lib/utils';
 import ContractorForm from '@/components/forms/ContractorForm';
 import ExtractForm from '@/components/forms/ExtractForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -363,23 +364,23 @@ const ContractorsPage = () => {
               <h2 style="margin-bottom: 20px; color: #2c3e50;">بيانات المقاول</h2>
               <div class="info-row">
                 <span class="label">اسم المقاول:</span>
-                <span class="value">${contractor.name || 'غير محدد'}</span>
+                <span class="value">${escapeHtml(contractor.name) || 'غير محدد'}</span>
               </div>
               <div class="info-row">
                 <span class="label">الشركة:</span>
-                <span class="value">${contractor.company || 'غير محدد'}</span>
+                <span class="value">${escapeHtml(contractor.company) || 'غير محدد'}</span>
               </div>
               <div class="info-row">
                 <span class="label">التخصص:</span>
-                <span class="value">${contractor.specialization || 'غير محدد'}</span>
+                <span class="value">${escapeHtml(contractor.specialization) || 'غير محدد'}</span>
               </div>
               <div class="info-row">
                 <span class="label">الهاتف:</span>
-                <span class="value">${contractor.phone || 'غير محدد'}</span>
+                <span class="value">${escapeHtml(contractor.phone) || 'غير محدد'}</span>
               </div>
               <div class="info-row">
                 <span class="label">البريد الإلكتروني:</span>
-                <span class="value">${contractor.email || 'غير محدد'}</span>
+                <span class="value">${escapeHtml(contractor.email) || 'غير محدد'}</span>
               </div>
             </div>
 
@@ -419,14 +420,14 @@ const ContractorsPage = () => {
               <tbody>
                 ${contractorExtracts.length > 0 ? contractorExtracts.map(extract => `
                   <tr>
-                    <td>${extract.extract_number || 'غير محدد'}</td>
+                    <td>${escapeHtml(extract.extract_number) || 'غير محدد'}</td>
                     <td>${new Date(extract.extract_date).toLocaleDateString('en-GB')}</td>
-                    <td>${extract.project_name || 'غير محدد'}</td>
+                    <td>${escapeHtml(extract.project_name) || 'غير محدد'}</td>
                     <td>${Number(extract.amount).toLocaleString()} ر.س</td>
                     <td>${extract.percentage_completed || 0}%</td>
                     <td>
                       <span class="status-badge ${extract.status === 'مدفوع' || extract.status === 'مكتمل' ? 'status-paid' : extract.status === 'قيد المراجعة' ? 'status-review' : 'status-unpaid'}">
-                        ${extract.status || 'غير محدد'}
+                        ${escapeHtml(extract.status) || 'غير محدد'}
                       </span>
                     </td>
                   </tr>

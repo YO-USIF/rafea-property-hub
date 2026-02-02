@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { escapeHtml } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -123,7 +124,7 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
       <html dir="rtl">
         <head>
           <meta charset="utf-8">
-          <title>تقرير تفصيلي - ${selectedProject?.name || ''}</title>
+          <title>تقرير تفصيلي - ${escapeHtml(selectedProject?.name) || ''}</title>
           <script src="https://cdn.tailwindcss.com"></script>
           <style>
             @page {

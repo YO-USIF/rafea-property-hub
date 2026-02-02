@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { escapeHtml } from '@/lib/utils';
 import PurchaseForm from '@/components/forms/PurchaseForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -217,7 +218,7 @@ const PurchasesPage = () => {
                               printWindow.document.write(`
                                 <html dir="rtl">
                                   <head>
-                                    <title>طلب شراء ${order.order_number}</title>
+                                    <title>طلب شراء ${escapeHtml(order.order_number)}</title>
                                     <style>
                                       * { margin: 0; padding: 0; box-sizing: border-box; }
                                       body { 
@@ -347,19 +348,19 @@ const PurchasesPage = () => {
                                       <div class="purchase-info">
                                         <div class="info-item">
                                           <div class="info-label">رقم الطلب</div>
-                                          <div class="info-value">${order.order_number}</div>
+                                          <div class="info-value">${escapeHtml(order.order_number)}</div>
                                         </div>
                                         <div class="info-item">
                                           <div class="info-label">اسم المورد</div>
-                                          <div class="info-value">${order.supplier_name}</div>
+                                          <div class="info-value">${escapeHtml(order.supplier_name)}</div>
                                         </div>
                                         <div class="info-item">
                                           <div class="info-label">المشروع</div>
-                                          <div class="info-value">${order.project_name}</div>
+                                          <div class="info-value">${escapeHtml(order.project_name)}</div>
                                         </div>
                                         <div class="info-item">
                                           <div class="info-label">طالب الشراء</div>
-                                          <div class="info-value">${order.requested_by}</div>
+                                          <div class="info-value">${escapeHtml(order.requested_by)}</div>
                                         </div>
                                         <div class="info-item">
                                           <div class="info-label">تاريخ الطلب</div>

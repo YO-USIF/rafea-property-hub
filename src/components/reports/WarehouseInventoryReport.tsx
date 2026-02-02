@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { escapeHtml } from "@/lib/utils";
 import { useWarehouse } from "@/hooks/useWarehouse";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -157,7 +158,7 @@ export const WarehouseInventoryReport = () => {
         <div class="header">
           <h1>تقرير أصناف المستودع</h1>
           <p>تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')}</p>
-          ${categoryFilter !== 'all' ? `<p>التصنيف: ${categoryFilter}</p>` : ''}
+          ${categoryFilter !== 'all' ? `<p>التصنيف: ${escapeHtml(categoryFilter)}</p>` : ''}
           ${stockFilter !== 'all' ? `<p>حالة المخزون: ${stockFilter === 'low' ? 'نواقص' : 'عادي'}</p>` : ''}
         </div>
 
@@ -193,17 +194,17 @@ export const WarehouseInventoryReport = () => {
           <tbody>
             ${filteredInventory.map(item => `
               <tr>
-                <td>${item.item_code}</td>
-                <td>${item.item_name}</td>
-                <td><span class="badge">${item.category}</span></td>
+                <td>${escapeHtml(item.item_code)}</td>
+                <td>${escapeHtml(item.item_name)}</td>
+                <td><span class="badge">${escapeHtml(item.category)}</span></td>
                 <td class="${item.current_quantity <= item.minimum_quantity ? 'low-stock' : ''}">
                   ${item.current_quantity}
                 </td>
                 <td>${item.minimum_quantity}</td>
-                <td>${item.unit}</td>
+                <td>${escapeHtml(item.unit)}</td>
                 <td>${item.unit_price.toLocaleString()} ريال</td>
                 <td>${(item.current_quantity * item.unit_price).toLocaleString()} ريال</td>
-                <td>${item.location || '-'}</td>
+                <td>${escapeHtml(item.location) || '-'}</td>
               </tr>
             `).join('')}
           </tbody>

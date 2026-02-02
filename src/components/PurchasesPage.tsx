@@ -377,17 +377,17 @@ const PurchasesPage = () => {
                                         <div class="amount">${order.total_amount.toLocaleString()} ريال سعودي</div>
                                       </div>
                                       
-                                      <div class="status-section">
+                                        <div class="status-section">
                                         <div class="status-item">
                                           <div class="info-label">حالة الموافقة</div>
                                           <div class="info-value">
-                                            <span class="status">${order.status}</span>
+                                            <span class="status">${escapeHtml(order.status)}</span>
                                           </div>
                                         </div>
                                         <div class="status-item">
                                           <div class="info-label">حالة التسليم</div>
                                           <div class="info-value">
-                                            <span class="delivery-status">${order.delivery_status}</span>
+                                            <span class="delivery-status">${escapeHtml(order.delivery_status)}</span>
                                           </div>
                                         </div>
                                       </div>
@@ -395,7 +395,7 @@ const PurchasesPage = () => {
                                       ${order.approved_by ? `
                                         <div class="info-item" style="margin-top: 20px;">
                                           <div class="info-label">المعتمد من</div>
-                                          <div class="info-value">${order.approved_by}</div>
+                                          <div class="info-value">${escapeHtml(order.approved_by)}</div>
                                         </div>
                                       ` : ''}
                                     </div>

@@ -158,7 +158,7 @@ const SuppliersPage = () => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>كشف حساب المورد - ${supplier.name}</title>
+        <title>كشف حساب المورد - ${escapeHtml(supplier.name)}</title>
         <style>
           @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
           
@@ -647,7 +647,7 @@ const SuppliersPage = () => {
                               <head>
                                 <meta charset="UTF-8">
                                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                <title>بيانات المورد - ${supplier.name}</title>
+                                <title>بيانات المورد - ${escapeHtml(supplier.name)}</title>
                                 <style>
                                   body {
                                     font-family: 'Arial', sans-serif;
@@ -799,7 +799,7 @@ const SuppliersPage = () => {
                                 <div class="container">
                                   <div class="header">
                                     <h1>بيانات المورد</h1>
-                                    <h2>${supplier.name}</h2>
+                                    <h2>${escapeHtml(supplier.name)}</h2>
                                     <div class="date">تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')}</div>
                                   </div>
                                   
@@ -808,29 +808,29 @@ const SuppliersPage = () => {
                                     <div class="info-grid">
                                       <div class="info-item">
                                         <span class="label">اسم المورد</span>
-                                        <span class="value">${supplier.name}</span>
+                                        <span class="value">${escapeHtml(supplier.name)}</span>
                                       </div>
                                       <div class="info-item">
                                         <span class="label">اسم الشركة</span>
-                                        <span class="value">${supplier.company || '-'}</span>
+                                        <span class="value">${escapeHtml(supplier.company) || '-'}</span>
                                       </div>
                                       <div class="info-item">
                                         <span class="label">رقم الهاتف</span>
-                                        <span class="value">${supplier.phone || '-'}</span>
+                                        <span class="value">${escapeHtml(supplier.phone) || '-'}</span>
                                       </div>
                                       <div class="info-item">
                                         <span class="label">البريد الإلكتروني</span>
-                                        <span class="value">${supplier.email || '-'}</span>
+                                        <span class="value">${escapeHtml(supplier.email) || '-'}</span>
                                       </div>
                                       <div class="info-item">
                                         <span class="label">التصنيف</span>
-                                        <span class="value">${supplier.category || '-'}</span>
+                                        <span class="value">${escapeHtml(supplier.category) || '-'}</span>
                                       </div>
                                       <div class="info-item">
                                         <span class="label">الحالة</span>
                                         <span class="value">
                                           <span class="status-badge ${supplier.status === 'نشط' ? 'status-active' : 'status-inactive'}">
-                                            ${supplier.status}
+                                            ${escapeHtml(supplier.status)}
                                           </span>
                                         </span>
                                       </div>

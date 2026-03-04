@@ -424,6 +424,118 @@ export type Database = {
         }
         Relationships: []
       }
+      hoa_fees: {
+        Row: {
+          amount: number
+          created_at: string
+          due_date: string
+          fee_type: string
+          id: string
+          member_id: string
+          notes: string | null
+          payment_date: string | null
+          payment_status: string
+          period: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          due_date: string
+          fee_type?: string
+          id?: string
+          member_id: string
+          notes?: string | null
+          payment_date?: string | null
+          payment_status?: string
+          period?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          due_date?: string
+          fee_type?: string
+          id?: string
+          member_id?: string
+          notes?: string | null
+          payment_date?: string | null
+          payment_status?: string
+          period?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hoa_fees_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "hoa_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hoa_members: {
+        Row: {
+          building_name: string
+          created_at: string
+          email: string | null
+          id: string
+          member_name: string
+          membership_date: string
+          notes: string | null
+          phone: string | null
+          project_id: string | null
+          project_name: string
+          status: string
+          unit_number: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          building_name: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          member_name: string
+          membership_date?: string
+          notes?: string | null
+          phone?: string | null
+          project_id?: string | null
+          project_name: string
+          status?: string
+          unit_number: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          building_name?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          member_name?: string
+          membership_date?: string
+          notes?: string | null
+          phone?: string | null
+          project_id?: string | null
+          project_name?: string
+          status?: string
+          unit_number?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hoa_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           amount: number
@@ -1158,6 +1270,122 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      unit_handovers: {
+        Row: {
+          attached_file_name: string | null
+          attached_file_url: string | null
+          building_name: string
+          check_ac: boolean | null
+          check_bathrooms: boolean | null
+          check_doors_windows: boolean | null
+          check_electricity: boolean | null
+          check_flooring: boolean | null
+          check_kitchen: boolean | null
+          check_painting: boolean | null
+          check_plumbing: boolean | null
+          created_at: string
+          customer_id_number: string | null
+          customer_name: string
+          customer_phone: string | null
+          customer_signature_confirmed: boolean | null
+          electricity_meter_reading: string | null
+          floor_number: string | null
+          handover_date: string
+          id: string
+          keys_delivered: number | null
+          keys_description: string | null
+          notes: string | null
+          project_id: string | null
+          project_name: string
+          status: string
+          unit_number: string
+          unit_type: string
+          updated_at: string
+          user_id: string
+          warranty_notes: string | null
+          warranty_period_months: number | null
+          water_meter_reading: string | null
+        }
+        Insert: {
+          attached_file_name?: string | null
+          attached_file_url?: string | null
+          building_name: string
+          check_ac?: boolean | null
+          check_bathrooms?: boolean | null
+          check_doors_windows?: boolean | null
+          check_electricity?: boolean | null
+          check_flooring?: boolean | null
+          check_kitchen?: boolean | null
+          check_painting?: boolean | null
+          check_plumbing?: boolean | null
+          created_at?: string
+          customer_id_number?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          customer_signature_confirmed?: boolean | null
+          electricity_meter_reading?: string | null
+          floor_number?: string | null
+          handover_date?: string
+          id?: string
+          keys_delivered?: number | null
+          keys_description?: string | null
+          notes?: string | null
+          project_id?: string | null
+          project_name: string
+          status?: string
+          unit_number: string
+          unit_type?: string
+          updated_at?: string
+          user_id: string
+          warranty_notes?: string | null
+          warranty_period_months?: number | null
+          water_meter_reading?: string | null
+        }
+        Update: {
+          attached_file_name?: string | null
+          attached_file_url?: string | null
+          building_name?: string
+          check_ac?: boolean | null
+          check_bathrooms?: boolean | null
+          check_doors_windows?: boolean | null
+          check_electricity?: boolean | null
+          check_flooring?: boolean | null
+          check_kitchen?: boolean | null
+          check_painting?: boolean | null
+          check_plumbing?: boolean | null
+          created_at?: string
+          customer_id_number?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          customer_signature_confirmed?: boolean | null
+          electricity_meter_reading?: string | null
+          floor_number?: string | null
+          handover_date?: string
+          id?: string
+          keys_delivered?: number | null
+          keys_description?: string | null
+          notes?: string | null
+          project_id?: string | null
+          project_name?: string
+          status?: string
+          unit_number?: string
+          unit_type?: string
+          updated_at?: string
+          user_id?: string
+          warranty_notes?: string | null
+          warranty_period_months?: number | null
+          water_meter_reading?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unit_handovers_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_permissions: {
         Row: {

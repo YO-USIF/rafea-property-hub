@@ -15,19 +15,34 @@ import {
   ClipboardList,
   BarChart3,
   Bell,
-  Menu,
-  X,
+  ChevronRight,
+  ChevronLeft,
   LogOut,
   Calculator,
   Receipt,
   Package,
   Shield,
-  Clipboard
+  Clipboard,
+  Briefcase,
+  CreditCard,
+  LayoutDashboard,
+  type LucideIcon
 } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+}
+
+interface MenuItem {
+  id: string;
+  name: string;
+  icon: LucideIcon;
+  adminOnly?: boolean;
+  managerOnly?: boolean;
+  group: string;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
@@ -35,137 +50,178 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   const { signOut, user } = useAuth();
   const { isAdmin, isManager, isProjectManager } = useUserRole();
   const { canAccessPage } = usePermissions();
-  const isManagerOrAdmin = isManager || isAdmin;
 
-  const menuItems = [
-    { id: 'dashboard', name: 'لوحة التحكم', icon: Home },
-    { id: 'projects', name: 'إدارة المشاريع', icon: Building },
-    { id: 'sales', name: 'مبيعات الشقق', icon: ShoppingCart },
-    { id: 'contractors', name: 'المقاولون', icon: Users },
-    { id: 'suppliers', name: 'الموردون', icon: Truck },
-    { id: 'purchases', name: 'المشتريات', icon: FileText },
-    { id: 'warehouse', name: 'المستودع', icon: Package, managerOnly: true },
-    { id: 'extracts', name: 'المستخصات', icon: Receipt },
-    { id: 'assignment_orders', name: 'أوامر التكليف', icon: Clipboard },
-    { id: 'invoices', name: 'الفواتير', icon: Receipt },
-    { id: 'accounting', name: 'النظام المحاسبي', icon: Calculator },
-    { id: 'maintenance', name: 'الصيانة', icon: Wrench },
-    { id: 'tasks', name: 'المهام اليومية', icon: ClipboardList },
-    { id: 'reports', name: 'التقارير', icon: BarChart3 },
-    { id: 'notifications', name: 'إدارة الإشعارات', icon: Bell, adminOnly: true },
-    { id: 'permissions', name: 'إدارة الصلاحيات', icon: Shield, adminOnly: true },
-    { id: 'settings', name: 'الإعدادات', icon: Settings },
+  const menuItems: MenuItem[] = [
+    { id: 'dashboard', name: 'لوحة التحكم', icon: LayoutDashboard, group: 'main' },
+    { id: 'projects', name: 'إدارة المشاريع', icon: Building, group: 'projects' },
+    { id: 'sales', name: 'مبيعات الشقق', icon: ShoppingCart, group: 'projects' },
+    { id: 'contractors', name: 'المقاولون', icon: Users, group: 'operations' },
+    { id: 'suppliers', name: 'الموردون', icon: Truck, group: 'operations' },
+    { id: 'purchases', name: 'المشتريات', icon: CreditCard, group: 'operations' },
+    { id: 'warehouse', name: 'المستودع', icon: Package, managerOnly: true, group: 'operations' },
+    { id: 'extracts', name: 'المستخلصات', icon: Receipt, group: 'finance' },
+    { id: 'assignment_orders', name: 'أوامر التكليف', icon: Clipboard, group: 'finance' },
+    { id: 'invoices', name: 'الفواتير', icon: FileText, group: 'finance' },
+    { id: 'accounting', name: 'النظام المحاسبي', icon: Calculator, group: 'finance' },
+    { id: 'maintenance', name: 'الصيانة', icon: Wrench, group: 'tasks' },
+    { id: 'tasks', name: 'المهام اليومية', icon: ClipboardList, group: 'tasks' },
+    { id: 'reports', name: 'التقارير', icon: BarChart3, group: 'system' },
+    { id: 'notifications', name: 'إدارة الإشعارات', icon: Bell, adminOnly: true, group: 'system' },
+    { id: 'permissions', name: 'إدارة الصلاحيات', icon: Shield, adminOnly: true, group: 'system' },
+    { id: 'settings', name: 'الإعدادات', icon: Settings, group: 'system' },
   ];
 
-  // تصفية العناصر بناءً على الصلاحيات
+  const groups: Record<string, string> = {
+    main: '',
+    projects: 'المشاريع والمبيعات',
+    operations: 'العمليات',
+    finance: 'المالية',
+    tasks: 'المهام والصيانة',
+    system: 'النظام',
+  };
+
   const filteredMenuItems = menuItems.filter(item => {
-    // مدير المشروع يرى فقط المقاولين والمستخصات
     if (isProjectManager) {
       return item.id === 'contractors' || item.id === 'extracts';
     }
-    
-    // مدير النظام فقط له جميع الصلاحيات
-    if (isAdmin) {
-      return true;
-    }
-    
-    // التحقق من الصلاحيات الإدارية
-    if (item.adminOnly) {
-      return false; // فقط مدير النظام
-    }
+    if (isAdmin) return true;
+    if (item.adminOnly) return false;
     if (item.managerOnly) {
-      // السماح بالوصول إما للمدراء أو للمستخدمين الذين لديهم صلاحيات صريحة
       return isManager || canAccessPage(item.id);
     }
-    
-    // الجميع (بما في ذلك المدراء) يخضعون لنظام الصلاحيات
     return canAccessPage(item.id);
   });
 
-  return (
-    <div 
-      className={`
-        fixed right-0 top-0 h-screen bg-sidebar text-sidebar-foreground transition-all duration-300 z-50
-        ${isCollapsed ? 'w-16' : 'w-64'}
-        border-l border-sidebar-border shadow-xl
-      `}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
+  const groupedItems = Object.keys(groups).reduce((acc, groupKey) => {
+    const items = filteredMenuItems.filter(item => item.group === groupKey);
+    if (items.length > 0) acc[groupKey] = items;
+    return acc;
+  }, {} as Record<string, MenuItem[]>);
+
+  const renderMenuItem = (item: MenuItem) => {
+    const Icon = item.icon;
+    const isActive = activeTab === item.id;
+
+    const button = (
+      <button
+        onClick={() => setActiveTab(item.id)}
+        className={`
+          group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative
+          ${isActive 
+            ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-md shadow-sidebar-primary/30' 
+            : 'hover:bg-sidebar-accent/60 text-sidebar-foreground/70 hover:text-sidebar-foreground'
+          }
+          ${isCollapsed ? 'justify-center px-2' : ''}
+        `}
+      >
+        <Icon className={`w-[18px] h-[18px] shrink-0 transition-transform duration-200 ${isActive ? '' : 'group-hover:scale-110'}`} />
         {!isCollapsed && (
-          <div className="flex items-center space-x-3 space-x-reverse">
-            <div className="w-10 h-10 bg-gradient-real-estate rounded-lg flex items-center justify-center">
-              <Building className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-sidebar-foreground">سهيل طيبة</h1>
-              <p className="text-xs text-sidebar-foreground/70">للتطوير العقاري</p>
-            </div>
-          </div>
+          <span className={`text-sm ${isActive ? 'font-semibold' : 'font-medium'}`}>{item.name}</span>
         )}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-2 hover:bg-sidebar-accent rounded-lg transition-colors"
-        >
-          {isCollapsed ? <Menu className="w-5 h-5" /> : <X className="w-5 h-5" />}
-        </button>
-      </div>
-
-      {/* Navigation */}
-      <nav className="mt-6 px-3">
-        <ul className="space-y-2">
-          {filteredMenuItems
-            .map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            
-            return (
-              <li key={item.id}>
-                <button
-                  onClick={() => setActiveTab(item.id)}
-                  className={`
-                    w-full flex items-center px-3 py-3 rounded-lg transition-all duration-200
-                    ${isActive 
-                      ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-lg' 
-                      : 'hover:bg-sidebar-accent text-sidebar-foreground/80 hover:text-sidebar-foreground'
-                    }
-                    ${isCollapsed ? 'justify-center' : 'justify-start space-x-3 space-x-reverse'}
-                  `}
-                >
-                  <Icon className={`w-5 h-5 ${isActive ? 'text-white' : ''}`} />
-                  {!isCollapsed && (
-                    <span className="font-medium">{item.name}</span>
-                  )}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-
-      {/* User section and logout */}
-      <div className="absolute bottom-4 left-0 right-0 px-3">
-        {!isCollapsed && user && (
-          <div className="mb-3 p-3 bg-sidebar-accent rounded-lg">
-            <p className="text-sm text-sidebar-foreground/70">مسجل باسم:</p>
-            <p className="text-sm font-medium text-sidebar-foreground truncate">{user.email}</p>
-          </div>
+        {isActive && !isCollapsed && (
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-sidebar-primary-foreground/50 rounded-r-full" />
         )}
-        <button
-          onClick={signOut}
-          className={`
-            w-full flex items-center px-3 py-3 rounded-lg transition-all duration-200
-            hover:bg-red-500/10 text-red-500 hover:text-red-600
-            ${isCollapsed ? 'justify-center' : 'justify-start space-x-3 space-x-reverse'}
-          `}
-        >
-          <LogOut className="w-5 h-5" />
+      </button>
+    );
+
+    if (isCollapsed) {
+      return (
+        <Tooltip key={item.id} delayDuration={0}>
+          <TooltipTrigger asChild>{button}</TooltipTrigger>
+          <TooltipContent side="left" className="font-medium">
+            {item.name}
+          </TooltipContent>
+        </Tooltip>
+      );
+    }
+
+    return <React.Fragment key={item.id}>{button}</React.Fragment>;
+  };
+
+  return (
+    <TooltipProvider>
+      <div 
+        className={`
+          fixed right-0 top-0 h-screen bg-sidebar text-sidebar-foreground transition-all duration-300 z-50 flex flex-col
+          ${isCollapsed ? 'w-[68px]' : 'w-64'}
+          border-l border-sidebar-border
+        `}
+        style={{ boxShadow: '0 0 40px rgba(0,0,0,0.3)' }}
+      >
+        {/* Header */}
+        <div className={`flex items-center p-4 border-b border-sidebar-border/50 ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
           {!isCollapsed && (
-            <span className="font-medium">تسجيل الخروج</span>
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shrink-0">
+                <Building className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-sm font-bold text-sidebar-foreground truncate leading-tight">سهيل طيبة</h1>
+                <p className="text-[11px] text-sidebar-foreground/50 truncate">للتطوير العقاري</p>
+              </div>
+            </div>
           )}
-        </button>
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-1.5 hover:bg-sidebar-accent/60 rounded-lg transition-colors shrink-0"
+          >
+            {isCollapsed ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <ScrollArea className="flex-1 py-3">
+          <div className={`space-y-4 ${isCollapsed ? 'px-2' : 'px-3'}`}>
+            {Object.entries(groupedItems).map(([groupKey, items]) => (
+              <div key={groupKey}>
+                {!isCollapsed && groups[groupKey] && (
+                  <p className="text-[11px] font-semibold text-sidebar-foreground/40 uppercase tracking-wider mb-2 px-3">
+                    {groups[groupKey]}
+                  </p>
+                )}
+                {isCollapsed && groups[groupKey] && (
+                  <div className="h-px bg-sidebar-border/40 mx-1 mb-2" />
+                )}
+                <div className="space-y-0.5">
+                  {items.map(renderMenuItem)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+
+        {/* User & Logout */}
+        <div className="border-t border-sidebar-border/50 p-3 space-y-2">
+          {!isCollapsed && user && (
+            <div className="px-3 py-2 rounded-lg bg-sidebar-accent/40">
+              <p className="text-[11px] text-sidebar-foreground/40">مسجل باسم</p>
+              <p className="text-xs font-medium text-sidebar-foreground/80 truncate">{user.email}</p>
+            </div>
+          )}
+          {isCollapsed ? (
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={signOut}
+                  className="w-full flex items-center justify-center p-2.5 rounded-xl transition-colors hover:bg-destructive/10 text-destructive"
+                >
+                  <LogOut className="w-[18px] h-[18px]" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="left">تسجيل الخروج</TooltipContent>
+            </Tooltip>
+          ) : (
+            <button
+              onClick={signOut}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors hover:bg-destructive/10 text-destructive"
+            >
+              <LogOut className="w-[18px] h-[18px]" />
+              <span className="text-sm font-medium">تسجيل الخروج</span>
+            </button>
+          )}
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 };
 

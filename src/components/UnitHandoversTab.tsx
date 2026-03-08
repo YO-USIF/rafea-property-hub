@@ -62,12 +62,15 @@ const UnitHandoversTab = () => {
     }
   };
 
-  const printHandover = (h: any) => {
+  const printHandover = (h: any, company: 'suhail' | 'rafea') => {
     const escapeHtml = (str: string) => {
       if (!str) return '';
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     };
     const checkMark = (v: boolean) => v ? '✅' : '❌';
+    const isSuhail = company === 'suhail';
+    const companyName = isSuhail ? 'شركة سهيل طيبة للتطوير العقاري' : 'شركة رافع للتطوير العقاري';
+    const logoUrl = isSuhail ? '/logos/suhail-tayba-logo.png' : '/logos/rafea-logo.jpeg';
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
     printWindow.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><title>إقرار تسليم وحدة سكنية</title>
@@ -75,7 +78,12 @@ const UnitHandoversTab = () => {
     @page{size:A4;margin:15mm 15mm 15mm 15mm}
     body{font-family:Arial,sans-serif;padding:0;margin:0;direction:rtl;font-size:12px;color:#333}
     .page{padding:15mm;box-sizing:border-box}
-    h1{text-align:center;border-bottom:2px solid #333;padding-bottom:8px;font-size:18px;margin:0 0 12px}
+    .header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1a365d;padding-bottom:10px;margin-bottom:12px}
+    .header-logo img{width:90px;height:90px;object-fit:contain;border-radius:8px}
+    .header-title{text-align:center;flex:1}
+    .header-title h1{font-size:18px;color:#1a365d;margin:0 0 4px}
+    .header-title h2{font-size:13px;color:#555;margin:0;font-weight:normal}
+    .header-company{font-size:11px;color:#777;text-align:left}
     .section{margin:8px 0;border:1px solid #ddd;padding:10px 12px;border-radius:6px}
     .section h3{margin:0 0 6px;color:#1a56db;border-bottom:1px solid #eee;padding-bottom:4px;font-size:13px}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -96,7 +104,11 @@ const UnitHandoversTab = () => {
 
     <!-- الصفحة الأولى: بيانات الوحدة والفحص -->
     <div class="page">
-    <h1>إقرار تسليم وحدة سكنية</h1>
+    <div class="header">
+    <div class="header-logo"><img src="${logoUrl}" alt="${escapeHtml(companyName)}" /></div>
+    <div class="header-title"><h1>إقرار تسليم وحدة سكنية</h1><h2>${escapeHtml(companyName)}</h2></div>
+    <div class="header-company"></div>
+    </div>
 
     <div class="section"><h3>بيانات الوحدة</h3><div class="grid3">
     <div class="field"><label>المشروع:</label> <span>${escapeHtml(h.project_name)}</span></div>

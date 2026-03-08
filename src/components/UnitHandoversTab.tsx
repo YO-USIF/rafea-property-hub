@@ -156,7 +156,11 @@ const UnitHandoversTab = () => {
 
     <!-- الصفحة الثانية: الإقرار والتوقيعات -->
     <div class="page page-break" style="display:flex;flex-direction:column;min-height:calc(297mm - 30mm)">
-    <h1>إقرار تسليم وحدة سكنية - إقرار المشتري</h1>
+    <div class="header">
+    <div class="header-logo"><img src="${logoUrl}" alt="${escapeHtml(companyName)}" /></div>
+    <div class="header-title"><h1 style="border:none;padding:0;margin:0 0 4px">إقرار المشتري</h1><h2>${escapeHtml(companyName)}</h2></div>
+    <div class="header-company"></div>
+    </div>
 
     <div style="margin:10px 0;padding:10px 15px;background:#f0f4ff;border-radius:8px;font-size:12px;border:1px solid #d0d9f0">
     <strong>المشروع:</strong> ${escapeHtml(h.project_name)} &nbsp;|&nbsp;

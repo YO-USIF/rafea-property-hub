@@ -18,6 +18,8 @@ const UnitHandoversTab = () => {
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<any>(undefined);
+  const [printDialogOpen, setPrintDialogOpen] = useState(false);
+  const [printingHandover, setPrintingHandover] = useState<any>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 

@@ -146,6 +146,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
           ${isCollapsed ? 'w-[68px]' : 'w-64'}
           border-l border-sidebar-border
         `}
+        dir="rtl"
         style={{ boxShadow: '0 0 40px rgba(0,0,0,0.3)' }}
       >
         {/* Header */}

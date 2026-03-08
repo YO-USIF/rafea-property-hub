@@ -275,7 +275,7 @@ const UnitHandoversTab = () => {
                     <TableCell>{h.customer_signature_confirmed ? <Badge className="bg-green-100 text-green-800">موقع</Badge> : <Badge variant="outline">غير موقع</Badge>}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => printHandover(h)}><Printer className="w-4 h-4" /></Button>
+                        <Button variant="outline" size="sm" onClick={() => { setPrintingHandover(h); setPrintDialogOpen(true); }}><Printer className="w-4 h-4" /></Button>
                         <Button variant="outline" size="sm" onClick={() => { setEditing(h); setFormOpen(true); }}><Edit className="w-4 h-4" /></Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild><Button variant="outline" size="sm" className="hover:bg-red-50"><Trash2 className="w-4 h-4" /></Button></AlertDialogTrigger>

@@ -221,6 +221,7 @@ const ExtractsPage = () => {
                   <TableHead>رقم المستخص</TableHead>
                   <TableHead>المشروع</TableHead>
                   <TableHead>المقاول</TableHead>
+                  <TableHead>وصف الأعمال</TableHead>
                   <TableHead>التاريخ</TableHead>
                   <TableHead>نسبة الإنجاز</TableHead>
                   <TableHead>المبلغ المدفوع سابقاً</TableHead>

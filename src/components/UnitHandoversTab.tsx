@@ -140,17 +140,17 @@ const UnitHandoversTab = () => {
     </div>
 
     <!-- الصفحة الثانية: الإقرار والتوقيعات -->
-    <div class="page page-break">
+    <div class="page page-break" style="display:flex;flex-direction:column;min-height:calc(297mm - 30mm)">
     <h1>إقرار تسليم وحدة سكنية - إقرار المشتري</h1>
 
-    <div style="margin:10px 0;padding:8px 12px;background:#f0f4ff;border-radius:6px;font-size:12px">
+    <div style="margin:10px 0;padding:10px 15px;background:#f0f4ff;border-radius:8px;font-size:12px;border:1px solid #d0d9f0">
     <strong>المشروع:</strong> ${escapeHtml(h.project_name)} &nbsp;|&nbsp;
     <strong>الوحدة:</strong> ${escapeHtml(h.unit_number)} &nbsp;|&nbsp;
     <strong>العميل:</strong> ${escapeHtml(h.customer_name)} &nbsp;|&nbsp;
     <strong>التاريخ:</strong> ${escapeHtml(h.handover_date)}
     </div>
 
-    <div class="declaration">
+    <div class="declaration" style="flex:1;display:flex;flex-direction:column;justify-content:center">
     <h3>إقرار المشتري</h3>
     <p>
     هذا وأقر بتوقيعي أنا المشتري على هذا المحضر أنني قد استلمت الوحدة وشهادات الضمان المتعلقة بالوحدة، وذلك بعد أن تعرفت ووقفت على الوحدة وعاينتها وصفاً وحدوداً ومساحةً ومعالماً، المعاينة التامة النافية لكل جهالة أو غرر شرعي أو نظامي، وأقر بأنني وجدت الوحدة المباعة ومحتوياتها وتجهيزاتها خالية من العيوب وبحالة جيدة وصالحة، كما أقر أنه ليس لدي أي تحفظات في هذا الخصوص، وأن توقيعي على هذا المحضر هو إقرار مني أنا المشتري بقبول الوحدة وضماناتها ومحتوياتها بحالتها الراهنة دون أن يحق لي الرجوع على المالك مستقبلاً بأي إدّعاء يخالف ذلك أو مطالبات من أي نوع فيما يتعلق بالوحدة المباعة أو تجهيزاتها الداخلية والخارجية أمام أي جهة عامة أو خاصة أو قضائية.
@@ -160,11 +160,13 @@ const UnitHandoversTab = () => {
     </p>
     </div>
 
+    <div style="margin-top:auto">
     <div class="signature">
     <div><p>توقيع المشتري (المستلم)</p><p>${escapeHtml(h.customer_name)}</p><p style="margin-top:25px">_______________</p></div>
     <div><p>توقيع المالك (المسلّم)</p><p style="margin-top:25px">_______________</p></div>
     </div>
     <div class="footer-date">تاريخ التوقيع: ${escapeHtml(h.handover_date)}</div>
+    </div>
     </div>
 
     </body></html>`);

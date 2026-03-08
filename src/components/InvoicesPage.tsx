@@ -305,6 +305,7 @@ const InvoicesPage = () => {
               <TableRow>
                 <TableHead>رقم الفاتورة</TableHead>
                 <TableHead>المورد</TableHead>
+                <TableHead>الوصف</TableHead>
                 <TableHead>المبلغ</TableHead>
                 <TableHead>تاريخ الفاتورة</TableHead>
                 <TableHead>تاريخ الاستحقاق</TableHead>

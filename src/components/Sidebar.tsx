@@ -215,7 +215,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
               onClick={signOut}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors hover:bg-destructive/10 text-destructive"
             >
-              <LogOut className="w-[18px] h-[18px]" />
+              <LogOut className="w-5 h-5" />
               <span className="text-sm font-medium">تسجيل الخروج</span>
             </button>
           )}

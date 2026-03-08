@@ -298,6 +298,32 @@ const UnitHandoversTab = () => {
       </Card>
 
       <UnitHandoverForm open={formOpen} onOpenChange={(open) => { setFormOpen(open); if (!open) setEditing(undefined); }} handover={editing} onSuccess={fetchHandovers} />
+
+      <Dialog open={printDialogOpen} onOpenChange={setPrintDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">اختر الشركة للطباعة</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 py-4">
+            <Button
+              variant="outline"
+              className="h-20 flex items-center gap-4 justify-start px-4"
+              onClick={() => { setPrintDialogOpen(false); if (printingHandover) printHandover(printingHandover, 'suhail'); }}
+            >
+              <img src="/logos/suhail-tayba-logo.png" alt="سهيل طيبة" className="w-14 h-14 rounded-lg object-contain" />
+              <span className="text-base font-medium">شركة سهيل طيبة للتطوير العقاري</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-20 flex items-center gap-4 justify-start px-4"
+              onClick={() => { setPrintDialogOpen(false); if (printingHandover) printHandover(printingHandover, 'rafea'); }}
+            >
+              <img src="/logos/rafea-logo.jpeg" alt="رافع" className="w-14 h-14 rounded-lg object-contain" />
+              <span className="text-base font-medium">شركة رافع للتطوير العقاري</span>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

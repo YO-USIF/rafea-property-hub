@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Search, Edit, Trash2, Printer, Home, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,6 +18,8 @@ const UnitHandoversTab = () => {
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<any>(undefined);
+  const [printDialogOpen, setPrintDialogOpen] = useState(false);
+  const [printingHandover, setPrintingHandover] = useState<any>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -59,12 +62,15 @@ const UnitHandoversTab = () => {
     }
   };
 
-  const printHandover = (h: any) => {
+  const printHandover = (h: any, company: 'suhail' | 'rafea') => {
     const escapeHtml = (str: string) => {
       if (!str) return '';
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     };
     const checkMark = (v: boolean) => v ? '✅' : '❌';
+    const isSuhail = company === 'suhail';
+    const companyName = isSuhail ? 'شركة سهيل طيبة للتطوير العقاري' : 'شركة رافع للتطوير العقاري';
+    const logoUrl = isSuhail ? '/logos/suhail-tayba-logo.png' : '/logos/rafea-logo.jpeg';
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
     printWindow.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><title>إقرار تسليم وحدة سكنية</title>
@@ -72,7 +78,12 @@ const UnitHandoversTab = () => {
     @page{size:A4;margin:15mm 15mm 15mm 15mm}
     body{font-family:Arial,sans-serif;padding:0;margin:0;direction:rtl;font-size:12px;color:#333}
     .page{padding:15mm;box-sizing:border-box}
-    h1{text-align:center;border-bottom:2px solid #333;padding-bottom:8px;font-size:18px;margin:0 0 12px}
+    .header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1a365d;padding-bottom:10px;margin-bottom:12px}
+    .header-logo img{width:90px;height:90px;object-fit:contain;border-radius:8px}
+    .header-title{text-align:center;flex:1}
+    .header-title h1{font-size:18px;color:#1a365d;margin:0 0 4px}
+    .header-title h2{font-size:13px;color:#555;margin:0;font-weight:normal}
+    .header-company{font-size:11px;color:#777;text-align:left}
     .section{margin:8px 0;border:1px solid #ddd;padding:10px 12px;border-radius:6px}
     .section h3{margin:0 0 6px;color:#1a56db;border-bottom:1px solid #eee;padding-bottom:4px;font-size:13px}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -93,7 +104,11 @@ const UnitHandoversTab = () => {
 
     <!-- الصفحة الأولى: بيانات الوحدة والفحص -->
     <div class="page">
-    <h1>إقرار تسليم وحدة سكنية</h1>
+    <div class="header">
+    <div class="header-logo"><img src="${logoUrl}" alt="${escapeHtml(companyName)}" /></div>
+    <div class="header-title"><h1>إقرار تسليم وحدة سكنية</h1><h2>${escapeHtml(companyName)}</h2></div>
+    <div class="header-company"></div>
+    </div>
 
     <div class="section"><h3>بيانات الوحدة</h3><div class="grid3">
     <div class="field"><label>المشروع:</label> <span>${escapeHtml(h.project_name)}</span></div>
@@ -141,7 +156,11 @@ const UnitHandoversTab = () => {
 
     <!-- الصفحة الثانية: الإقرار والتوقيعات -->
     <div class="page page-break" style="display:flex;flex-direction:column;min-height:calc(297mm - 30mm)">
-    <h1>إقرار تسليم وحدة سكنية - إقرار المشتري</h1>
+    <div class="header">
+    <div class="header-logo"><img src="${logoUrl}" alt="${escapeHtml(companyName)}" /></div>
+    <div class="header-title"><h1 style="border:none;padding:0;margin:0 0 4px">إقرار المشتري</h1><h2>${escapeHtml(companyName)}</h2></div>
+    <div class="header-company"></div>
+    </div>
 
     <div style="margin:10px 0;padding:10px 15px;background:#f0f4ff;border-radius:8px;font-size:12px;border:1px solid #d0d9f0">
     <strong>المشروع:</strong> ${escapeHtml(h.project_name)} &nbsp;|&nbsp;
@@ -256,7 +275,7 @@ const UnitHandoversTab = () => {
                     <TableCell>{h.customer_signature_confirmed ? <Badge className="bg-green-100 text-green-800">موقع</Badge> : <Badge variant="outline">غير موقع</Badge>}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => printHandover(h)}><Printer className="w-4 h-4" /></Button>
+                        <Button variant="outline" size="sm" onClick={() => { setPrintingHandover(h); setPrintDialogOpen(true); }}><Printer className="w-4 h-4" /></Button>
                         <Button variant="outline" size="sm" onClick={() => { setEditing(h); setFormOpen(true); }}><Edit className="w-4 h-4" /></Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild><Button variant="outline" size="sm" className="hover:bg-red-50"><Trash2 className="w-4 h-4" /></Button></AlertDialogTrigger>
@@ -279,6 +298,32 @@ const UnitHandoversTab = () => {
       </Card>
 
       <UnitHandoverForm open={formOpen} onOpenChange={(open) => { setFormOpen(open); if (!open) setEditing(undefined); }} handover={editing} onSuccess={fetchHandovers} />
+
+      <Dialog open={printDialogOpen} onOpenChange={setPrintDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">اختر الشركة للطباعة</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 py-4">
+            <Button
+              variant="outline"
+              className="h-20 flex items-center gap-4 justify-start px-4"
+              onClick={() => { setPrintDialogOpen(false); if (printingHandover) printHandover(printingHandover, 'suhail'); }}
+            >
+              <img src="/logos/suhail-tayba-logo.png" alt="سهيل طيبة" className="w-14 h-14 rounded-lg object-contain" />
+              <span className="text-base font-medium">شركة سهيل طيبة للتطوير العقاري</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-20 flex items-center gap-4 justify-start px-4"
+              onClick={() => { setPrintDialogOpen(false); if (printingHandover) printHandover(printingHandover, 'rafea'); }}
+            >
+              <img src="/logos/rafea-logo.jpeg" alt="رافع" className="w-14 h-14 rounded-lg object-contain" />
+              <span className="text-base font-medium">شركة رافع للتطوير العقاري</span>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

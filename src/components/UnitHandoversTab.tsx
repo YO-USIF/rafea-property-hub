@@ -113,7 +113,17 @@ const UnitHandoversTab = () => {
     <div class="field"><label>ملاحظات:</label> <span>${escapeHtml(h.warranty_notes || '-')}</span></div>
     </div></div>
     ${h.notes ? `<div class="section"><h3>ملاحظات</h3><p>${escapeHtml(h.notes)}</p></div>` : ''}
-    <div class="signature"><div><p>توقيع العميل</p><p>${escapeHtml(h.customer_name)}</p></div><div><p>توقيع المسؤول</p><p>_______________</p></div></div>
+    <div class="section" style="margin-top:30px;background:#f9fafb;border:2px solid #1a56db;padding:20px;border-radius:8px">
+    <h3 style="text-align:center;color:#1a56db;font-size:16px;margin-bottom:15px">إقرار المشتري</h3>
+    <p style="text-align:justify;line-height:2;font-size:13px;color:#333">
+    هذا وأقر بتوقيعي أنا المشتري على هذا المحضر أنني قد استلمت الوحدة وشهادات الضمان المتعلقة بالوحدة، وذلك بعد أن تعرفت ووقفت على الوحدة وعاينتها وصفاً وحدوداً ومساحةً ومعالماً، المعاينة التامة النافية لكل جهالة أو غرر شرعي أو نظامي، وأقر بأنني وجدت الوحدة المباعة ومحتوياتها وتجهيزاتها خالية من العيوب وبحالة جيدة وصالحة، كما أقر أنه ليس لدي أي تحفظات في هذا الخصوص، وأن توقيعي على هذا المحضر هو إقرار مني أنا المشتري بقبول الوحدة وضماناتها ومحتوياتها بحالتها الراهنة دون أن يحق لي الرجوع على المالك مستقبلاً بأي إدّعاء يخالف ذلك أو مطالبات من أي نوع فيما يتعلق بالوحدة المباعة أو تجهيزاتها الداخلية والخارجية أمام أي جهة عامة أو خاصة أو قضائية.
+    </p>
+    <p style="text-align:justify;line-height:2;font-size:13px;color:#333;margin-top:10px">
+    كما أقر أنا المشتري باعتباري مسؤولاً من وقت وتاريخ التوقيع على هذا المحضر المسؤولية المدنية والجنائية الكاملة عن الوحدة المباعة ومحتوياتها وتجهيزاتها، وعن أي تلف أو نقص أو ضرر من أي نوع قد يلحق بالوحدة أو العقار أو المساحات المشتركة بالعقار أو بالملّاك أو المستأجرين الآخرين في العقار أو الغير يرجع إلى خطأ أو إهمال أو امتناع صادر مني أو من أحد تابعي، هذا وأخلي مسؤولية المالك الكاملة من تاريخ ووقت التوقيع على هذا المحضر من أي مسؤولية أو مطالبة أو مصروفات أو غرامات أو خلافه قد تلحق بالوحدة المباعة أو ما يتعلق بها.
+    </p>
+    </div>
+    <div class="signature"><div><p>توقيع المشتري (المستلم)</p><p>${escapeHtml(h.customer_name)}</p><p style="margin-top:30px">_______________</p></div><div><p>توقيع المالك (المسلّم)</p><p>_______________</p></div></div>
+    <div style="text-align:center;margin-top:20px;font-size:12px;color:#888">تاريخ التوقيع: ${escapeHtml(h.handover_date)}</div>
     </body></html>`);
     printWindow.document.close();
     printWindow.print();

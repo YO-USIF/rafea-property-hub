@@ -114,12 +114,12 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
           ${isCollapsed ? 'justify-center px-2' : ''}
         `}
       >
-        <Icon className={`w-[18px] h-[18px] shrink-0 transition-transform duration-200 ${isActive ? '' : 'group-hover:scale-110'}`} />
+        <Icon className={`w-5 h-5 shrink-0 transition-transform duration-200 ${isActive ? '' : 'group-hover:scale-110'}`} />
         {!isCollapsed && (
           <span className={`text-sm ${isActive ? 'font-semibold' : 'font-medium'}`}>{item.name}</span>
         )}
         {isActive && !isCollapsed && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-sidebar-primary-foreground/50 rounded-r-full" />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-sidebar-primary-foreground/50 rounded-l-full" />
         )}
       </button>
     );
@@ -205,7 +205,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
                   onClick={signOut}
                   className="w-full flex items-center justify-center p-2.5 rounded-xl transition-colors hover:bg-destructive/10 text-destructive"
                 >
-                  <LogOut className="w-[18px] h-[18px]" />
+                  <LogOut className="w-5 h-5" />
                 </button>
               </TooltipTrigger>
               <TooltipContent side="left">تسجيل الخروج</TooltipContent>
@@ -215,7 +215,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
               onClick={signOut}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors hover:bg-destructive/10 text-destructive"
             >
-              <LogOut className="w-[18px] h-[18px]" />
+              <LogOut className="w-5 h-5" />
               <span className="text-sm font-medium">تسجيل الخروج</span>
             </button>
           )}

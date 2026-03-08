@@ -68,15 +68,33 @@ const UnitHandoversTab = () => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
     printWindow.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><title>إقرار تسليم وحدة سكنية</title>
-    <style>body{font-family:Arial,sans-serif;padding:30px;direction:rtl}h1{text-align:center;border-bottom:2px solid #333;padding-bottom:10px}
-    .section{margin:20px 0;border:1px solid #ddd;padding:15px;border-radius:8px}
-    .section h3{margin:0 0 10px;color:#1a56db;border-bottom:1px solid #eee;padding-bottom:5px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-    .field{margin:5px 0}.field label{font-weight:bold;color:#555}.field span{margin-right:5px}
-    .check-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
-    .signature{margin-top:40px;display:flex;justify-content:space-between}.signature div{text-align:center;width:45%;border-top:1px solid #333;padding-top:10px}
-    @media print{body{padding:15px}}</style></head><body>
+    <style>
+    @page{size:A4;margin:15mm 15mm 15mm 15mm}
+    body{font-family:Arial,sans-serif;padding:0;margin:0;direction:rtl;font-size:12px;color:#333}
+    .page{padding:15mm;box-sizing:border-box}
+    h1{text-align:center;border-bottom:2px solid #333;padding-bottom:8px;font-size:18px;margin:0 0 12px}
+    .section{margin:8px 0;border:1px solid #ddd;padding:10px 12px;border-radius:6px}
+    .section h3{margin:0 0 6px;color:#1a56db;border-bottom:1px solid #eee;padding-bottom:4px;font-size:13px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+    .field{margin:3px 0;font-size:12px}
+    .field label{font-weight:bold;color:#555}
+    .field span{margin-right:4px}
+    .check-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;font-size:12px}
+    .page-break{page-break-before:always}
+    .declaration{background:#f9fafb;border:2px solid #1a56db;padding:18px;border-radius:8px;margin-top:10px}
+    .declaration h3{text-align:center;color:#1a56db;font-size:15px;margin:0 0 12px;border:none}
+    .declaration p{text-align:justify;line-height:1.9;font-size:12.5px;color:#333;margin:0 0 8px}
+    .signature{margin-top:35px;display:flex;justify-content:space-between}
+    .signature div{text-align:center;width:45%;border-top:1px solid #333;padding-top:8px}
+    .footer-date{text-align:center;margin-top:15px;font-size:11px;color:#888}
+    @media print{body{padding:0}.page{padding:0}}
+    </style></head><body>
+
+    <!-- الصفحة الأولى: بيانات الوحدة والفحص -->
+    <div class="page">
     <h1>إقرار تسليم وحدة سكنية</h1>
+
     <div class="section"><h3>بيانات الوحدة</h3><div class="grid3">
     <div class="field"><label>المشروع:</label> <span>${escapeHtml(h.project_name)}</span></div>
     <div class="field"><label>المبنى:</label> <span>${escapeHtml(h.building_name)}</span></div>
@@ -85,19 +103,23 @@ const UnitHandoversTab = () => {
     <div class="field"><label>الطابق:</label> <span>${escapeHtml(h.floor_number || '-')}</span></div>
     <div class="field"><label>تاريخ التسليم:</label> <span>${escapeHtml(h.handover_date)}</span></div>
     </div></div>
+
     <div class="section"><h3>بيانات العميل</h3><div class="grid3">
     <div class="field"><label>الاسم:</label> <span>${escapeHtml(h.customer_name)}</span></div>
     <div class="field"><label>الجوال:</label> <span>${escapeHtml(h.customer_phone || '-')}</span></div>
     <div class="field"><label>رقم الهوية:</label> <span>${escapeHtml(h.customer_id_number || '-')}</span></div>
     </div></div>
+
     <div class="section"><h3>قراءات العدادات</h3><div class="grid">
     <div class="field"><label>عداد الكهرباء:</label> <span>${escapeHtml(h.electricity_meter_reading || '-')}</span></div>
     <div class="field"><label>عداد الماء:</label> <span>${escapeHtml(h.water_meter_reading || '-')}</span></div>
     </div></div>
+
     <div class="section"><h3>المفاتيح المسلمة</h3><div class="grid">
     <div class="field"><label>العدد:</label> <span>${h.keys_delivered || 0}</span></div>
     <div class="field"><label>التفاصيل:</label> <span>${escapeHtml(h.keys_description || '-')}</span></div>
     </div></div>
+
     <div class="section"><h3>قائمة الفحص</h3><div class="check-grid">
     <div>${checkMark(h.check_electricity)} الكهرباء</div>
     <div>${checkMark(h.check_plumbing)} السباكة</div>
@@ -108,22 +130,43 @@ const UnitHandoversTab = () => {
     <div>${checkMark(h.check_kitchen)} المطبخ</div>
     <div>${checkMark(h.check_bathrooms)} دورات المياه</div>
     </div></div>
+
     <div class="section"><h3>الضمانات</h3><div class="grid">
     <div class="field"><label>فترة الضمان:</label> <span>${h.warranty_period_months || 12} شهر</span></div>
     <div class="field"><label>ملاحظات:</label> <span>${escapeHtml(h.warranty_notes || '-')}</span></div>
     </div></div>
-    ${h.notes ? `<div class="section"><h3>ملاحظات</h3><p>${escapeHtml(h.notes)}</p></div>` : ''}
-    <div class="section" style="margin-top:30px;background:#f9fafb;border:2px solid #1a56db;padding:20px;border-radius:8px">
-    <h3 style="text-align:center;color:#1a56db;font-size:16px;margin-bottom:15px">إقرار المشتري</h3>
-    <p style="text-align:justify;line-height:2;font-size:13px;color:#333">
+
+    ${h.notes ? '<div class="section"><h3>ملاحظات</h3><p style="margin:0;font-size:12px">' + escapeHtml(h.notes) + '</p></div>' : ''}
+    </div>
+
+    <!-- الصفحة الثانية: الإقرار والتوقيعات -->
+    <div class="page page-break">
+    <h1>إقرار تسليم وحدة سكنية - إقرار المشتري</h1>
+
+    <div style="margin:10px 0;padding:8px 12px;background:#f0f4ff;border-radius:6px;font-size:12px">
+    <strong>المشروع:</strong> ${escapeHtml(h.project_name)} &nbsp;|&nbsp;
+    <strong>الوحدة:</strong> ${escapeHtml(h.unit_number)} &nbsp;|&nbsp;
+    <strong>العميل:</strong> ${escapeHtml(h.customer_name)} &nbsp;|&nbsp;
+    <strong>التاريخ:</strong> ${escapeHtml(h.handover_date)}
+    </div>
+
+    <div class="declaration">
+    <h3>إقرار المشتري</h3>
+    <p>
     هذا وأقر بتوقيعي أنا المشتري على هذا المحضر أنني قد استلمت الوحدة وشهادات الضمان المتعلقة بالوحدة، وذلك بعد أن تعرفت ووقفت على الوحدة وعاينتها وصفاً وحدوداً ومساحةً ومعالماً، المعاينة التامة النافية لكل جهالة أو غرر شرعي أو نظامي، وأقر بأنني وجدت الوحدة المباعة ومحتوياتها وتجهيزاتها خالية من العيوب وبحالة جيدة وصالحة، كما أقر أنه ليس لدي أي تحفظات في هذا الخصوص، وأن توقيعي على هذا المحضر هو إقرار مني أنا المشتري بقبول الوحدة وضماناتها ومحتوياتها بحالتها الراهنة دون أن يحق لي الرجوع على المالك مستقبلاً بأي إدّعاء يخالف ذلك أو مطالبات من أي نوع فيما يتعلق بالوحدة المباعة أو تجهيزاتها الداخلية والخارجية أمام أي جهة عامة أو خاصة أو قضائية.
     </p>
-    <p style="text-align:justify;line-height:2;font-size:13px;color:#333;margin-top:10px">
+    <p>
     كما أقر أنا المشتري باعتباري مسؤولاً من وقت وتاريخ التوقيع على هذا المحضر المسؤولية المدنية والجنائية الكاملة عن الوحدة المباعة ومحتوياتها وتجهيزاتها، وعن أي تلف أو نقص أو ضرر من أي نوع قد يلحق بالوحدة أو العقار أو المساحات المشتركة بالعقار أو بالملّاك أو المستأجرين الآخرين في العقار أو الغير يرجع إلى خطأ أو إهمال أو امتناع صادر مني أو من أحد تابعي، هذا وأخلي مسؤولية المالك الكاملة من تاريخ ووقت التوقيع على هذا المحضر من أي مسؤولية أو مطالبة أو مصروفات أو غرامات أو خلافه قد تلحق بالوحدة المباعة أو ما يتعلق بها.
     </p>
     </div>
-    <div class="signature"><div><p>توقيع المشتري (المستلم)</p><p>${escapeHtml(h.customer_name)}</p><p style="margin-top:30px">_______________</p></div><div><p>توقيع المالك (المسلّم)</p><p>_______________</p></div></div>
-    <div style="text-align:center;margin-top:20px;font-size:12px;color:#888">تاريخ التوقيع: ${escapeHtml(h.handover_date)}</div>
+
+    <div class="signature">
+    <div><p>توقيع المشتري (المستلم)</p><p>${escapeHtml(h.customer_name)}</p><p style="margin-top:25px">_______________</p></div>
+    <div><p>توقيع المالك (المسلّم)</p><p style="margin-top:25px">_______________</p></div>
+    </div>
+    <div class="footer-date">تاريخ التوقيع: ${escapeHtml(h.handover_date)}</div>
+    </div>
+
     </body></html>`);
     printWindow.document.close();
     printWindow.print();

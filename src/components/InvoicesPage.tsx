@@ -319,6 +319,7 @@ const InvoicesPage = () => {
                   <TableRow key={invoice.id}>
                     <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
                     <TableCell>{invoice.supplier_name}</TableCell>
+                    <TableCell className="max-w-[200px] truncate" title={invoice.description || '-'}>{invoice.description || '-'}</TableCell>
                     <TableCell>{formatCurrency(invoice.amount)}</TableCell>
                     <TableCell>{invoice.invoice_date}</TableCell>
                     <TableCell>{invoice.due_date}</TableCell>

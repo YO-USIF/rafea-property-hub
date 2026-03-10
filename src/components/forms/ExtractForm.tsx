@@ -132,23 +132,27 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
   useEffect(() => {
     const amountBeforeTax = (formData.previous_amount || 0) + (formData.current_amount || 0);
     
+    let total: number;
     if (formData.tax_included && amountBeforeTax > 0) {
-      // المبلغ المدخل هو قبل الضريبة، نضيف الضريبة للإجمالي
       const taxAmount = amountBeforeTax * 0.15;
-      const total = amountBeforeTax + taxAmount;
+      total = Math.round((amountBeforeTax + taxAmount) * 100) / 100;
       setFormData(prev => ({
         ...prev,
         amount_before_tax: Math.round(amountBeforeTax * 100) / 100,
         tax_amount: Math.round(taxAmount * 100) / 100,
-        amount: Math.round(total * 100) / 100
+        amount: total,
+        installment_amount: prev.payment_type === 'دفعات' && (prev.installments_count || 1) > 0 
+          ? Math.round((total / (prev.installments_count || 1)) * 100) / 100 : 0
       }));
     } else {
-      // بدون ضريبة، الإجمالي = المبلغ قبل الضريبة
+      total = amountBeforeTax;
       setFormData(prev => ({
         ...prev,
         amount_before_tax: amountBeforeTax,
         tax_amount: 0,
-        amount: amountBeforeTax
+        amount: amountBeforeTax,
+        installment_amount: prev.payment_type === 'دفعات' && (prev.installments_count || 1) > 0 
+          ? Math.round((amountBeforeTax / (prev.installments_count || 1)) * 100) / 100 : 0
       }));
     }
   }, [formData.previous_amount, formData.current_amount, formData.tax_included]);

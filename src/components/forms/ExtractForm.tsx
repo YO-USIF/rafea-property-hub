@@ -246,6 +246,12 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                   <SelectValue placeholder="اختر المقاول" />
                 </SelectTrigger>
                 <SelectContent>
+                  {/* Show current contractor name as option if not in the list */}
+                  {formData.contractor_name && !contractors.some((c: any) => c.name === formData.contractor_name) && (
+                    <SelectItem key="current" value={formData.contractor_name}>
+                      {formData.contractor_name}
+                    </SelectItem>
+                  )}
                   {contractors.map((contractor: any) => (
                     <SelectItem key={contractor.id} value={contractor.name}>
                       {contractor.name}

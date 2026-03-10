@@ -33,6 +33,9 @@ interface Extract {
   tax_amount?: number;
   amount_before_tax?: number;
   is_external_project?: boolean;
+  payment_type?: string;
+  installments_count?: number;
+  installment_amount?: number;
 }
 
 interface ExtractFormProps {

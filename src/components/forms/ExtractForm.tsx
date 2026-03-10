@@ -405,6 +405,64 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
               </p>
             </div>
 
+            {/* نظام الدفعات */}
+            <div className="space-y-2 md:col-span-2">
+              <Label>نوع الدفع</Label>
+              <Select
+                value={formData.payment_type || 'كامل'}
+                onValueChange={(value) => {
+                  const count = value === 'كامل' ? 1 : (formData.installments_count || 2);
+                  const installmentAmt = value === 'دفعات' && formData.amount > 0 ? Math.round((formData.amount / count) * 100) / 100 : 0;
+                  setFormData(prev => ({ 
+                    ...prev, 
+                    payment_type: value,
+                    installments_count: count,
+                    installment_amount: installmentAmt
+                  }));
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="كامل">دفعة كاملة</SelectItem>
+                  <SelectItem value="دفعات">دفعات متعددة</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {formData.payment_type === 'دفعات' && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="installments_count">عدد الدفعات</Label>
+                  <Input
+                    id="installments_count"
+                    type="number"
+                    min="2"
+                    max="24"
+                    value={formData.installments_count}
+                    onChange={(e) => {
+                      const count = parseInt(e.target.value) || 2;
+                      const installmentAmt = formData.amount > 0 ? Math.round((formData.amount / count) * 100) / 100 : 0;
+                      setFormData(prev => ({ ...prev, installments_count: count, installment_amount: installmentAmt }));
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>قيمة كل دفعة</Label>
+                  <Input
+                    type="number"
+                    value={formData.installment_amount}
+                    disabled
+                    className="bg-muted/50 font-semibold"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    يحسب تلقائياً: إجمالي المبلغ ÷ عدد الدفعات
+                  </p>
+                </div>
+              </>
+            )}
+
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="status">الحالة</Label>
               <Select

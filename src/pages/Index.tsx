@@ -134,8 +134,8 @@ const Index = () => {
       />
       <Header sidebarCollapsed={sidebarCollapsed} setActiveTab={setActiveTab} />
       
-      <main className="transition-all duration-300 pt-16 pr-64 pl-6 pb-6">
-        <div className="max-w-7xl mx-auto py-6">
+      <main className="transition-all duration-300 pt-16 pr-64 pl-6 pb-6 overflow-x-auto">
+        <div className="min-w-0 py-6">
           {renderContent()}
         </div>
       </main>

@@ -213,9 +213,9 @@ const ExtractsPage = () => {
             عرض جميع المستخصات ({filteredExtracts.length})
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
+        <CardContent className="p-0 md:p-6">
+          <div className="overflow-x-auto w-full">
+            <Table className="min-w-[1200px]">
               <TableHeader>
                 <TableRow>
                   <TableHead>رقم المستخص</TableHead>

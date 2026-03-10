@@ -69,7 +69,10 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
     tax_included: extract?.tax_included || false,
     tax_amount: extract?.tax_amount || 0,
     amount_before_tax: extract?.amount_before_tax || 0,
-    is_external_project: extract?.is_external_project || false
+    is_external_project: extract?.is_external_project || false,
+    payment_type: extract?.payment_type || 'كامل',
+    installments_count: extract?.installments_count || 1,
+    installment_amount: extract?.installment_amount || 0,
   });
 
   // تحديث البيانات عند تغيير العنصر المرسل للتعديل

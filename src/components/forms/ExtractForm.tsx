@@ -175,6 +175,9 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         previous_amount: formData.previous_amount !== undefined ? Number(formData.previous_amount) : 0,
         attached_file_url: formData.attached_file_url || '',
         attached_file_name: formData.attached_file_name || '',
+        payment_type: formData.payment_type || 'كامل',
+        installments_count: formData.payment_type === 'دفعات' ? Number(formData.installments_count || 2) : 1,
+        installment_amount: formData.payment_type === 'دفعات' ? Number(formData.installment_amount || 0) : 0,
       };
 
       // التحقق من صحة البيانات باستخدام Zod

@@ -33,6 +33,9 @@ interface Extract {
   tax_amount?: number;
   amount_before_tax?: number;
   is_external_project?: boolean;
+  payment_type?: string;
+  installments_count?: number;
+  installment_amount?: number;
 }
 
 interface ExtractFormProps {
@@ -66,7 +69,10 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
     tax_included: extract?.tax_included || false,
     tax_amount: extract?.tax_amount || 0,
     amount_before_tax: extract?.amount_before_tax || 0,
-    is_external_project: extract?.is_external_project || false
+    is_external_project: extract?.is_external_project || false,
+    payment_type: extract?.payment_type || 'كامل',
+    installments_count: extract?.installments_count || 1,
+    installment_amount: extract?.installment_amount || 0,
   });
 
   // تحديث البيانات عند تغيير العنصر المرسل للتعديل
@@ -90,7 +96,10 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         tax_included: extract.tax_included || false,
         tax_amount: extract.tax_amount || 0,
         amount_before_tax: extract.amount_before_tax || 0,
-        is_external_project: isExternal && extract.project_name ? true : false
+        is_external_project: isExternal && extract.project_name ? true : false,
+        payment_type: extract.payment_type || 'كامل',
+        installments_count: extract.installments_count || 1,
+        installment_amount: extract.installment_amount || 0,
       });
     } else {
       setFormData({
@@ -110,7 +119,10 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         tax_included: false,
         tax_amount: 0,
         amount_before_tax: 0,
-        is_external_project: false
+        is_external_project: false,
+        payment_type: 'كامل',
+        installments_count: 1,
+        installment_amount: 0,
       });
     }
   }, [extract]);
@@ -120,23 +132,27 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
   useEffect(() => {
     const amountBeforeTax = (formData.previous_amount || 0) + (formData.current_amount || 0);
     
+    let total: number;
     if (formData.tax_included && amountBeforeTax > 0) {
-      // المبلغ المدخل هو قبل الضريبة، نضيف الضريبة للإجمالي
       const taxAmount = amountBeforeTax * 0.15;
-      const total = amountBeforeTax + taxAmount;
+      total = Math.round((amountBeforeTax + taxAmount) * 100) / 100;
       setFormData(prev => ({
         ...prev,
         amount_before_tax: Math.round(amountBeforeTax * 100) / 100,
         tax_amount: Math.round(taxAmount * 100) / 100,
-        amount: Math.round(total * 100) / 100
+        amount: total,
+        installment_amount: prev.payment_type === 'دفعات' && (prev.installments_count || 1) > 0 
+          ? Math.round((total / (prev.installments_count || 1)) * 100) / 100 : 0
       }));
     } else {
-      // بدون ضريبة، الإجمالي = المبلغ قبل الضريبة
+      total = amountBeforeTax;
       setFormData(prev => ({
         ...prev,
         amount_before_tax: amountBeforeTax,
         tax_amount: 0,
-        amount: amountBeforeTax
+        amount: amountBeforeTax,
+        installment_amount: prev.payment_type === 'دفعات' && (prev.installments_count || 1) > 0 
+          ? Math.round((amountBeforeTax / (prev.installments_count || 1)) * 100) / 100 : 0
       }));
     }
   }, [formData.previous_amount, formData.current_amount, formData.tax_included]);
@@ -163,6 +179,9 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         previous_amount: formData.previous_amount !== undefined ? Number(formData.previous_amount) : 0,
         attached_file_url: formData.attached_file_url || '',
         attached_file_name: formData.attached_file_name || '',
+        payment_type: formData.payment_type || 'كامل',
+        installments_count: formData.payment_type === 'دفعات' ? Number(formData.installments_count || 2) : 1,
+        installment_amount: formData.payment_type === 'دفعات' ? Number(formData.installment_amount || 0) : 0,
       };
 
       // التحقق من صحة البيانات باستخدام Zod
@@ -234,6 +253,12 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                   <SelectValue placeholder="اختر المقاول" />
                 </SelectTrigger>
                 <SelectContent>
+                  {/* Show current contractor name as option if not in the list */}
+                  {formData.contractor_name && !contractors.some((c: any) => c.name === formData.contractor_name) && (
+                    <SelectItem key="current" value={formData.contractor_name}>
+                      {formData.contractor_name}
+                    </SelectItem>
+                  )}
                   {contractors.map((contractor: any) => (
                     <SelectItem key={contractor.id} value={contractor.name}>
                       {contractor.name}
@@ -386,6 +411,64 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                   : 'يحسب تلقائياً: المبلغ المدفوع سابقاً + قيمة المستخلص الحالي'}
               </p>
             </div>
+
+            {/* نظام الدفعات */}
+            <div className="space-y-2 md:col-span-2">
+              <Label>نوع الدفع</Label>
+              <Select
+                value={formData.payment_type || 'كامل'}
+                onValueChange={(value) => {
+                  const count = value === 'كامل' ? 1 : (formData.installments_count || 2);
+                  const installmentAmt = value === 'دفعات' && formData.amount > 0 ? Math.round((formData.amount / count) * 100) / 100 : 0;
+                  setFormData(prev => ({ 
+                    ...prev, 
+                    payment_type: value,
+                    installments_count: count,
+                    installment_amount: installmentAmt
+                  }));
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="كامل">دفعة كاملة</SelectItem>
+                  <SelectItem value="دفعات">دفعات متعددة</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {formData.payment_type === 'دفعات' && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="installments_count">عدد الدفعات</Label>
+                  <Input
+                    id="installments_count"
+                    type="number"
+                    min="2"
+                    max="24"
+                    value={formData.installments_count}
+                    onChange={(e) => {
+                      const count = parseInt(e.target.value) || 2;
+                      const installmentAmt = formData.amount > 0 ? Math.round((formData.amount / count) * 100) / 100 : 0;
+                      setFormData(prev => ({ ...prev, installments_count: count, installment_amount: installmentAmt }));
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>قيمة كل دفعة</Label>
+                  <Input
+                    type="number"
+                    value={formData.installment_amount}
+                    disabled
+                    className="bg-muted/50 font-semibold"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    يحسب تلقائياً: إجمالي المبلغ ÷ عدد الدفعات
+                  </p>
+                </div>
+              </>
+            )}
 
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="status">الحالة</Label>

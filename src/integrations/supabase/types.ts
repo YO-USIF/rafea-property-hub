@@ -327,6 +327,9 @@ export type Database = {
           extract_date: string
           extract_number: string
           id: string
+          installment_amount: number | null
+          installments_count: number | null
+          payment_type: string | null
           percentage_completed: number | null
           previous_amount: number | null
           project_id: string | null
@@ -349,6 +352,9 @@ export type Database = {
           extract_date?: string
           extract_number: string
           id?: string
+          installment_amount?: number | null
+          installments_count?: number | null
+          payment_type?: string | null
           percentage_completed?: number | null
           previous_amount?: number | null
           project_id?: string | null
@@ -371,6 +377,9 @@ export type Database = {
           extract_date?: string
           extract_number?: string
           id?: string
+          installment_amount?: number | null
+          installments_count?: number | null
+          payment_type?: string | null
           percentage_completed?: number | null
           previous_amount?: number | null
           project_id?: string | null

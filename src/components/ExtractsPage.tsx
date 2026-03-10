@@ -227,6 +227,7 @@ const ExtractsPage = () => {
                   <TableHead>المبلغ المدفوع سابقاً</TableHead>
                   <TableHead>قيمة المستخلص الحالي</TableHead>
                   <TableHead>إجمالي المبلغ</TableHead>
+                  <TableHead>نوع الدفع</TableHead>
                   <TableHead>الحالة</TableHead>
                   <TableHead>الملف المرفق</TableHead>
                   <TableHead>الإجراءات</TableHead>
@@ -244,6 +245,13 @@ const ExtractsPage = () => {
                     <TableCell className="font-semibold text-gray-600">{formatCurrency(extract.previous_amount || 0)}</TableCell>
                     <TableCell className="font-semibold text-blue-600">{formatCurrency(extract.current_amount || 0)}</TableCell>
                     <TableCell className="font-bold text-green-600">{formatCurrency(extract.amount)}</TableCell>
+                    <TableCell>
+                      {extract.payment_type === 'دفعات' ? (
+                        <Badge variant="outline">{extract.installments_count} دفعات - {formatCurrency(extract.installment_amount || 0)}/دفعة</Badge>
+                      ) : (
+                        <Badge variant="secondary">كامل</Badge>
+                      )}
+                    </TableCell>
                     <TableCell>{getStatusBadge(extract.status)}</TableCell>
                     <TableCell>
                       {extract.attached_file_url && (

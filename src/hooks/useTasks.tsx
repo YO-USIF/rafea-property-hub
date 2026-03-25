@@ -3,7 +3,32 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useUserRole } from './useUserRole';
 import { useToast } from './use-toast';
-import { useNotifications } from './useNotifications';
+
+// Helper to find user_id by full_name from profiles
+const findUserIdByName = async (assignedToName: string): Promise<string | null> => {
+  const { data } = await supabase
+    .from('profiles')
+    .select('user_id')
+    .eq('full_name', assignedToName)
+    .limit(1)
+    .maybeSingle();
+  return data?.user_id || null;
+};
+
+// Send notification directly to a user
+const sendTaskNotification = async (
+  targetUserId: string,
+  title: string,
+  message: string,
+  type: string = 'info'
+) => {
+  await supabase.from('notifications').insert({
+    user_id: targetUserId,
+    title,
+    message,
+    type,
+  });
+};
 
 export const useTasks = () => {
   const { user } = useAuth();
@@ -11,7 +36,6 @@ export const useTasks = () => {
   const isManagerOrAdmin = isManager || isAdmin;
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { createNotification } = useNotifications();
 
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ['tasks', isManagerOrAdmin],
@@ -44,12 +68,20 @@ export const useTasks = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: (newTask) => {
+    onSuccess: async (newTask) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({ title: "تم إضافة المهمة بنجاح" });
       
-      // إنشاء إشعار عند إضافة مهمة جديدة
-      createNotification.taskAssigned(newTask.title, newTask.assigned_to);
+      // إرسال إشعار مباشر للمستخدم المكلف بالمهمة
+      const assignedUserId = await findUserIdByName(newTask.assigned_to);
+      if (assignedUserId) {
+        await sendTaskNotification(
+          assignedUserId,
+          '📋 مهمة جديدة مسندة إليك',
+          `تم تكليفك بمهمة: "${newTask.title}"\nالأولوية: ${newTask.priority}\nتاريخ الاستحقاق: ${new Date(newTask.due_date).toLocaleDateString('ar-SA')}`,
+          newTask.priority === 'عالية' ? 'warning' : 'info'
+        );
+      }
     },
     onError: (error) => {
       toast({ title: "خطأ في إضافة المهمة", variant: "destructive" });
@@ -73,13 +105,40 @@ export const useTasks = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: (updatedTask) => {
+    onSuccess: async (updatedTask) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({ title: "تم تحديث المهمة بنجاح" });
       
-      // إنشاء إشعار عند اكتمال المهمة
-      if (updatedTask.status === 'مكتملة') {
-        createNotification.taskCompleted(updatedTask.title, updatedTask.assigned_to);
+      const assignedUserId = await findUserIdByName(updatedTask.assigned_to);
+      
+      if (assignedUserId) {
+        // إشعار عند اكتمال المهمة
+        if (updatedTask.status === 'مكتملة') {
+          await sendTaskNotification(
+            assignedUserId,
+            '✅ تم إنجاز المهمة',
+            `المهمة "${updatedTask.title}" تم تحديثها كمكتملة. أحسنت!`,
+            'success'
+          );
+        } 
+        // إشعار عند تغيير الحالة لقيد التنفيذ
+        else if (updatedTask.status === 'قيد التنفيذ') {
+          await sendTaskNotification(
+            assignedUserId,
+            '🔄 تحديث حالة المهمة',
+            `المهمة "${updatedTask.title}" أصبحت قيد التنفيذ.`,
+            'info'
+          );
+        }
+        // إشعار عند تأخر المهمة
+        else if (updatedTask.status === 'متأخرة') {
+          await sendTaskNotification(
+            assignedUserId,
+            '⚠️ مهمة متأخرة',
+            `المهمة "${updatedTask.title}" تم تحديثها كمتأخرة. يرجى المتابعة.`,
+            'warning'
+          );
+        }
       }
     },
     onError: (error) => {

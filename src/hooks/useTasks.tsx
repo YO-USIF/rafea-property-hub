@@ -3,7 +3,32 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useUserRole } from './useUserRole';
 import { useToast } from './use-toast';
-import { useNotifications } from './useNotifications';
+
+// Helper to find user_id by full_name from profiles
+const findUserIdByName = async (assignedToName: string): Promise<string | null> => {
+  const { data } = await supabase
+    .from('profiles')
+    .select('user_id')
+    .eq('full_name', assignedToName)
+    .limit(1)
+    .maybeSingle();
+  return data?.user_id || null;
+};
+
+// Send notification directly to a user
+const sendTaskNotification = async (
+  targetUserId: string,
+  title: string,
+  message: string,
+  type: string = 'info'
+) => {
+  await supabase.from('notifications').insert({
+    user_id: targetUserId,
+    title,
+    message,
+    type,
+  });
+};
 
 export const useTasks = () => {
   const { user } = useAuth();
@@ -11,7 +36,6 @@ export const useTasks = () => {
   const isManagerOrAdmin = isManager || isAdmin;
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { createNotification } = useNotifications();
 
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ['tasks', isManagerOrAdmin],

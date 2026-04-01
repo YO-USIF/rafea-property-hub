@@ -8,6 +8,7 @@ import {
   Plus, 
   Search, 
   Edit, 
+  Trash2,
   FileText, 
   Calculator,
   TrendingUp,

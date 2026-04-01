@@ -287,6 +287,17 @@ const ExtractsPage = () => {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
+                        {(isAdmin || isManager) && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDelete(extract.id)}
+                            title="حذف المستخلص"
+                            className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>

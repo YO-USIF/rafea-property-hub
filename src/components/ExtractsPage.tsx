@@ -33,7 +33,13 @@ const ExtractsPage = () => {
   
   const { user } = useAuth();
   const { userRole, isManager, isAdmin, isProjectManager, loading: roleLoading } = useUserRole();
-  const { extracts, isLoading } = useExtracts();
+  const { extracts, isLoading, deleteExtract } = useExtracts();
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('هل أنت متأكد من حذف هذا المستخلص؟')) {
+      deleteExtract.mutate(id);
+    }
+  };
 
   // تصفية المستخصات بناءً على البحث
   const filteredExtracts = extracts.filter(extract =>

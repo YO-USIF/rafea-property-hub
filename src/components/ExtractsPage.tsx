@@ -8,6 +8,7 @@ import {
   Plus, 
   Search, 
   Edit, 
+  Trash2,
   FileText, 
   Calculator,
   TrendingUp,
@@ -32,7 +33,13 @@ const ExtractsPage = () => {
   
   const { user } = useAuth();
   const { userRole, isManager, isAdmin, isProjectManager, loading: roleLoading } = useUserRole();
-  const { extracts, isLoading } = useExtracts();
+  const { extracts, isLoading, deleteExtract } = useExtracts();
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('هل أنت متأكد من حذف هذا المستخلص؟')) {
+      deleteExtract.mutate(id);
+    }
+  };
 
   // تصفية المستخصات بناءً على البحث
   const filteredExtracts = extracts.filter(extract =>
@@ -280,6 +287,17 @@ const ExtractsPage = () => {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
+                        {(isAdmin || isManager) && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDelete(extract.id)}
+                            title="حذف المستخلص"
+                            className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>

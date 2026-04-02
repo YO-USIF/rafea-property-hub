@@ -226,6 +226,7 @@ const AssignmentOrdersPage = () => {
                   <TableHead>المدة (أيام)</TableHead>
                   <TableHead>المبلغ</TableHead>
                   <TableHead>الحالة</TableHead>
+                  <TableHead>التعميد</TableHead>
                   <TableHead>الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>

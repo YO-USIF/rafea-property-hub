@@ -16,8 +16,11 @@ import {
   Filter,
   Calendar,
   Printer,
-  Trash2
+  Trash2,
+  CheckCircle2,
+  ShieldCheck
 } from 'lucide-react';
+import { useUserRole } from '@/hooks/useUserRole';
 import { useAssignmentOrders } from '@/hooks/useAssignmentOrders';
 import { useAuth } from '@/hooks/useAuth';
 import AssignmentOrderForm from '@/components/forms/AssignmentOrderForm';
@@ -41,7 +44,8 @@ const AssignmentOrdersPage = () => {
   const [deletingOrder, setDeletingOrder] = useState<any>(null);
   
   const { user } = useAuth();
-  const { assignmentOrders, isLoading, deleteAssignmentOrder } = useAssignmentOrders();
+  const { isAdmin } = useUserRole();
+  const { assignmentOrders, isLoading, deleteAssignmentOrder, approveAssignmentOrder } = useAssignmentOrders();
 
   const filteredOrders = assignmentOrders.filter(order =>
     order.order_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -222,6 +226,7 @@ const AssignmentOrdersPage = () => {
                   <TableHead>المدة (أيام)</TableHead>
                   <TableHead>المبلغ</TableHead>
                   <TableHead>الحالة</TableHead>
+                  <TableHead>التعميد</TableHead>
                   <TableHead>الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
@@ -243,6 +248,29 @@ const AssignmentOrdersPage = () => {
                       {formatCurrency(order.amount)}
                     </TableCell>
                     <TableCell>{getStatusBadge(order.status)}</TableCell>
+                    <TableCell>
+                      {order.approved ? (
+                        <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                          <CheckCircle2 className="w-3 h-3 ml-1" />
+                          معتمد
+                        </Badge>
+                      ) : isAdmin ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-amber-600 border-amber-300 hover:bg-amber-50"
+                          onClick={() => approveAssignmentOrder.mutateAsync(order.id)}
+                          title="تعميد أمر التكليف"
+                        >
+                          <ShieldCheck className="w-4 h-4 ml-1" />
+                          تعميد
+                        </Button>
+                      ) : (
+                        <Badge variant="secondary">
+                          بانتظار التعميد
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
                         <Button

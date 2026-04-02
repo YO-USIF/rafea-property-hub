@@ -118,6 +118,32 @@ export const useAssignmentOrders = () => {
     },
   });
 
+  const approveAssignmentOrder = useMutation({
+    mutationFn: async (id: string) => {
+      const { data, error } = await supabase
+        .from('assignment_orders')
+        .update({ 
+          approved: true, 
+          approved_by: user?.id,
+          approved_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['assignment_orders'], refetchType: 'all' });
+      toast({ title: "تم تعميد أمر التكليف بنجاح" });
+    },
+    onError: (error) => {
+      console.error('Error approving assignment order:', error);
+      toast({ title: "خطأ في تعميد أمر التكليف", variant: "destructive" });
+    },
+  });
+
   const deleteAssignmentOrder = useMutation({
     mutationFn: async (id: string) => {
       let query = supabase.from('assignment_orders').delete().eq('id', id);
@@ -147,6 +173,7 @@ export const useAssignmentOrders = () => {
     createAssignmentOrder,
     updateAssignmentOrder,
     deleteAssignmentOrder,
+    approveAssignmentOrder,
     approverName: approverName || 'مدير النظام',
   };
 };

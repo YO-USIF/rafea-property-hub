@@ -132,6 +132,31 @@ export const useAssignmentOrders = () => {
         .single();
       
       if (error) throw error;
+
+      // إرسال إشعار لجميع المستخدمين
+      try {
+        const { data: allProfiles } = await supabase
+          .from('profiles')
+          .select('user_id');
+        
+        if (allProfiles) {
+          const notifications = allProfiles
+            .filter(p => p.user_id !== user?.id)
+            .map(p => ({
+              user_id: p.user_id,
+              title: '✅ تم تعميد أمر تكليف',
+              message: `تم تعميد أمر التكليف رقم ${data.order_number} - المقاول: ${data.contractor_name} - المشروع: ${data.project_name}`,
+              type: 'info'
+            }));
+          
+          if (notifications.length > 0) {
+            await supabase.from('notifications').insert(notifications);
+          }
+        }
+      } catch (notifError) {
+        console.warn('Could not send approval notifications:', notifError);
+      }
+
       return data;
     },
     onSuccess: () => {
@@ -141,6 +166,32 @@ export const useAssignmentOrders = () => {
     onError: (error) => {
       console.error('Error approving assignment order:', error);
       toast({ title: "خطأ في تعميد أمر التكليف", variant: "destructive" });
+    },
+  });
+
+  const revokeApprovalAssignmentOrder = useMutation({
+    mutationFn: async (id: string) => {
+      const { data, error } = await supabase
+        .from('assignment_orders')
+        .update({ 
+          approved: false, 
+          approved_by: null,
+          approved_at: null
+        })
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['assignment_orders'], refetchType: 'all' });
+      toast({ title: "تم إلغاء تعميد أمر التكليف" });
+    },
+    onError: (error) => {
+      console.error('Error revoking approval:', error);
+      toast({ title: "خطأ في إلغاء التعميد", variant: "destructive" });
     },
   });
 

@@ -16,8 +16,11 @@ import {
   Filter,
   Calendar,
   Printer,
-  Trash2
+  Trash2,
+  CheckCircle2,
+  ShieldCheck
 } from 'lucide-react';
+import { useUserRole } from '@/hooks/useUserRole';
 import { useAssignmentOrders } from '@/hooks/useAssignmentOrders';
 import { useAuth } from '@/hooks/useAuth';
 import AssignmentOrderForm from '@/components/forms/AssignmentOrderForm';

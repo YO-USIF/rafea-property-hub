@@ -35,7 +35,7 @@ const ExtractsPage = () => {
   
   const { user } = useAuth();
   const { userRole, isManager, isAdmin, isProjectManager, loading: roleLoading } = useUserRole();
-  const { extracts, isLoading, deleteExtract } = useExtracts();
+  const { extracts, isLoading, deleteExtract, approveExtract, revokeApprovalExtract } = useExtracts();
 
   const handleDelete = (id: string) => {
     if (window.confirm('هل أنت متأكد من حذف هذا المستخلص؟')) {

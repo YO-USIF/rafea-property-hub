@@ -238,6 +238,7 @@ const ExtractsPage = () => {
                   <TableHead>إجمالي المبلغ</TableHead>
                   <TableHead>نوع الدفع</TableHead>
                   <TableHead>الحالة</TableHead>
+                  <TableHead>التعميد</TableHead>
                   <TableHead>الملف المرفق</TableHead>
                   <TableHead>الإجراءات</TableHead>
                 </TableRow>

@@ -45,7 +45,7 @@ const AssignmentOrdersPage = () => {
   
   const { user } = useAuth();
   const { isAdmin } = useUserRole();
-  const { assignmentOrders, isLoading, deleteAssignmentOrder, approveAssignmentOrder } = useAssignmentOrders();
+  const { assignmentOrders, isLoading, deleteAssignmentOrder, approveAssignmentOrder, revokeApprovalAssignmentOrder } = useAssignmentOrders();
 
   const filteredOrders = assignmentOrders.filter(order =>
     order.order_number.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -45,7 +45,7 @@ const AssignmentOrdersPage = () => {
   
   const { user } = useAuth();
   const { isAdmin } = useUserRole();
-  const { assignmentOrders, isLoading, deleteAssignmentOrder, approveAssignmentOrder } = useAssignmentOrders();
+  const { assignmentOrders, isLoading, deleteAssignmentOrder, approveAssignmentOrder, revokeApprovalAssignmentOrder } = useAssignmentOrders();
 
   const filteredOrders = assignmentOrders.filter(order =>
     order.order_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -250,10 +250,23 @@ const AssignmentOrdersPage = () => {
                     <TableCell>{getStatusBadge(order.status)}</TableCell>
                     <TableCell>
                       {order.approved ? (
-                        <Badge variant="default" className="bg-green-600 hover:bg-green-700">
-                          <CheckCircle2 className="w-3 h-3 ml-1" />
-                          معتمد
-                        </Badge>
+                        <div className="flex flex-col items-center gap-1">
+                          <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                            <CheckCircle2 className="w-3 h-3 ml-1" />
+                            معتمد
+                          </Badge>
+                          {isAdmin && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-xs text-red-500 hover:text-red-700 h-6 px-2"
+                              onClick={() => revokeApprovalAssignmentOrder.mutateAsync(order.id)}
+                              title="إلغاء التعميد"
+                            >
+                              إلغاء التعميد
+                            </Button>
+                          )}
+                        </div>
                       ) : isAdmin ? (
                         <Button
                           variant="outline"

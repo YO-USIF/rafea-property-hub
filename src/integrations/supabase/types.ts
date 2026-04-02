@@ -327,6 +327,9 @@ export type Database = {
         Row: {
           amount: number
           amount_before_tax: number | null
+          approved: boolean
+          approved_at: string | null
+          approved_by: string | null
           attached_file_name: string | null
           attached_file_url: string | null
           contractor_name: string
@@ -352,6 +355,9 @@ export type Database = {
         Insert: {
           amount?: number
           amount_before_tax?: number | null
+          approved?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
           attached_file_name?: string | null
           attached_file_url?: string | null
           contractor_name: string
@@ -377,6 +383,9 @@ export type Database = {
         Update: {
           amount?: number
           amount_before_tax?: number | null
+          approved?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
           attached_file_name?: string | null
           attached_file_url?: string | null
           contractor_name?: string

@@ -225,6 +225,7 @@ export const useAssignmentOrders = () => {
     updateAssignmentOrder,
     deleteAssignmentOrder,
     approveAssignmentOrder,
+    revokeApprovalAssignmentOrder,
     approverName: approverName || 'مدير النظام',
   };
 };

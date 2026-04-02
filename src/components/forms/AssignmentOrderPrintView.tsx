@@ -371,6 +371,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             </div>
             <div class="signature-box">
               <div class="signature-name">${escapeHtml(order.approver_name) || 'مدير النظام'}</div>
+              ${order.approved ? `
               <div style="height: 40px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
                 <svg viewBox="0 0 120 40" style="width: 100px; height: 35px;">
                   <path 
@@ -385,6 +386,14 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
                   </text>
                 </svg>
               </div>
+              <div style="text-align: center; font-size: 9px; color: #22c55e; margin-bottom: 4px;">
+                ✅ تم التعميد بتاريخ ${order.approved_at ? new Date(order.approved_at).toLocaleDateString('en-GB') : ''}
+              </div>
+              ` : `
+              <div style="height: 40px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
+                <span style="color: #ef4444; font-size: 12px; font-weight: bold;">لم يتم التعميد بعد</span>
+              </div>
+              `}
               <div class="signature-line" style="margin-top: 0;">
                 <div class="signature-title">المُعتمد</div>
                 <div class="signature-title-en">Approver</div>

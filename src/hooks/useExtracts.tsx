@@ -165,7 +165,6 @@ export const useExtracts = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      // إبطال جميع استعلامات المستخلصات لتحديث البيانات لجميع المستخدمين
       queryClient.invalidateQueries({ queryKey: ['extracts'], refetchType: 'all' });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast({ title: "تم حذف المستخص بنجاح" });
@@ -176,12 +175,93 @@ export const useExtracts = () => {
     },
   });
 
+  // تعميد مستخلص
+  const approveExtract = useMutation({
+    mutationFn: async (id: string) => {
+      const { data, error } = await supabase
+        .from('extracts')
+        .update({ 
+          approved: true, 
+          approved_by: user?.id,
+          approved_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+
+      // إرسال إشعار لجميع المستخدمين
+      try {
+        const { data: allProfiles } = await supabase
+          .from('profiles')
+          .select('user_id');
+        
+        if (allProfiles) {
+          const notifications = allProfiles
+            .filter(p => p.user_id !== user?.id)
+            .map(p => ({
+              user_id: p.user_id,
+              title: '✅ تم تعميد مستخلص',
+              message: `تم تعميد المستخلص رقم ${data.extract_number} - المقاول: ${data.contractor_name} - المشروع: ${data.project_name}`,
+              type: 'info'
+            }));
+          
+          if (notifications.length > 0) {
+            await supabase.from('notifications').insert(notifications);
+          }
+        }
+      } catch (notifError) {
+        console.warn('Could not send approval notifications:', notifError);
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['extracts'], refetchType: 'all' });
+      toast({ title: "تم تعميد المستخلص بنجاح" });
+    },
+    onError: (error) => {
+      console.error('Error approving extract:', error);
+      toast({ title: "خطأ في تعميد المستخلص", variant: "destructive" });
+    },
+  });
+
+  // إلغاء تعميد مستخلص
+  const revokeApprovalExtract = useMutation({
+    mutationFn: async (id: string) => {
+      const { data, error } = await supabase
+        .from('extracts')
+        .update({ 
+          approved: false, 
+          approved_by: null,
+          approved_at: null
+        })
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['extracts'], refetchType: 'all' });
+      toast({ title: "تم إلغاء تعميد المستخلص" });
+    },
+    onError: (error) => {
+      console.error('Error revoking extract approval:', error);
+      toast({ title: "خطأ في إلغاء التعميد", variant: "destructive" });
+    },
+  });
+
   return {
     extracts,
     isLoading,
     createExtract,
     updateExtract,
     deleteExtract,
+    approveExtract,
+    revokeApprovalExtract,
     approverName: approverName || 'مدير النظام',
   };
 };

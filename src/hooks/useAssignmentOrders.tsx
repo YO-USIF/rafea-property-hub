@@ -173,6 +173,7 @@ export const useAssignmentOrders = () => {
     createAssignmentOrder,
     updateAssignmentOrder,
     deleteAssignmentOrder,
+    approveAssignmentOrder,
     approverName: approverName || 'مدير النظام',
   };
 };

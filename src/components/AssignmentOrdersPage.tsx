@@ -249,6 +249,29 @@ const AssignmentOrdersPage = () => {
                     </TableCell>
                     <TableCell>{getStatusBadge(order.status)}</TableCell>
                     <TableCell>
+                      {order.approved ? (
+                        <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                          <CheckCircle2 className="w-3 h-3 ml-1" />
+                          معتمد
+                        </Badge>
+                      ) : isAdmin ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-amber-600 border-amber-300 hover:bg-amber-50"
+                          onClick={() => approveAssignmentOrder.mutateAsync(order.id)}
+                          title="تعميد أمر التكليف"
+                        >
+                          <ShieldCheck className="w-4 h-4 ml-1" />
+                          تعميد
+                        </Button>
+                      ) : (
+                        <Badge variant="secondary">
+                          بانتظار التعميد
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       <div className="flex gap-2">
                         <Button
                           variant="outline"

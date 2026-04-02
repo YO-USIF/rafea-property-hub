@@ -15,7 +15,9 @@ import {
   DollarSign,
   Download,
   Filter,
-  Printer
+  Printer,
+  CheckCircle2,
+  ShieldCheck
 } from 'lucide-react';
 import { useExtracts } from '@/hooks/useExtracts';
 import { useAuth } from '@/hooks/useAuth';

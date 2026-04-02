@@ -597,7 +597,22 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             </div>
             <div className="text-center">
               <p className="font-bold text-primary mb-2">{order.approver_name || 'مدير النظام'}</p>
-              <div className="border-t-2 border-gray-400 pt-2 mt-12">
+              {order.approved ? (
+                <>
+                  <div className="flex items-center justify-center h-12 mb-2">
+                    <svg viewBox="0 0 120 40" className="w-24 h-10">
+                      <path d="M10 30 Q20 10, 40 20 T70 15 Q90 10, 110 25" fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round" />
+                      <text x="35" y="28" fontFamily="cursive" fontSize="14" fill="#3b82f6" fontStyle="italic">Yousi</text>
+                    </svg>
+                  </div>
+                  <p className="text-xs text-green-600 mb-1">✅ تم التعميد {order.approved_at ? new Date(order.approved_at).toLocaleDateString('en-GB') : ''}</p>
+                </>
+              ) : (
+                <div className="flex items-center justify-center h-12 mb-2">
+                  <span className="text-sm text-red-500 font-bold">لم يتم التعميد بعد</span>
+                </div>
+              )}
+              <div className="border-t-2 border-gray-400 pt-2">
                 <p className="font-semibold text-gray-700">المُعتمد</p>
                 <p className="text-sm text-gray-500">Approver</p>
               </div>

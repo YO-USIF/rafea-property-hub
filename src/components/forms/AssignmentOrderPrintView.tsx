@@ -372,18 +372,18 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             <div class="signature-box">
               <div class="signature-name">${escapeHtml(order.approver_name) || 'م. يوسف صلاح يوسف'}</div>
               ${order.approved ? `
-              <div style="height: 40px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
-                <svg viewBox="0 0 120 40" style="width: 100px; height: 35px;">
-                  <path 
-                    d="M10 30 Q20 10, 40 20 T70 15 Q90 10, 110 25" 
-                    fill="none" 
-                    stroke="#3b82f6" 
-                    stroke-width="1.5" 
-                    stroke-linecap="round"
-                  />
-                  <text x="20" y="28" font-family="cursive" font-size="12" fill="#3b82f6" font-style="italic">
-                    يوسف صلاح
-                  </text>
+              <div style="height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
+                <svg viewBox="0 0 180 55" style="width: 140px; height: 45px;">
+                  <defs>
+                    <linearGradient id="sigGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" style="stop-color:#1e40af;stop-opacity:0.9"/>
+                      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.8"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M15 40 C25 15, 35 10, 50 22 S70 35, 85 18 S105 8, 125 20 S145 32, 165 15" fill="none" stroke="url(#sigGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M30 38 Q45 42, 60 36 Q75 30, 90 35" fill="none" stroke="url(#sigGrad)" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+                  <text x="90" y="35" font-family="'Traditional Arabic', 'Sakkal Majalla', 'Arial'" font-size="18" fill="#1e3a5f" text-anchor="middle" font-weight="bold" direction="rtl">يوسف صلاح</text>
+                  <line x1="25" y1="48" x2="155" y2="48" stroke="#1e40af" stroke-width="0.5" opacity="0.3"/>
                 </svg>
               </div>
               <div style="text-align: center; font-size: 9px; color: #22c55e; margin-bottom: 4px;">
@@ -599,10 +599,18 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
               <p className="font-bold text-primary mb-2">{order.approver_name || 'م. يوسف صلاح يوسف'}</p>
               {order.approved ? (
                 <>
-                  <div className="flex items-center justify-center h-12 mb-2">
-                    <svg viewBox="0 0 120 40" className="w-24 h-10">
-                      <path d="M10 30 Q20 10, 40 20 T70 15 Q90 10, 110 25" fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round" />
-                      <text x="20" y="28" fontFamily="cursive" fontSize="12" fill="#3b82f6" fontStyle="italic">يوسف صلاح</text>
+                  <div className="flex items-center justify-center h-14 mb-2">
+                    <svg viewBox="0 0 180 55" className="w-36 h-12">
+                      <defs>
+                        <linearGradient id="sigGradPreview" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#1e40af" stopOpacity="0.9"/>
+                          <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.8"/>
+                        </linearGradient>
+                      </defs>
+                      <path d="M15 40 C25 15, 35 10, 50 22 S70 35, 85 18 S105 8, 125 20 S145 32, 165 15" fill="none" stroke="url(#sigGradPreview)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M30 38 Q45 42, 60 36 Q75 30, 90 35" fill="none" stroke="url(#sigGradPreview)" strokeWidth="1" strokeLinecap="round" opacity="0.5"/>
+                      <text x="90" y="35" fontFamily="'Traditional Arabic', 'Sakkal Majalla', 'Arial'" fontSize="18" fill="#1e3a5f" textAnchor="middle" fontWeight="bold" direction="rtl">يوسف صلاح</text>
+                      <line x1="25" y1="48" x2="155" y2="48" stroke="#1e40af" strokeWidth="0.5" opacity="0.3"/>
                     </svg>
                   </div>
                   <p className="text-xs text-green-600 mb-1">✅ تم التعميد {order.approved_at ? new Date(order.approved_at).toLocaleDateString('en-GB') : ''}</p>

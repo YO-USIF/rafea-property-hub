@@ -256,7 +256,7 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
               <p className="text-[10px] text-foreground/60 mt-0.5">التوقيع</p>
             </div>
             <div className="text-center p-2 bg-muted/30 rounded border border-muted-foreground/20">
-              <p className="font-bold text-xs text-primary mb-1">{extract.approver_name || 'مدير النظام'}</p>
+              <p className="font-bold text-xs text-primary mb-1">{extract.approver_name || 'م. يوسف صلاح يوسف'}</p>
               {extract.approved ? (
                 <>
                   <div className="h-12 flex items-center justify-center mb-1.5 relative">
@@ -270,7 +270,7 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
                           strokeLinecap="round"
                         />
                         <text x="35" y="28" fontFamily="cursive" fontSize="14" fill="hsl(var(--primary))" fontStyle="italic">
-                          Yousi
+                          يوسف صلاح
                         </text>
                       </svg>
                     </div>

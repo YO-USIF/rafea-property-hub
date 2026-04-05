@@ -381,8 +381,8 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
                     stroke-width="1.5" 
                     stroke-linecap="round"
                   />
-                  <text x="35" y="28" font-family="cursive" font-size="14" fill="#3b82f6" font-style="italic">
-                    Yousi
+                  <text x="20" y="28" font-family="cursive" font-size="12" fill="#3b82f6" font-style="italic">
+                    يوسف صلاح
                   </text>
                 </svg>
               </div>

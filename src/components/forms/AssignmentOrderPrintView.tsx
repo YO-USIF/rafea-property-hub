@@ -370,7 +370,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
               </div>
             </div>
             <div class="signature-box">
-              <div class="signature-name">${escapeHtml(order.approver_name) || 'مدير النظام'}</div>
+              <div class="signature-name">${escapeHtml(order.approver_name) || 'م. يوسف صلاح يوسف'}</div>
               ${order.approved ? `
               <div style="height: 40px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
                 <svg viewBox="0 0 120 40" style="width: 100px; height: 35px;">
@@ -381,8 +381,8 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
                     stroke-width="1.5" 
                     stroke-linecap="round"
                   />
-                  <text x="35" y="28" font-family="cursive" font-size="14" fill="#3b82f6" font-style="italic">
-                    Yousi
+                  <text x="20" y="28" font-family="cursive" font-size="12" fill="#3b82f6" font-style="italic">
+                    يوسف صلاح
                   </text>
                 </svg>
               </div>
@@ -596,13 +596,13 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
               </div>
             </div>
             <div className="text-center">
-              <p className="font-bold text-primary mb-2">{order.approver_name || 'مدير النظام'}</p>
+              <p className="font-bold text-primary mb-2">{order.approver_name || 'م. يوسف صلاح يوسف'}</p>
               {order.approved ? (
                 <>
                   <div className="flex items-center justify-center h-12 mb-2">
                     <svg viewBox="0 0 120 40" className="w-24 h-10">
                       <path d="M10 30 Q20 10, 40 20 T70 15 Q90 10, 110 25" fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round" />
-                      <text x="35" y="28" fontFamily="cursive" fontSize="14" fill="#3b82f6" fontStyle="italic">Yousi</text>
+                      <text x="20" y="28" fontFamily="cursive" fontSize="12" fill="#3b82f6" fontStyle="italic">يوسف صلاح</text>
                     </svg>
                   </div>
                   <p className="text-xs text-green-600 mb-1">✅ تم التعميد {order.approved_at ? new Date(order.approved_at).toLocaleDateString('en-GB') : ''}</p>

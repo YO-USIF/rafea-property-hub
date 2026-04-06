@@ -273,20 +273,33 @@ const TasksPage = () => {
                         <span className="text-gray-400 text-sm">لا يوجد ملف</span>
                       )}
                     </TableCell>
-                    {isManagerOrAdmin && (
-                      <TableCell>
+                    <TableCell>
                         <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="outline"
+                            className="text-blue-600 border-blue-200 hover:bg-blue-50"
                             onClick={() => {
-                              setAttachingTask(task);
-                              setShowAttachForm(true);
+                              setProgressReportTask(task);
+                              setShowProgressReport(true);
                             }}
-                            title="إرفاق ملف"
+                            title="تقرير تحديث المهمة"
                           >
-                            <Paperclip className="w-4 h-4" />
+                            <FileText className="w-4 h-4" />
                           </Button>
+                          {isManagerOrAdmin && (
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => {
+                                setAttachingTask(task);
+                                setShowAttachForm(true);
+                              }}
+                              title="إرفاق ملف"
+                            >
+                              <Paperclip className="w-4 h-4" />
+                            </Button>
+                          )}
                           {isAdmin && (
                             <>
                               <Button 
@@ -310,7 +323,6 @@ const TasksPage = () => {
                           )}
                         </div>
                       </TableCell>
-                    )}
                   </TableRow>
                 ))}
               </TableBody>

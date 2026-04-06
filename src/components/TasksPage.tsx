@@ -416,7 +416,7 @@ const TasksPage = () => {
         />
       )}
 
-      {isManagerOrAdmin && attachingTask && (
+      {attachingTask && (
         <AttachFileForm
           open={showAttachForm}
           onOpenChange={(open) => {
@@ -433,6 +433,19 @@ const TasksPage = () => {
           }}
         />
       )}
+
+      <TaskProgressReportForm
+        open={showProgressReport}
+        onOpenChange={(open) => {
+          setShowProgressReport(open);
+          if (!open) setProgressReportTask(null);
+        }}
+        task={progressReportTask}
+        onSuccess={() => {
+          setShowProgressReport(false);
+          setProgressReportTask(null);
+        }}
+      />
     </div>
   );
 };

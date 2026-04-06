@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import TaskForm from '@/components/forms/TaskForm';
 import TaskReportForm from '@/components/forms/TaskReportForm';
+import TaskProgressReportForm from '@/components/forms/TaskProgressReportForm';
 import AttachFileForm from '@/components/forms/AttachFileForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

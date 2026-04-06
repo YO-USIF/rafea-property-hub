@@ -25,6 +25,8 @@ const TasksPage = () => {
   const [showReports, setShowReports] = useState(false);
   const [showAttachForm, setShowAttachForm] = useState(false);
   const [attachingTask, setAttachingTask] = useState<any>(null);
+  const [showProgressReport, setShowProgressReport] = useState(false);
+  const [progressReportTask, setProgressReportTask] = useState<any>(null);
   const { tasks, isLoading, deleteTask } = useTasks();
   const { isAdmin, isManager } = useUserRole();
   const { reports, deleteReport } = useTaskReports();

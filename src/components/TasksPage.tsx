@@ -225,8 +225,8 @@ const TasksPage = () => {
                   <TableHead className="text-right">الحالة</TableHead>
                   <TableHead className="text-right">نسبة الإنجاز</TableHead>
                   <TableHead className="text-right">تاريخ الاستحقاق</TableHead>
-                  <TableHead className="text-right">الملف المرفق</TableHead>
-                  {isManagerOrAdmin && <TableHead className="text-right">الإجراءات</TableHead>}
+                   <TableHead className="text-right">الملف المرفق</TableHead>
+                   <TableHead className="text-right">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

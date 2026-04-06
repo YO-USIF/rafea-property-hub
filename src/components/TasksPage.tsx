@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import TaskForm from '@/components/forms/TaskForm';
 import TaskReportForm from '@/components/forms/TaskReportForm';
+import TaskProgressReportForm from '@/components/forms/TaskProgressReportForm';
 import AttachFileForm from '@/components/forms/AttachFileForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,8 @@ const TasksPage = () => {
   const [showReports, setShowReports] = useState(false);
   const [showAttachForm, setShowAttachForm] = useState(false);
   const [attachingTask, setAttachingTask] = useState<any>(null);
+  const [showProgressReport, setShowProgressReport] = useState(false);
+  const [progressReportTask, setProgressReportTask] = useState<any>(null);
   const { tasks, isLoading, deleteTask } = useTasks();
   const { isAdmin, isManager } = useUserRole();
   const { reports, deleteReport } = useTaskReports();
@@ -222,8 +225,8 @@ const TasksPage = () => {
                   <TableHead className="text-right">الحالة</TableHead>
                   <TableHead className="text-right">نسبة الإنجاز</TableHead>
                   <TableHead className="text-right">تاريخ الاستحقاق</TableHead>
-                  <TableHead className="text-right">الملف المرفق</TableHead>
-                  {isManagerOrAdmin && <TableHead className="text-right">الإجراءات</TableHead>}
+                   <TableHead className="text-right">الملف المرفق</TableHead>
+                   <TableHead className="text-right">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -270,20 +273,33 @@ const TasksPage = () => {
                         <span className="text-gray-400 text-sm">لا يوجد ملف</span>
                       )}
                     </TableCell>
-                    {isManagerOrAdmin && (
-                      <TableCell>
+                    <TableCell>
                         <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="outline"
+                            className="text-blue-600 border-blue-200 hover:bg-blue-50"
                             onClick={() => {
-                              setAttachingTask(task);
-                              setShowAttachForm(true);
+                              setProgressReportTask(task);
+                              setShowProgressReport(true);
                             }}
-                            title="إرفاق ملف"
+                            title="تقرير تحديث المهمة"
                           >
-                            <Paperclip className="w-4 h-4" />
+                            <FileText className="w-4 h-4" />
                           </Button>
+                          {isManagerOrAdmin && (
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => {
+                                setAttachingTask(task);
+                                setShowAttachForm(true);
+                              }}
+                              title="إرفاق ملف"
+                            >
+                              <Paperclip className="w-4 h-4" />
+                            </Button>
+                          )}
                           {isAdmin && (
                             <>
                               <Button 
@@ -307,7 +323,6 @@ const TasksPage = () => {
                           )}
                         </div>
                       </TableCell>
-                    )}
                   </TableRow>
                 ))}
               </TableBody>
@@ -401,7 +416,7 @@ const TasksPage = () => {
         />
       )}
 
-      {isManagerOrAdmin && attachingTask && (
+      {attachingTask && (
         <AttachFileForm
           open={showAttachForm}
           onOpenChange={(open) => {
@@ -418,6 +433,19 @@ const TasksPage = () => {
           }}
         />
       )}
+
+      <TaskProgressReportForm
+        open={showProgressReport}
+        onOpenChange={(open) => {
+          setShowProgressReport(open);
+          if (!open) setProgressReportTask(null);
+        }}
+        task={progressReportTask}
+        onSuccess={() => {
+          setShowProgressReport(false);
+          setProgressReportTask(null);
+        }}
+      />
     </div>
   );
 };

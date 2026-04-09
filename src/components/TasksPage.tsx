@@ -437,6 +437,21 @@ const TasksPage = () => {
         />
       )}
 
+      {reportingTask && (
+        <TaskProgressReportForm
+          open={showProgressReport}
+          onOpenChange={(open) => {
+            setShowProgressReport(open);
+            if (!open) setReportingTask(null);
+          }}
+          task={reportingTask}
+          onSuccess={() => {
+            setShowProgressReport(false);
+            setReportingTask(null);
+          }}
+        />
+      )}
+
     </div>
   );
 };

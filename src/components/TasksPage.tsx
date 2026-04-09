@@ -278,6 +278,20 @@ const TasksPage = () => {
                     </TableCell>
                     <TableCell>
                         <div className="flex gap-2">
+                          {/* زر إضافة تقرير - متاح فقط للمستخدم المكلف بالمهمة */}
+                          {task.assigned_to === currentUserName && (
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => {
+                                setReportingTask(task);
+                                setShowProgressReport(true);
+                              }}
+                              title="إضافة تقرير"
+                            >
+                              <FileText className="w-4 h-4" />
+                            </Button>
+                          )}
                           {isManagerOrAdmin && (
                             <Button 
                               size="sm" 

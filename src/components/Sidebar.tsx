@@ -86,9 +86,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
     }
     if (isAdmin) return true;
     if (item.adminOnly) return false;
-    if (item.managerOnly) {
-      return isManager || canAccessPage(item.id);
-    }
     return canAccessPage(item.id);
   });
 

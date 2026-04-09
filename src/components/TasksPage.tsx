@@ -14,6 +14,7 @@ import { useTasks } from '@/hooks/useTasks';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useTaskReports } from '@/hooks/useTaskReports';
 import { useProfiles } from '@/hooks/useProfiles';
+import { useAuth } from '@/hooks/useAuth';
 
 
 const TasksPage = () => {

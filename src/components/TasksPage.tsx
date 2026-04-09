@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import TaskForm from '@/components/forms/TaskForm';
 import TaskReportForm from '@/components/forms/TaskReportForm';
+import TaskProgressReportForm from '@/components/forms/TaskProgressReportForm';
 import AttachFileForm from '@/components/forms/AttachFileForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { useTasks } from '@/hooks/useTasks';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useTaskReports } from '@/hooks/useTaskReports';
 import { useProfiles } from '@/hooks/useProfiles';
+import { useAuth } from '@/hooks/useAuth';
 
 
 const TasksPage = () => {
@@ -24,13 +26,19 @@ const TasksPage = () => {
   const [showReports, setShowReports] = useState(false);
   const [showAttachForm, setShowAttachForm] = useState(false);
   const [attachingTask, setAttachingTask] = useState<any>(null);
+  const [showProgressReport, setShowProgressReport] = useState(false);
+  const [reportingTask, setReportingTask] = useState<any>(null);
   const { tasks, isLoading, deleteTask } = useTasks();
   const { isAdmin, isManager } = useUserRole();
   const { reports, deleteReport } = useTaskReports();
   const { profiles } = useProfiles();
-  
+  const { user } = useAuth();
   
   const isManagerOrAdmin = isAdmin || isManager;
+
+  // Get current user's full_name from profiles to match against assigned_to
+  const currentUserProfile = profiles.find(p => p.user_id === user?.id);
+  const currentUserName = currentUserProfile?.full_name || '';
 
 
   if (isLoading) {
@@ -270,6 +278,20 @@ const TasksPage = () => {
                     </TableCell>
                     <TableCell>
                         <div className="flex gap-2">
+                          {/* زر إضافة تقرير - متاح فقط للمستخدم المكلف بالمهمة */}
+                          {task.assigned_to === currentUserName && (
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => {
+                                setReportingTask(task);
+                                setShowProgressReport(true);
+                              }}
+                              title="إضافة تقرير"
+                            >
+                              <FileText className="w-4 h-4" />
+                            </Button>
+                          )}
                           {isManagerOrAdmin && (
                             <Button 
                               size="sm" 
@@ -411,6 +433,21 @@ const TasksPage = () => {
           onSuccess={() => {
             setShowAttachForm(false);
             setAttachingTask(null);
+          }}
+        />
+      )}
+
+      {reportingTask && (
+        <TaskProgressReportForm
+          open={showProgressReport}
+          onOpenChange={(open) => {
+            setShowProgressReport(open);
+            if (!open) setReportingTask(null);
+          }}
+          task={reportingTask}
+          onSuccess={() => {
+            setShowProgressReport(false);
+            setReportingTask(null);
           }}
         />
       )}

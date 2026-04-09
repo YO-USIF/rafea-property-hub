@@ -32,9 +32,13 @@ const TasksPage = () => {
   const { isAdmin, isManager } = useUserRole();
   const { reports, deleteReport } = useTaskReports();
   const { profiles } = useProfiles();
-  
+  const { user } = useAuth();
   
   const isManagerOrAdmin = isAdmin || isManager;
+
+  // Get current user's full_name from profiles to match against assigned_to
+  const currentUserProfile = profiles.find(p => p.user_id === user?.id);
+  const currentUserName = currentUserProfile?.full_name || '';
 
 
   if (isLoading) {

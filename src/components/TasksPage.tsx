@@ -24,8 +24,6 @@ const TasksPage = () => {
   const [showReports, setShowReports] = useState(false);
   const [showAttachForm, setShowAttachForm] = useState(false);
   const [attachingTask, setAttachingTask] = useState<any>(null);
-  const [showProgressReport, setShowProgressReport] = useState(false);
-  const [progressReportTask, setProgressReportTask] = useState<any>(null);
   const { tasks, isLoading, deleteTask } = useTasks();
   const { isAdmin, isManager } = useUserRole();
   const { reports, deleteReport } = useTaskReports();
@@ -102,15 +100,13 @@ const TasksPage = () => {
               {showReports ? 'إخفاء التقارير' : 'عرض التقارير'}
             </Button>
           )}
-          {isManagerOrAdmin && (
-            <Button 
-              variant="outline"
-              onClick={() => setShowReportForm(true)}
-            >
-              <Plus className="w-4 h-4 ml-2" />
-              إضافة تقرير
-            </Button>
-          )}
+          <Button 
+            variant="outline"
+            onClick={() => setShowReportForm(true)}
+          >
+            <Plus className="w-4 h-4 ml-2" />
+            إضافة تقرير
+          </Button>
           {isManagerOrAdmin && (
             <Button 
               className="bg-primary hover:bg-primary/90"
@@ -274,18 +270,6 @@ const TasksPage = () => {
                     </TableCell>
                     <TableCell>
                         <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                            onClick={() => {
-                              setProgressReportTask(task);
-                              setShowProgressReport(true);
-                            }}
-                            title="تقرير تحديث المهمة"
-                          >
-                            <FileText className="w-4 h-4" />
-                          </Button>
                           {isManagerOrAdmin && (
                             <Button 
                               size="sm" 
@@ -400,20 +384,18 @@ const TasksPage = () => {
         />
       )}
 
-      {isManagerOrAdmin && (
-        <TaskReportForm
-          open={showReportForm}
-          onOpenChange={(open) => {
-            setShowReportForm(open);
-            if (!open) setEditingReport(null);
-          }}
-          report={editingReport}
-          onSuccess={() => {
-            setShowReportForm(false);
-            setEditingReport(null);
-          }}
-        />
-      )}
+      <TaskReportForm
+        open={showReportForm}
+        onOpenChange={(open) => {
+          setShowReportForm(open);
+          if (!open) setEditingReport(null);
+        }}
+        report={editingReport}
+        onSuccess={() => {
+          setShowReportForm(false);
+          setEditingReport(null);
+        }}
+      />
 
       {attachingTask && (
         <AttachFileForm
@@ -433,18 +415,6 @@ const TasksPage = () => {
         />
       )}
 
-      <TaskProgressReportForm
-        open={showProgressReport}
-        onOpenChange={(open) => {
-          setShowProgressReport(open);
-          if (!open) setProgressReportTask(null);
-        }}
-        task={progressReportTask}
-        onSuccess={() => {
-          setShowProgressReport(false);
-          setProgressReportTask(null);
-        }}
-      />
     </div>
   );
 };

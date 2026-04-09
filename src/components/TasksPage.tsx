@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import TaskForm from '@/components/forms/TaskForm';
 import TaskReportForm from '@/components/forms/TaskReportForm';
+import TaskProgressReportForm from '@/components/forms/TaskProgressReportForm';
 import AttachFileForm from '@/components/forms/AttachFileForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,8 @@ const TasksPage = () => {
   const [showReports, setShowReports] = useState(false);
   const [showAttachForm, setShowAttachForm] = useState(false);
   const [attachingTask, setAttachingTask] = useState<any>(null);
+  const [showProgressReport, setShowProgressReport] = useState(false);
+  const [reportingTask, setReportingTask] = useState<any>(null);
   const { tasks, isLoading, deleteTask } = useTasks();
   const { isAdmin, isManager } = useUserRole();
   const { reports, deleteReport } = useTaskReports();

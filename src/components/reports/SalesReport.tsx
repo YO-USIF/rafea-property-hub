@@ -79,7 +79,7 @@ const SalesReport: React.FC<SalesReportProps> = ({ data, period }) => {
         </Button>
       </div>
 
-      <div id="sales-report-content">
+      <div id="report-print-content">
         {/* الإحصائيات */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Card>

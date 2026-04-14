@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Badge } from '@/components/ui/badge';
 import { useTasks } from '@/hooks/useTasks';
 import { useTaskReports } from '@/hooks/useTaskReports';
+import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle2, Clock, AlertTriangle, Loader2 } from 'lucide-react';
 
@@ -68,6 +69,16 @@ const TaskProgressReportForm = ({ open, onOpenChange, task, onSuccess }: TaskPro
         title: `تقرير تحديث: ${task.title}`,
         content: `📋 المهمة: ${task.title}\n👤 المسؤول: ${task.assigned_to}\n📊 نسبة الإنجاز: ${progress}%\n📌 الحالة: ${status}\n\n📝 ملاحظات:\n${notes || 'لا توجد ملاحظات'}`,
       });
+
+      // إرسال إشعار لمنشئ المهمة (المدير) عند تحديث نسبة الإنجاز
+      if (task.user_id) {
+        await supabase.from('notifications').insert({
+          user_id: task.user_id,
+          title: '📊 تحديث نسبة إنجاز مهمة',
+          message: `قام ${task.assigned_to} بتحديث المهمة "${task.title}" - نسبة الإنجاز: ${progress}% - الحالة: ${status}`,
+          type: progress === 100 ? 'success' : 'info',
+        });
+      }
 
       onSuccess();
       onOpenChange(false);

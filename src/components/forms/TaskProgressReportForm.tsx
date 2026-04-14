@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Badge } from '@/components/ui/badge';
 import { useTasks } from '@/hooks/useTasks';
 import { useTaskReports } from '@/hooks/useTaskReports';
+import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle2, Clock, AlertTriangle, Loader2 } from 'lucide-react';
 

@@ -70,6 +70,16 @@ const TaskProgressReportForm = ({ open, onOpenChange, task, onSuccess }: TaskPro
         content: `📋 المهمة: ${task.title}\n👤 المسؤول: ${task.assigned_to}\n📊 نسبة الإنجاز: ${progress}%\n📌 الحالة: ${status}\n\n📝 ملاحظات:\n${notes || 'لا توجد ملاحظات'}`,
       });
 
+      // إرسال إشعار لمنشئ المهمة (المدير) عند تحديث نسبة الإنجاز
+      if (task.user_id) {
+        await supabase.from('notifications').insert({
+          user_id: task.user_id,
+          title: '📊 تحديث نسبة إنجاز مهمة',
+          message: `قام ${task.assigned_to} بتحديث المهمة "${task.title}" - نسبة الإنجاز: ${progress}% - الحالة: ${status}`,
+          type: progress === 100 ? 'success' : 'info',
+        });
+      }
+
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {

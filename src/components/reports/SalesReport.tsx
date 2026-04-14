@@ -73,7 +73,7 @@ const SalesReport: React.FC<SalesReportProps> = ({ data, period }) => {
           <FileSpreadsheet className="w-4 h-4 ml-1" />
           Excel
         </Button>
-        <Button variant="outline" size="sm" onClick={() => exportToPDF('sales-report-content', `تقرير المبيعات - ${projectLabel}`)}>
+        <Button variant="outline" size="sm" onClick={() => exportToPDF('report-print-content', `تقرير المبيعات - ${projectLabel}`)}>
           <FileText className="w-4 h-4 ml-1" />
           PDF
         </Button>

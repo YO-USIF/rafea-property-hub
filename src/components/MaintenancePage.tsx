@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import MaintenanceForm from './forms/MaintenanceForm';
+import MaintenancePrintView from './forms/MaintenancePrintView';
 import UnitHandoversTab from './UnitHandoversTab';
 import HOAManagementTab from './HOAManagementTab';
 
@@ -21,6 +22,8 @@ const MaintenancePage = () => {
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [editingRequest, setEditingRequest] = useState(undefined);
+  const [printRequest, setPrintRequest] = useState<any>(null);
+  const [printOpen, setPrintOpen] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -230,6 +233,9 @@ const MaintenancePage = () => {
                           <TableCell>{request.reported_date}</TableCell>
                           <TableCell>
                             <div className="flex gap-2">
+                              <Button variant="outline" size="sm" onClick={() => { setPrintRequest(request); setPrintOpen(true); }} title="طباعة أمر تكاليف صيانة">
+                                <Printer className="w-4 h-4" />
+                              </Button>
                               <Button variant="outline" size="sm" onClick={() => { setEditingRequest(request); setFormOpen(true); }}>
                                 <Edit className="w-4 h-4" />
                               </Button>
@@ -266,6 +272,12 @@ const MaintenancePage = () => {
               onOpenChange={(open) => { setFormOpen(open); if (!open) setEditingRequest(undefined); }}
               request={editingRequest}
               onSuccess={fetchRequests}
+            />
+
+            <MaintenancePrintView
+              open={printOpen}
+              onOpenChange={setPrintOpen}
+              request={printRequest}
             />
           </div>
         </TabsContent>

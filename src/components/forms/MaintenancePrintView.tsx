@@ -315,7 +315,7 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
             </div>
             <div class="signature-box">
               <div class="signature-line">
-                ${request.approved ? `<div style="font-family: 'Brush Script MT', cursive; font-size: 22px; color: #16a34a; margin-bottom: 4px;">م. يوسف صلاح يوسف</div>` : ''}
+                ${request.approved ? `<div style="height: 55px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;"><img src="${window.location.origin}/signatures/yousef-signature.jpeg" alt="توقيع المُعتمد" style="height: 55px; object-fit: contain; mix-blend-mode: multiply;" /></div><div style="font-size: 11px; font-weight: bold; color: #1e3a5f; margin-bottom: 4px;">م. يوسف صلاح يوسف</div>` : ''}
                 <div class="signature-title">المُعتمد</div>
                 <div class="signature-title-en">Approver</div>
                 ${request.approved && request.approved_at ? `<div style="font-size: 10px; color: #16a34a; margin-top: 4px;">تاريخ التعميد: ${formatDate(request.approved_at)}</div>` : ''}

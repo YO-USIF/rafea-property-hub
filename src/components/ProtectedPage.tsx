@@ -15,7 +15,7 @@ export const ProtectedPage = ({
   requirePermission = 'view' 
 }: ProtectedPageProps) => {
   const { checkPermission, isLoadingMy } = usePermissions();
-  const { isAdmin, isManager, loading: roleLoading } = useUserRole();
+  const { isAdmin, loading: roleLoading } = useUserRole();
 
   if (roleLoading || isLoadingMy) {
     return (

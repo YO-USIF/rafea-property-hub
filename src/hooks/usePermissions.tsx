@@ -25,7 +25,7 @@ export interface PermissionUpdate {
 }
 
 export const usePermissions = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -41,7 +41,7 @@ export const usePermissions = () => {
       if (error) throw error;
       return data as UserPermission[];
     },
-    enabled: !!user,
+    enabled: !authLoading && !!user,
   });
 
   // جلب صلاحيات المستخدم الحالي
@@ -58,7 +58,7 @@ export const usePermissions = () => {
       if (error) throw error;
       return data as UserPermission[];
     },
-    enabled: !!user?.id,
+    enabled: !authLoading && !!user?.id,
   });
 
   // التحقق من صلاحية معينة
@@ -156,6 +156,7 @@ export const usePermissions = () => {
     myPermissions,
     isLoadingAll,
     isLoadingMy,
+    authLoading,
     checkPermission,
     canAccessPage,
     upsertPermission,

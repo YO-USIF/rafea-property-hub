@@ -26,6 +26,7 @@ const MaintenancePage = () => {
   const [printRequest, setPrintRequest] = useState<any>(null);
   const [printOpen, setPrintOpen] = useState(false);
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
   const { toast } = useToast();
 
   useEffect(() => {

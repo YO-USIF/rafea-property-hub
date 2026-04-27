@@ -266,6 +266,7 @@ const MaintenancePage = () => {
                         <TableHead className="text-right">المسؤول</TableHead>
                         <TableHead className="text-right">التكلفة المقدرة</TableHead>
                         <TableHead className="text-right">تاريخ الإبلاغ</TableHead>
+                        <TableHead className="text-right">التعميد</TableHead>
                         <TableHead className="text-right">إجراءات</TableHead>
                       </TableRow>
                     </TableHeader>

@@ -2,8 +2,14 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
+const ROLE_PRIORITY = ['مدير النظام', 'مدير', 'مدير مشروع'] as const;
+
+const getPrimaryRole = (roles: string[]) => {
+  return ROLE_PRIORITY.find((role) => roles.includes(role)) ?? roles[0] ?? null;
+};
+
 export const useUserRole = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [userRole, setUserRole] = useState<string | null>(null);
   const [isManager, setIsManager] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -11,41 +17,63 @@ export const useUserRole = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
+    const resetRoleState = () => {
+      if (!isMounted) return;
+      setUserRole(null);
+      setIsManager(false);
+      setIsAdmin(false);
+      setIsProjectManager(false);
+    };
+
     const fetchUserRole = async () => {
-      if (!user?.id) {
-        setLoading(false);
+      if (authLoading) {
+        if (isMounted) setLoading(true);
         return;
       }
+
+      if (!user?.id) {
+        resetRoleState();
+        if (isMounted) setLoading(false);
+        return;
+      }
+
+      if (isMounted) setLoading(true);
 
       try {
         const { data, error } = await supabase
           .from('user_roles')
           .select('role')
-          .eq('user_id', user.id)
-          .maybeSingle();
+          .eq('user_id', user.id);
 
         if (error) {
-          setLoading(false);
-          return;
+          throw error;
         }
 
-        const role = data?.role || null;
-        setUserRole(role);
-        const isManagerRole = role === 'مدير' || role === 'مدير النظام';
-        const isAdminRole = role === 'مدير النظام';
-        const isProjectManagerRole = (role as string) === 'مدير مشروع';
-        setIsManager(isManagerRole);
-        setIsAdmin(isAdminRole);
-        setIsProjectManager(isProjectManagerRole);
+        const roles = (data ?? []).map((item) => item.role).filter(Boolean) as string[];
+        const primaryRole = getPrimaryRole(roles);
+
+        if (!isMounted) return;
+
+        setUserRole(primaryRole);
+        setIsAdmin(roles.includes('مدير النظام'));
+        setIsManager(roles.includes('مدير النظام') || roles.includes('مدير'));
+        setIsProjectManager(roles.includes('مدير مشروع'));
       } catch (error) {
         console.error('Error fetching user role:', error);
+        resetRoleState();
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchUserRole();
-  }, [user?.id]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [authLoading, user?.id]);
 
   return {
     userRole,

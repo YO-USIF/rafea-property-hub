@@ -127,6 +127,8 @@ const MaintenancePage = () => {
       toast({ title: 'خطأ في إلغاء التعميد', description: error.message, variant: 'destructive' });
     }
   };
+
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case 'مكتمل':
         return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">مكتمل</Badge>;

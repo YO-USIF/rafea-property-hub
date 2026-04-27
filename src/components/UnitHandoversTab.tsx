@@ -182,11 +182,7 @@ const UnitHandoversTab = () => {
     <div style="margin-top:auto">
     <div class="signature">
     <div><p>توقيع المشتري (المستلم)</p><p>${escapeHtml(h.customer_name)}</p><p style="margin-top:25px">_______________</p></div>
-    <div style="position:relative">
-    <p>توقيع المالك (المسلّم)</p>
-    <p style="margin-top:25px">_______________</p>
-    <img src="${window.location.origin}/stamps/rafea-stamp.jpeg" alt="ختم الشركة" style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(-8deg);width:130px;height:130px;object-fit:contain;opacity:0.75;mix-blend-mode:multiply;pointer-events:none" />
-    </div>
+    <div><p>توقيع المالك (المسلّم)</p><p style="margin-top:25px">_______________</p></div>
     </div>
     <div class="footer-date">تاريخ التوقيع: ${escapeHtml(h.handover_date)}</div>
     </div>

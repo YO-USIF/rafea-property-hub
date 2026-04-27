@@ -714,6 +714,9 @@ export type Database = {
       }
       maintenance_requests: {
         Row: {
+          approved: boolean
+          approved_at: string | null
+          approved_by: string | null
           assigned_to: string | null
           building_name: string
           created_at: string
@@ -729,6 +732,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          approved?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
           assigned_to?: string | null
           building_name: string
           created_at?: string
@@ -744,6 +750,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          approved?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
           assigned_to?: string | null
           building_name?: string
           created_at?: string

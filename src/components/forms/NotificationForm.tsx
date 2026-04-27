@@ -11,6 +11,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Send, Users, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
+const rolePriority = ['مدير النظام', 'مدير', 'مدير مشروع', 'موظف مبيعات', 'محاسب', 'موظف'];
+
+const getDisplayRole = (roles?: string[]) => {
+  if (!roles?.length) return 'موظف';
+  return rolePriority.find((role) => roles.includes(role)) || roles[0];
+};
+
 interface NotificationFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -224,7 +231,7 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
                         <div className="flex justify-between items-center">
                           <span>{profile.full_name || profile.email}</span>
                           <span className="text-xs text-muted-foreground">
-                            {profile.roles?.[0] || 'موظف'}
+                            {getDisplayRole(profile.roles)}
                           </span>
                         </div>
                       </Label>

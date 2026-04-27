@@ -14,6 +14,13 @@ import { useNotificationSettings } from '@/hooks/useNotificationSettings';
 import { useBackupLogs, useSecuritySettings } from '@/hooks/useSystemSettings';
 import UserForm from '@/components/forms/UserForm';
 
+const rolePriority = ['مدير النظام', 'مدير', 'مدير مشروع', 'موظف مبيعات', 'محاسب', 'موظف'];
+
+const getDisplayRole = (roles?: string[]) => {
+  if (!roles?.length) return 'موظف';
+  return rolePriority.find((role) => roles.includes(role)) || roles[0];
+};
+
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState('general');
   const [isUserFormOpen, setIsUserFormOpen] = useState(false);
@@ -210,7 +217,7 @@ const SettingsPage = () => {
                     <TableCell>{profile.email}</TableCell>
                     <TableCell>
                       <Select
-                        value={profile.roles?.[0] || 'موظف'}
+                        value={getDisplayRole(profile.roles)}
                         onValueChange={(value) => handleRoleChange(profile.user_id, value)}
                       >
                         <SelectTrigger className="w-32">

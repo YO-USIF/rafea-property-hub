@@ -13,12 +13,13 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ sidebarCollapsed, setActiveTab }) => {
-  const { user, signOut } = useAuth();
-  const { userRole } = useUserRole();
+  const { user, signOut, loading: authLoading } = useAuth();
+  const { userRole, loading: roleLoading } = useUserRole();
   const { toast } = useToast();
   const { unreadCount } = useNotifications();
   const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const isIdentityLoading = authLoading || roleLoading;
 
   const searchOptions = [
     { label: 'لوحة التحكم', tab: 'dashboard', keywords: ['لوحة', 'تحكم', 'رئيسية', 'dashboard'] },
@@ -130,7 +131,7 @@ const Header: React.FC<HeaderProps> = ({ sidebarCollapsed, setActiveTab }) => {
           </button>
 
           {/* Settings - Only for System Admin */}
-          {userRole === 'مدير النظام' && (
+          {!isIdentityLoading && userRole === 'مدير النظام' && (
             <button 
               onClick={() => setActiveTab?.('settings')}
               className="p-2 hover:bg-muted rounded-lg transition-colors"
@@ -156,7 +157,7 @@ const Header: React.FC<HeaderProps> = ({ sidebarCollapsed, setActiveTab }) => {
             </div>
             <div className="text-sm">
               <p className="font-medium text-gray-900">{user?.email?.split('@')[0] || 'مستخدم'}</p>
-              <p className="text-gray-500">{userRole || 'موظف'}</p>
+              <p className="text-gray-500">{isIdentityLoading ? 'جارٍ تحميل الصلاحية...' : userRole || 'بدون دور'}</p>
             </div>
           </div>
         </div>

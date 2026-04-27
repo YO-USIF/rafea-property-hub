@@ -14,10 +14,10 @@ export const ProtectedPage = ({
   pageName, 
   requirePermission = 'view' 
 }: ProtectedPageProps) => {
-  const { checkPermission, isLoadingMy } = usePermissions();
+  const { checkPermission, isLoadingMy, authLoading } = usePermissions();
   const { isAdmin, loading: roleLoading } = useUserRole();
 
-  if (roleLoading || isLoadingMy) {
+  if (authLoading || roleLoading || isLoadingMy) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p className="text-lg">جارٍ التحميل...</p>

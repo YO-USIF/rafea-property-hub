@@ -47,9 +47,10 @@ interface MenuItem {
 
 const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const { signOut, user } = useAuth();
-  const { isAdmin, isManager, isProjectManager } = useUserRole();
-  const { canAccessPage } = usePermissions();
+  const { signOut, user, loading: authLoading } = useAuth();
+  const { isAdmin, isManager, isProjectManager, loading: roleLoading } = useUserRole();
+  const { canAccessPage, isLoadingMy } = usePermissions();
+  const isNavLoading = authLoading || roleLoading || isLoadingMy;
 
   const menuItems: MenuItem[] = [
     { id: 'dashboard', name: 'لوحة التحكم', icon: LayoutDashboard, group: 'main' },
@@ -81,6 +82,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   };
 
   const filteredMenuItems = menuItems.filter(item => {
+    if (isNavLoading) {
+      return false;
+    }
     if (isProjectManager) {
       return item.id === 'contractors' || item.id === 'extracts';
     }
@@ -170,6 +174,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
         {/* Navigation */}
         <ScrollArea className="flex-1 py-3">
           <div className={`space-y-4 ${isCollapsed ? 'px-2' : 'px-3'}`}>
+            {isNavLoading && !isCollapsed && (
+              <div className="px-3 py-2 text-sm text-sidebar-foreground/60">جارٍ تحميل الصلاحيات...</div>
+            )}
             {Object.entries(groupedItems).map(([groupKey, items]) => (
               <div key={groupKey}>
                 {!isCollapsed && groups[groupKey] && (

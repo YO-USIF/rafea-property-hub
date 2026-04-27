@@ -75,7 +75,58 @@ const MaintenancePage = () => {
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const handleApprove = async (request: any) => {
+    try {
+      const { error } = await supabase
+        .from('maintenance_requests')
+        .update({
+          approved: true,
+          approved_by: user?.id,
+          approved_at: new Date().toISOString(),
+        })
+        .eq('id', request.id);
+      if (error) throw error;
+
+      // Broadcast notification to all users
+      try {
+        const { data: allProfiles } = await supabase.from('profiles').select('user_id');
+        if (allProfiles) {
+          const notifications = allProfiles
+            .filter((p) => p.user_id !== user?.id)
+            .map((p) => ({
+              user_id: p.user_id,
+              title: '✅ تم تعميد أمر تكاليف صيانة',
+              message: `تم تعميد أمر تكاليف الصيانة رقم #${request.id.slice(0, 8)} - المبنى: ${request.building_name} - الوحدة: ${request.unit}`,
+              type: 'info',
+            }));
+          if (notifications.length > 0) {
+            await supabase.from('notifications').insert(notifications);
+          }
+        }
+      } catch (notifErr) {
+        console.warn('Could not send approval notifications:', notifErr);
+      }
+
+      toast({ title: 'تم تعميد طلب الصيانة بنجاح' });
+      fetchRequests();
+    } catch (error: any) {
+      toast({ title: 'خطأ في التعميد', description: error.message, variant: 'destructive' });
+    }
+  };
+
+  const handleRevokeApproval = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('maintenance_requests')
+        .update({ approved: false, approved_by: null, approved_at: null })
+        .eq('id', id);
+      if (error) throw error;
+      toast({ title: 'تم إلغاء تعميد طلب الصيانة' });
+      fetchRequests();
+    } catch (error: any) {
+      toast({ title: 'خطأ في إلغاء التعميد', description: error.message, variant: 'destructive' });
+    }
+  };
     switch (status) {
       case 'مكتمل':
         return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">مكتمل</Badge>;

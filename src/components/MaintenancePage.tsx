@@ -288,6 +288,40 @@ const MaintenancePage = () => {
                           <TableCell>{request.estimated_cost} ر.س</TableCell>
                           <TableCell>{request.reported_date}</TableCell>
                           <TableCell>
+                            {request.approved ? (
+                              <div className="flex flex-col items-start gap-1">
+                                <Badge className="bg-green-600 hover:bg-green-700 text-white">
+                                  <CheckCircle2 className="w-3 h-3 ml-1" />
+                                  معتمد
+                                </Badge>
+                                {isAdmin && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-xs text-red-500 hover:text-red-700 h-6 px-2"
+                                    onClick={() => handleRevokeApproval(request.id)}
+                                    title="إلغاء التعميد"
+                                  >
+                                    إلغاء التعميد
+                                  </Button>
+                                )}
+                              </div>
+                            ) : isAdmin ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-amber-600 border-amber-300 hover:bg-amber-50"
+                                onClick={() => handleApprove(request)}
+                                title="تعميد طلب الصيانة"
+                              >
+                                <ShieldCheck className="w-4 h-4 ml-1" />
+                                تعميد
+                              </Button>
+                            ) : (
+                              <Badge variant="secondary">بانتظار التعميد</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
                             <div className="flex gap-2">
                               <Button variant="outline" size="sm" onClick={() => { setPrintRequest(request); setPrintOpen(true); }} title="طباعة أمر تكاليف صيانة">
                                 <Printer className="w-4 h-4" />

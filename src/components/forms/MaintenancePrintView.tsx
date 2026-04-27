@@ -227,9 +227,14 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
             ` : ''}
           </div>
 
-          <div class="title">
+          <div class="title" style="position: relative;">
             <h1>أمر تكاليف صيانة</h1>
             <p>Maintenance Cost Order</p>
+            ${request.approved ? `
+              <div style="position: absolute; top: -5px; left: 20px; transform: rotate(-15deg); border: 3px solid #16a34a; color: #16a34a; padding: 6px 18px; font-size: 18px; font-weight: bold; border-radius: 6px; opacity: 0.85;">
+                ✓ معتمد / APPROVED
+              </div>
+            ` : ''}
           </div>
 
           <div class="details-grid">
@@ -310,8 +315,10 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
             </div>
             <div class="signature-box">
               <div class="signature-line">
+                ${request.approved ? `<div style="font-family: 'Brush Script MT', cursive; font-size: 22px; color: #16a34a; margin-bottom: 4px;">م. يوسف صلاح يوسف</div>` : ''}
                 <div class="signature-title">المُعتمد</div>
                 <div class="signature-title-en">Approver</div>
+                ${request.approved && request.approved_at ? `<div style="font-size: 10px; color: #16a34a; margin-top: 4px;">تاريخ التعميد: ${formatDate(request.approved_at)}</div>` : ''}
               </div>
             </div>
           </div>

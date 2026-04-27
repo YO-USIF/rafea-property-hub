@@ -7,10 +7,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Plus, Search, Wrench, AlertTriangle, CheckCircle, Clock, Edit, Trash2, Printer, Home, Users } from 'lucide-react';
+import { Plus, Search, Wrench, AlertTriangle, CheckCircle, Clock, Edit, Trash2, Printer, Home, Users, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
 import MaintenanceForm from './forms/MaintenanceForm';
 import MaintenancePrintView from './forms/MaintenancePrintView';
 import UnitHandoversTab from './UnitHandoversTab';
@@ -25,6 +26,7 @@ const MaintenancePage = () => {
   const [printRequest, setPrintRequest] = useState<any>(null);
   const [printOpen, setPrintOpen] = useState(false);
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -70,6 +72,59 @@ const MaintenancePage = () => {
         description: error.message,
         variant: "destructive"
       });
+    }
+  };
+
+  const handleApprove = async (request: any) => {
+    try {
+      const { error } = await supabase
+        .from('maintenance_requests')
+        .update({
+          approved: true,
+          approved_by: user?.id,
+          approved_at: new Date().toISOString(),
+        })
+        .eq('id', request.id);
+      if (error) throw error;
+
+      // Broadcast notification to all users
+      try {
+        const { data: allProfiles } = await supabase.from('profiles').select('user_id');
+        if (allProfiles) {
+          const notifications = allProfiles
+            .filter((p) => p.user_id !== user?.id)
+            .map((p) => ({
+              user_id: p.user_id,
+              title: '✅ تم تعميد أمر تكاليف صيانة',
+              message: `تم تعميد أمر تكاليف الصيانة رقم #${request.id.slice(0, 8)} - المبنى: ${request.building_name} - الوحدة: ${request.unit}`,
+              type: 'info',
+            }));
+          if (notifications.length > 0) {
+            await supabase.from('notifications').insert(notifications);
+          }
+        }
+      } catch (notifErr) {
+        console.warn('Could not send approval notifications:', notifErr);
+      }
+
+      toast({ title: 'تم تعميد طلب الصيانة بنجاح' });
+      fetchRequests();
+    } catch (error: any) {
+      toast({ title: 'خطأ في التعميد', description: error.message, variant: 'destructive' });
+    }
+  };
+
+  const handleRevokeApproval = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('maintenance_requests')
+        .update({ approved: false, approved_by: null, approved_at: null })
+        .eq('id', id);
+      if (error) throw error;
+      toast({ title: 'تم إلغاء تعميد طلب الصيانة' });
+      fetchRequests();
+    } catch (error: any) {
+      toast({ title: 'خطأ في إلغاء التعميد', description: error.message, variant: 'destructive' });
     }
   };
 
@@ -211,6 +266,7 @@ const MaintenancePage = () => {
                         <TableHead className="text-right">المسؤول</TableHead>
                         <TableHead className="text-right">التكلفة المقدرة</TableHead>
                         <TableHead className="text-right">تاريخ الإبلاغ</TableHead>
+                        <TableHead className="text-right">التعميد</TableHead>
                         <TableHead className="text-right">إجراءات</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -231,6 +287,40 @@ const MaintenancePage = () => {
                           <TableCell>{request.assigned_to || 'غير محدد'}</TableCell>
                           <TableCell>{request.estimated_cost} ر.س</TableCell>
                           <TableCell>{request.reported_date}</TableCell>
+                          <TableCell>
+                            {request.approved ? (
+                              <div className="flex flex-col items-start gap-1">
+                                <Badge className="bg-green-600 hover:bg-green-700 text-white">
+                                  <CheckCircle2 className="w-3 h-3 ml-1" />
+                                  معتمد
+                                </Badge>
+                                {isAdmin && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-xs text-red-500 hover:text-red-700 h-6 px-2"
+                                    onClick={() => handleRevokeApproval(request.id)}
+                                    title="إلغاء التعميد"
+                                  >
+                                    إلغاء التعميد
+                                  </Button>
+                                )}
+                              </div>
+                            ) : isAdmin ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-amber-600 border-amber-300 hover:bg-amber-50"
+                                onClick={() => handleApprove(request)}
+                                title="تعميد طلب الصيانة"
+                              >
+                                <ShieldCheck className="w-4 h-4 ml-1" />
+                                تعميد
+                              </Button>
+                            ) : (
+                              <Badge variant="secondary">بانتظار التعميد</Badge>
+                            )}
+                          </TableCell>
                           <TableCell>
                             <div className="flex gap-2">
                               <Button variant="outline" size="sm" onClick={() => { setPrintRequest(request); setPrintOpen(true); }} title="طباعة أمر تكاليف صيانة">
@@ -259,7 +349,7 @@ const MaintenancePage = () => {
                         </TableRow>
                       ))}
                       {requests.length === 0 && (
-                        <TableRow><TableCell colSpan={10} className="text-center py-8 text-muted-foreground">لا توجد طلبات صيانة</TableCell></TableRow>
+                        <TableRow><TableCell colSpan={11} className="text-center py-8 text-muted-foreground">لا توجد طلبات صيانة</TableCell></TableRow>
                       )}
                     </TableBody>
                   </Table>

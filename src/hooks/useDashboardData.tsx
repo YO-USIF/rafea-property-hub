@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useUserRole } from './useUserRole';
@@ -7,6 +8,39 @@ export const useDashboardData = () => {
   const { user } = useAuth();
   const { isManager, isAdmin } = useUserRole();
   const isManagerOrAdmin = isManager || isAdmin;
+  const queryClient = useQueryClient();
+
+  // الاشتراك في تحديثات قاعدة البيانات في الوقت الفعلي
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const tablesToWatch = [
+      { table: 'projects', queryKey: 'dashboard-projects' },
+      { table: 'maintenance_requests', queryKey: 'dashboard-maintenance' },
+      { table: 'contractors', queryKey: 'dashboard-contractors' },
+      { table: 'suppliers', queryKey: 'dashboard-suppliers' },
+      { table: 'tasks', queryKey: 'dashboard-tasks' },
+    ];
+
+    const channels = tablesToWatch.map(({ table, queryKey }) => {
+      return supabase
+        .channel(`dashboard-${table}-changes`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table },
+          () => {
+            queryClient.invalidateQueries({ queryKey: [queryKey, isManagerOrAdmin] });
+          }
+        )
+        .subscribe();
+    });
+
+    return () => {
+      channels.forEach((channel) => {
+        supabase.removeChannel(channel);
+      });
+    };
+  }, [user?.id, isManagerOrAdmin, queryClient]);
 
   const { data: projects, isLoading: projectsLoading } = useQuery({
     queryKey: ['dashboard-projects', isManagerOrAdmin],

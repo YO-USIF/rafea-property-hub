@@ -260,20 +260,12 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
               {extract.approved ? (
                 <>
                   <div className="h-14 flex items-center justify-center mb-1.5 relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <svg viewBox="0 0 180 55" className="w-36 h-12">
-                        <defs>
-                          <linearGradient id="sigGradExt" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.9"/>
-                            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.5"/>
-                          </linearGradient>
-                        </defs>
-                        <path d="M15 40 C25 15, 35 10, 50 22 S70 35, 85 18 S105 8, 125 20 S145 32, 165 15" fill="none" stroke="url(#sigGradExt)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M30 38 Q45 42, 60 36 Q75 30, 90 35" fill="none" stroke="url(#sigGradExt)" strokeWidth="1" strokeLinecap="round" opacity="0.5"/>
-                        <text x="90" y="35" fontFamily="'Traditional Arabic', 'Sakkal Majalla', 'Arial'" fontSize="18" fill="hsl(var(--primary))" textAnchor="middle" fontWeight="bold" direction="rtl">يوسف صلاح</text>
-                        <line x1="25" y1="48" x2="155" y2="48" stroke="hsl(var(--primary))" strokeWidth="0.5" opacity="0.3"/>
-                      </svg>
-                    </div>
+                    <img
+                      src="/signatures/yousef-signature.jpeg"
+                      alt="توقيع المُعتمد"
+                      className="h-14 object-contain"
+                      style={{ mixBlendMode: 'multiply' }}
+                    />
                   </div>
                   <p className="text-[9px] text-green-600 mb-0.5">✅ تم التعميد {extract.approved_at ? new Date(extract.approved_at).toLocaleDateString('en-GB') : ''}</p>
                 </>

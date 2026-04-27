@@ -315,8 +315,10 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
             </div>
             <div class="signature-box">
               <div class="signature-line">
+                ${request.approved ? `<div style="font-family: 'Brush Script MT', cursive; font-size: 22px; color: #16a34a; margin-bottom: 4px;">م. يوسف صلاح يوسف</div>` : ''}
                 <div class="signature-title">المُعتمد</div>
                 <div class="signature-title-en">Approver</div>
+                ${request.approved && request.approved_at ? `<div style="font-size: 10px; color: #16a34a; margin-top: 4px;">تاريخ التعميد: ${formatDate(request.approved_at)}</div>` : ''}
               </div>
             </div>
           </div>

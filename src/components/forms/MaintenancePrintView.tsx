@@ -227,9 +227,14 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
             ` : ''}
           </div>
 
-          <div class="title">
+          <div class="title" style="position: relative;">
             <h1>أمر تكاليف صيانة</h1>
             <p>Maintenance Cost Order</p>
+            ${request.approved ? `
+              <div style="position: absolute; top: -5px; left: 20px; transform: rotate(-15deg); border: 3px solid #16a34a; color: #16a34a; padding: 6px 18px; font-size: 18px; font-weight: bold; border-radius: 6px; opacity: 0.85;">
+                ✓ معتمد / APPROVED
+              </div>
+            ` : ''}
           </div>
 
           <div class="details-grid">

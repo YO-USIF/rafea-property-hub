@@ -1,0 +1,1 @@
+ALTER TABLE public.extracts ADD COLUMN IF NOT EXISTS installments_approvals jsonb NOT NULL DEFAULT '[]'::jsonb;

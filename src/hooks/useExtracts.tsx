@@ -142,7 +142,32 @@ export const useExtracts = () => {
       if (cleanedData.project_id === "none" || cleanedData.project_id === "external" || cleanedData.project_id === "multiple" || cleanedData.project_id === "") {
         cleanedData.project_id = null;
       }
-      
+
+      // إعادة توليد قائمة تعميد الدفعات عند تغيّر نوع الدفع أو عدد الدفعات
+      if (cleanedData.payment_type !== undefined || cleanedData.installments_count !== undefined) {
+        const { data: current } = await supabase
+          .from('extracts')
+          .select('payment_type, installments_count, installment_amount, installments_approvals')
+          .eq('id', id)
+          .single();
+
+        const newPaymentType = cleanedData.payment_type ?? current?.payment_type;
+        const newCount = Number(cleanedData.installments_count ?? current?.installments_count ?? 1);
+        const newAmt = Number(cleanedData.installment_amount ?? current?.installment_amount ?? 0);
+        const prevApprovals: any[] = Array.isArray((current as any)?.installments_approvals) ? (current as any).installments_approvals : [];
+
+        if (newPaymentType === 'دفعات' && newCount > 1) {
+          cleanedData.installments_approvals = Array.from({ length: newCount }, (_, i) => {
+            const existing = prevApprovals.find((p: any) => p.index === i + 1);
+            return existing
+              ? { ...existing, amount: newAmt }
+              : { index: i + 1, amount: newAmt, approved: false, approved_at: null, approved_by: null };
+          });
+        } else {
+          cleanedData.installments_approvals = [];
+        }
+      }
+
       const { data, error } = await supabase
         .from('extracts')
         .update(cleanedData)

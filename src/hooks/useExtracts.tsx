@@ -293,6 +293,56 @@ export const useExtracts = () => {
     },
   });
 
+  // تعميد/إلغاء تعميد دفعة محددة
+  const approveInstallment = useMutation({
+    mutationFn: async ({ id, index, approve }: { id: string; index: number; approve: boolean }) => {
+      const { data: current, error: fetchErr } = await supabase
+        .from('extracts')
+        .select('installments_approvals')
+        .eq('id', id)
+        .single();
+      if (fetchErr) throw fetchErr;
+
+      const list: any[] = Array.isArray((current as any)?.installments_approvals)
+        ? [...(current as any).installments_approvals]
+        : [];
+      const updated = list.map((it: any) =>
+        it.index === index
+          ? {
+              ...it,
+              approved: approve,
+              approved_at: approve ? new Date().toISOString() : null,
+              approved_by: approve ? user?.id : null,
+            }
+          : it
+      );
+
+      const allApproved = updated.length > 0 && updated.every((it: any) => it.approved);
+
+      const { data, error } = await supabase
+        .from('extracts')
+        .update({
+          installments_approvals: updated,
+          approved: allApproved,
+          approved_by: allApproved ? user?.id : null,
+          approved_at: allApproved ? new Date().toISOString() : null,
+        })
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['extracts'], refetchType: 'all' });
+      toast({ title: vars.approve ? `تم تعميد الدفعة ${vars.index}` : `تم إلغاء تعميد الدفعة ${vars.index}` });
+    },
+    onError: (error: any) => {
+      console.error('Error updating installment approval:', error);
+      toast({ title: 'خطأ في تعميد الدفعة', description: error.message, variant: 'destructive' });
+    },
+  });
+
   return {
     extracts,
     isLoading,
@@ -301,6 +351,7 @@ export const useExtracts = () => {
     deleteExtract,
     approveExtract,
     revokeApprovalExtract,
+    approveInstallment,
     approverName: approverName || 'مدير النظام',
   };
 };

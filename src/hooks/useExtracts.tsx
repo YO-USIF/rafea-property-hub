@@ -75,9 +75,23 @@ export const useExtracts = () => {
   // إنشاء مستخص جديد
   const createExtract = useMutation({
     mutationFn: async (extractData: any) => {
+      // توليد قائمة تعميد الدفعات إذا كان نوع الدفع دفعات
+      let installments_approvals: any[] = [];
+      if (extractData.payment_type === 'دفعات' && Number(extractData.installments_count) > 1) {
+        const count = Number(extractData.installments_count);
+        const amt = Number(extractData.installment_amount) || 0;
+        installments_approvals = Array.from({ length: count }, (_, i) => ({
+          index: i + 1,
+          amount: amt,
+          approved: false,
+          approved_at: null,
+          approved_by: null,
+        }));
+      }
+
       const { data, error } = await supabase
         .from('extracts')
-        .insert([{ ...extractData, user_id: user?.id }])
+        .insert([{ ...extractData, installments_approvals, user_id: user?.id }])
         .select()
         .single();
       

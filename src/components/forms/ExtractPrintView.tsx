@@ -241,6 +241,42 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
             </div>
           )}
 
+          {/* Installments Section */}
+          {extract.payment_type === 'دفعات' && Array.isArray(extract.installments_approvals) && extract.installments_approvals.length > 0 && (
+            <div className="mb-3 p-2.5 bg-gradient-to-br from-primary/10 to-background rounded-lg border border-primary/30">
+              <h3 className="text-sm font-bold mb-2 text-primary border-b border-primary/30 pb-1">جدول الدفعات ({extract.installments_approvals.length} دفعات)</h3>
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="bg-primary/10">
+                    <th className="border border-primary/30 p-1.5 text-center font-bold">#</th>
+                    <th className="border border-primary/30 p-1.5 text-center font-bold">قيمة الدفعة</th>
+                    <th className="border border-primary/30 p-1.5 text-center font-bold">حالة التعميد</th>
+                    <th className="border border-primary/30 p-1.5 text-center font-bold">تاريخ التعميد</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {extract.installments_approvals.map((inst: any) => (
+                    <tr key={inst.index}>
+                      <td className="border border-primary/30 p-1.5 text-center font-bold">دفعة {inst.index}</td>
+                      <td className="border border-primary/30 p-1.5 text-center">{formatCurrency(Number(inst.amount) || 0)}</td>
+                      <td className="border border-primary/30 p-1.5 text-center">
+                        {inst.approved ? (
+                          <span className="text-green-700 font-bold">✅ معتمد</span>
+                        ) : (
+                          <span className="text-red-600 font-bold">⏳ بانتظار التعميد</span>
+                        )}
+                      </td>
+                      <td className="border border-primary/30 p-1.5 text-center">
+                        {inst.approved && inst.approved_at ? new Date(inst.approved_at).toLocaleDateString('en-GB') : '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+
           {/* Signatures Section - Professional Layout */}
           <div className="grid grid-cols-3 gap-3 mb-3 mt-4">
             <div className="text-center p-2 bg-muted/30 rounded border border-muted-foreground/20">

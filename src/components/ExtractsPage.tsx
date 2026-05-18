@@ -35,7 +35,7 @@ const ExtractsPage = () => {
   
   const { user } = useAuth();
   const { userRole, isManager, isAdmin, isProjectManager, loading: roleLoading } = useUserRole();
-  const { extracts, isLoading, deleteExtract, approveExtract, revokeApprovalExtract } = useExtracts();
+  const { extracts, isLoading, deleteExtract, approveExtract, revokeApprovalExtract, approveInstallment } = useExtracts();
 
   const handleDelete = (id: string) => {
     if (window.confirm('هل أنت متأكد من حذف هذا المستخلص؟')) {
@@ -264,7 +264,45 @@ const ExtractsPage = () => {
                     </TableCell>
                     <TableCell>{getStatusBadge(extract.status)}</TableCell>
                     <TableCell>
-                      {extract.approved ? (
+                      {extract.payment_type === 'دفعات' && Array.isArray(extract.installments_approvals) && extract.installments_approvals.length > 0 ? (
+                        <div className="flex flex-col gap-1 min-w-[180px]">
+                          {extract.installments_approvals.map((inst: any) => (
+                            <div key={inst.index} className="flex items-center justify-between gap-2 border rounded px-2 py-1 bg-muted/30">
+                              <span className="text-xs font-bold">دفعة {inst.index}</span>
+                              {inst.approved ? (
+                                <div className="flex items-center gap-1">
+                                  <Badge variant="default" className="bg-green-600 hover:bg-green-700 text-[10px] px-1.5 py-0">
+                                    <CheckCircle2 className="w-3 h-3 ml-0.5" />
+                                    معتمد
+                                  </Badge>
+                                  {isAdmin && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-5 px-1.5 text-[10px] text-red-500 hover:text-red-700"
+                                      onClick={() => approveInstallment.mutateAsync({ id: extract.id, index: inst.index, approve: false })}
+                                    >
+                                      إلغاء
+                                    </Button>
+                                  )}
+                                </div>
+                              ) : isAdmin ? (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-5 px-1.5 text-[10px] text-amber-600 border-amber-300 hover:bg-amber-50"
+                                  onClick={() => approveInstallment.mutateAsync({ id: extract.id, index: inst.index, approve: true })}
+                                >
+                                  <ShieldCheck className="w-3 h-3 ml-0.5" />
+                                  تعميد
+                                </Button>
+                              ) : (
+                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">بانتظار</Badge>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : extract.approved ? (
                         <div className="flex flex-col items-center gap-1">
                           <Badge variant="default" className="bg-green-600 hover:bg-green-700">
                             <CheckCircle2 className="w-3 h-3 ml-1" />

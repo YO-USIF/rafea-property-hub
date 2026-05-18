@@ -340,6 +340,7 @@ export type Database = {
           extract_number: string
           id: string
           installment_amount: number | null
+          installments_approvals: Json
           installments_count: number | null
           payment_type: string | null
           percentage_completed: number | null
@@ -368,6 +369,7 @@ export type Database = {
           extract_number: string
           id?: string
           installment_amount?: number | null
+          installments_approvals?: Json
           installments_count?: number | null
           payment_type?: string | null
           percentage_completed?: number | null
@@ -396,6 +398,7 @@ export type Database = {
           extract_number?: string
           id?: string
           installment_amount?: number | null
+          installments_approvals?: Json
           installments_count?: number | null
           payment_type?: string | null
           percentage_completed?: number | null

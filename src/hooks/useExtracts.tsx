@@ -75,9 +75,23 @@ export const useExtracts = () => {
   // إنشاء مستخص جديد
   const createExtract = useMutation({
     mutationFn: async (extractData: any) => {
+      // توليد قائمة تعميد الدفعات إذا كان نوع الدفع دفعات
+      let installments_approvals: any[] = [];
+      if (extractData.payment_type === 'دفعات' && Number(extractData.installments_count) > 1) {
+        const count = Number(extractData.installments_count);
+        const amt = Number(extractData.installment_amount) || 0;
+        installments_approvals = Array.from({ length: count }, (_, i) => ({
+          index: i + 1,
+          amount: amt,
+          approved: false,
+          approved_at: null,
+          approved_by: null,
+        }));
+      }
+
       const { data, error } = await supabase
         .from('extracts')
-        .insert([{ ...extractData, user_id: user?.id }])
+        .insert([{ ...extractData, installments_approvals, user_id: user?.id }])
         .select()
         .single();
       
@@ -128,7 +142,32 @@ export const useExtracts = () => {
       if (cleanedData.project_id === "none" || cleanedData.project_id === "external" || cleanedData.project_id === "multiple" || cleanedData.project_id === "") {
         cleanedData.project_id = null;
       }
-      
+
+      // إعادة توليد قائمة تعميد الدفعات عند تغيّر نوع الدفع أو عدد الدفعات
+      if (cleanedData.payment_type !== undefined || cleanedData.installments_count !== undefined) {
+        const { data: current } = await supabase
+          .from('extracts')
+          .select('payment_type, installments_count, installment_amount, installments_approvals')
+          .eq('id', id)
+          .single();
+
+        const newPaymentType = cleanedData.payment_type ?? current?.payment_type;
+        const newCount = Number(cleanedData.installments_count ?? current?.installments_count ?? 1);
+        const newAmt = Number(cleanedData.installment_amount ?? current?.installment_amount ?? 0);
+        const prevApprovals: any[] = Array.isArray((current as any)?.installments_approvals) ? (current as any).installments_approvals : [];
+
+        if (newPaymentType === 'دفعات' && newCount > 1) {
+          cleanedData.installments_approvals = Array.from({ length: newCount }, (_, i) => {
+            const existing = prevApprovals.find((p: any) => p.index === i + 1);
+            return existing
+              ? { ...existing, amount: newAmt }
+              : { index: i + 1, amount: newAmt, approved: false, approved_at: null, approved_by: null };
+          });
+        } else {
+          cleanedData.installments_approvals = [];
+        }
+      }
+
       const { data, error } = await supabase
         .from('extracts')
         .update(cleanedData)
@@ -254,6 +293,56 @@ export const useExtracts = () => {
     },
   });
 
+  // تعميد/إلغاء تعميد دفعة محددة
+  const approveInstallment = useMutation({
+    mutationFn: async ({ id, index, approve }: { id: string; index: number; approve: boolean }) => {
+      const { data: current, error: fetchErr } = await supabase
+        .from('extracts')
+        .select('installments_approvals')
+        .eq('id', id)
+        .single();
+      if (fetchErr) throw fetchErr;
+
+      const list: any[] = Array.isArray((current as any)?.installments_approvals)
+        ? [...(current as any).installments_approvals]
+        : [];
+      const updated = list.map((it: any) =>
+        it.index === index
+          ? {
+              ...it,
+              approved: approve,
+              approved_at: approve ? new Date().toISOString() : null,
+              approved_by: approve ? user?.id : null,
+            }
+          : it
+      );
+
+      const allApproved = updated.length > 0 && updated.every((it: any) => it.approved);
+
+      const { data, error } = await supabase
+        .from('extracts')
+        .update({
+          installments_approvals: updated,
+          approved: allApproved,
+          approved_by: allApproved ? user?.id : null,
+          approved_at: allApproved ? new Date().toISOString() : null,
+        })
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['extracts'], refetchType: 'all' });
+      toast({ title: vars.approve ? `تم تعميد الدفعة ${vars.index}` : `تم إلغاء تعميد الدفعة ${vars.index}` });
+    },
+    onError: (error: any) => {
+      console.error('Error updating installment approval:', error);
+      toast({ title: 'خطأ في تعميد الدفعة', description: error.message, variant: 'destructive' });
+    },
+  });
+
   return {
     extracts,
     isLoading,
@@ -262,6 +351,7 @@ export const useExtracts = () => {
     deleteExtract,
     approveExtract,
     revokeApprovalExtract,
+    approveInstallment,
     approverName: approverName || 'مدير النظام',
   };
 };

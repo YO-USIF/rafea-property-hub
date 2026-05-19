@@ -14,6 +14,7 @@ import ProfitLossReport from '@/components/reports/ProfitLossReport';
 import { ProjectCostCenterReport } from '@/components/reports/ProjectCostCenterReport';
 import { ProjectDetailedReport } from '@/components/reports/ProjectDetailedReport';
 import ExtractsAndOrdersReport from '@/components/reports/ExtractsAndOrdersReport';
+import ReservationsSalesReport from '@/components/reports/ReservationsSalesReport';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -62,6 +63,7 @@ const ReportsPage = () => {
       description: 'تقارير مبيعات الشقق والعقود',
       icon: TrendingUp,
       reports: [
+        { name: 'تقرير الحجوزات والمبيعات (احترافي)', type: 'reservations-sales' },
         { name: 'تقرير المبيعات', type: 'sales' },
         { name: 'تقرير المشتريات', type: 'purchases' },
       ]
@@ -237,6 +239,7 @@ const ReportsPage = () => {
 
     switch (reportType) {
       case 'sales': reportData = salesData; break;
+      case 'reservations-sales': reportData = salesData; break;
       case 'invoices': reportData = invoicesData; break;
       case 'purchases': reportData = purchasesData; break;
       case 'profit-loss': reportData = { salesData, invoicesData, purchasesData, extractsData }; break;
@@ -283,6 +286,8 @@ const ReportsPage = () => {
     switch (type) {
       case 'sales':
         return <SalesReport data={data} period={selectedPeriod} />;
+      case 'reservations-sales':
+        return <ReservationsSalesReport sales={data} period={selectedPeriod} />;
       case 'invoices':
         return <InvoicesReport data={data} period={selectedPeriod} />;
       case 'purchases':

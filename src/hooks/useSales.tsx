@@ -181,8 +181,8 @@ export const useSales = () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast({ title: "تم إضافة المبيعة بنجاح" });
     },
-    onError: (error) => {
-      toast({ title: "خطأ في إضافة المبيعة", variant: "destructive" });
+    onError: (error: any) => {
+      toast({ title: "خطأ في إضافة المبيعة", description: error?.message || 'حدث خطأ غير متوقع', variant: "destructive" });
     },
   });
 
@@ -233,8 +233,8 @@ export const useSales = () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast({ title: "تم تحديث المبيعة بنجاح" });
     },
-    onError: (error) => {
-      toast({ title: "خطأ في تحديث المبيعة", variant: "destructive" });
+    onError: (error: any) => {
+      toast({ title: "خطأ في تحديث المبيعة", description: error?.message || 'حدث خطأ غير متوقع', variant: "destructive" });
     },
   });
 

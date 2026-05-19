@@ -15,7 +15,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {
-  CalendarCheck, Clock, Search, Building2, Phone, User, Plus, CheckCircle2,
+  CalendarCheck, Clock, Search, Building2, Phone, User, Plus, CheckCircle2, XCircle,
 } from 'lucide-react';
 import SaleForm from '@/components/forms/SaleForm';
 import { PermissionButton } from '@/components/PermissionButton';

@@ -43,7 +43,7 @@ interface SaleFormProps {
 }
 
 const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, description }: SaleFormProps) => {
-  const { createSale, updateSale } = useSales();
+  const { createSale, updateSale, sales } = useSales();
   const { projects } = useProjects();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -126,11 +126,45 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
     }
   }, [formData.project_id, projects, sale]);
 
+  // قائمة الوحدات المحجوزة/المباعة فعلياً في المشروع المختار
+  const takenUnitsInProject = (sales || [])
+    .filter((s: any) =>
+      s.project_id === formData.project_id &&
+      (s.status === 'محجوز' || s.status === 'مباع') &&
+      s.id !== sale?.id
+    )
+    .map((s: any) => String(s.unit_number).trim());
+
+  // قائمة الوحدات المتاحة (1..total_units) باستثناء المحجوز/المباع
+  const selectedProjectObj = projects.find((p: any) => p.id === formData.project_id);
+  const totalUnits = Number(selectedProjectObj?.total_units) || 0;
+  const availableUnitNumbers: string[] = [];
+  for (let i = 1; i <= totalUnits; i++) {
+    const num = String(i);
+    if (!takenUnitsInProject.includes(num)) availableUnitNumbers.push(num);
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // منع حجز/بيع نفس الوحدة مرتين في نفس المشروع
+      if (
+        (formData.status === 'محجوز' || formData.status === 'مباع') &&
+        formData.project_id &&
+        formData.unit_number &&
+        takenUnitsInProject.includes(String(formData.unit_number).trim())
+      ) {
+        toast({
+          title: 'الوحدة محجوزة بالفعل',
+          description: `الوحدة رقم ${formData.unit_number} في مشروع ${formData.project_name} محجوزة أو مباعة بالفعل. يرجى اختيار وحدة أخرى أو إلغاء الحجز الحالي أولاً.`,
+          variant: 'destructive',
+        });
+        setLoading(false);
+        return;
+      }
+
       // التحقق من صحة البيانات باستخدام Zod
       const validatedData = saleFormSchema.parse({
         ...formData,
@@ -224,7 +258,7 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
               <Label htmlFor="project_id">المشروع</Label>
               <Select
                 value={formData.project_id}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, project_id: value }))}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, project_id: value, unit_number: '' }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر المشروع" />
@@ -241,13 +275,42 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
 
             <div className="space-y-2">
               <Label htmlFor="unit_number">رقم الوحدة</Label>
-              <Input
-                id="unit_number"
-                value={formData.unit_number}
-                onChange={(e) => setFormData(prev => ({ ...prev, unit_number: e.target.value }))}
-                required
-              />
+              {formData.project_id && totalUnits > 0 ? (
+                <>
+                  <Select
+                    value={formData.unit_number}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, unit_number: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={availableUnitNumbers.length ? 'اختر الوحدة المتاحة' : 'لا توجد وحدات متاحة'} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50 max-h-60">
+                      {/* السماح بإبقاء رقم الوحدة الحالي عند التعديل حتى لو كان محجوزاً */}
+                      {sale?.unit_number && !availableUnitNumbers.includes(String(sale.unit_number)) && (
+                        <SelectItem value={String(sale.unit_number)}>
+                          {sale.unit_number} (الوحدة الحالية)
+                        </SelectItem>
+                      )}
+                      {availableUnitNumbers.map((n) => (
+                        <SelectItem key={n} value={n}>{n}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    متاح: {availableUnitNumbers.length} من إجمالي {totalUnits} وحدة
+                  </p>
+                </>
+              ) : (
+                <Input
+                  id="unit_number"
+                  value={formData.unit_number}
+                  onChange={(e) => setFormData(prev => ({ ...prev, unit_number: e.target.value }))}
+                  placeholder={formData.project_id ? 'أدخل رقم الوحدة' : 'اختر المشروع أولاً'}
+                  required
+                />
+              )}
             </div>
+
 
             <div className="space-y-2">
               <Label htmlFor="unit_type">نوع الوحدة</Label>

@@ -331,6 +331,25 @@ export const ReservationsPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Confirm cancel reservation */}
+      <AlertDialog open={!!cancelTarget} onOpenChange={(open) => !open && setCancelTarget(null)}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد إلغاء الحجز</AlertDialogTitle>
+            <AlertDialogDescription>
+              سيتم إلغاء حجز الوحدة <strong>{cancelTarget?.unit_number}</strong> في مشروع{' '}
+              <strong>{cancelTarget?.project_name}</strong> وستصبح متاحة للحجز مرة أخرى.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>تراجع</AlertDialogCancel>
+            <AlertDialogAction onClick={handleCancelReservation} className="bg-red-600 hover:bg-red-700">
+              تأكيد الإلغاء
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

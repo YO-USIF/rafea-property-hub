@@ -93,7 +93,6 @@ export const ReservationsPage = () => {
     if (!convertTarget) return;
     await updateSale.mutateAsync({
       id: convertTarget.id,
-      ...convertTarget,
       status: 'مباع',
       sale_date: convertTarget.sale_date || new Date().toISOString().split('T')[0],
     });
@@ -104,7 +103,6 @@ export const ReservationsPage = () => {
     if (!cancelTarget) return;
     await updateSale.mutateAsync({
       id: cancelTarget.id,
-      ...cancelTarget,
       status: 'متاح',
       customer_id: null,
       customer_name: '',

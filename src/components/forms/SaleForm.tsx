@@ -126,6 +126,24 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
     }
   }, [formData.project_id, projects, sale]);
 
+  // قائمة الوحدات المحجوزة/المباعة فعلياً في المشروع المختار
+  const takenUnitsInProject = (sales || [])
+    .filter((s: any) =>
+      s.project_id === formData.project_id &&
+      (s.status === 'محجوز' || s.status === 'مباع') &&
+      s.id !== sale?.id
+    )
+    .map((s: any) => String(s.unit_number).trim());
+
+  // قائمة الوحدات المتاحة (1..total_units) باستثناء المحجوز/المباع
+  const selectedProjectObj = projects.find((p: any) => p.id === formData.project_id);
+  const totalUnits = Number(selectedProjectObj?.total_units) || 0;
+  const availableUnitNumbers: string[] = [];
+  for (let i = 1; i <= totalUnits; i++) {
+    const num = String(i);
+    if (!takenUnitsInProject.includes(num)) availableUnitNumbers.push(num);
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

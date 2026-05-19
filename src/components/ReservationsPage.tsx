@@ -116,6 +116,24 @@ export const ReservationsPage = () => {
             <p className="text-sm text-muted-foreground">عرض الشقق المتاحة والمحجوزة والمباعة لكل مشروع</p>
           </div>
         </div>
+        <PermissionButton
+          pageName="reservations"
+          requirePermission="create"
+          onClick={() => setIsFormOpen(true)}
+        >
+          <Plus className="ml-2 h-4 w-4" />
+          إضافة حجز
+        </PermissionButton>
+      </div>
+
+      <SaleForm
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        defaultStatus="محجوز"
+        title="إضافة حجز جديد"
+        description="أدخل بيانات العميل والوحدة المراد حجزها"
+        onSuccess={() => setIsFormOpen(false)}
+      />
       </div>
 
       {/* Stats */}

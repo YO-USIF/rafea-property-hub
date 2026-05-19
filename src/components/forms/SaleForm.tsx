@@ -37,9 +37,12 @@ interface SaleFormProps {
   onOpenChange: (open: boolean) => void;
   sale?: Sale;
   onSuccess: () => void;
+  defaultStatus?: string;
+  title?: string;
+  description?: string;
 }
 
-const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
+const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, description }: SaleFormProps) => {
   const { createSale, updateSale } = useSales();
   const { projects } = useProjects();
   const { toast } = useToast();
@@ -102,7 +105,7 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess }: SaleFormProps) => {
           area: 0,
           price: 0,
           remaining_amount: 0,
-          status: 'متاح',
+          status: defaultStatus || 'متاح',
           sale_date: '',
           installment_plan: '',
           payment_method: '',

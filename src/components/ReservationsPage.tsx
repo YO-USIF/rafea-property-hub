@@ -3,31 +3,24 @@ import { useSales } from '@/hooks/useSales';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import {
-  CalendarCheck, CheckCircle2, Clock, Home, Search, Building2, Phone, User, Plus,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  CalendarCheck, Clock, Search, Building2, Phone, User, Plus, CheckCircle2,
 } from 'lucide-react';
 import SaleForm from '@/components/forms/SaleForm';
 import { PermissionButton } from '@/components/PermissionButton';
-
-const statusBadge = (status: string) => {
-  switch (status) {
-    case 'مباع':
-      return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 gap-1"><CheckCircle2 className="w-3 h-3" />مباع</Badge>;
-    case 'محجوز':
-      return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 gap-1"><Clock className="w-3 h-3" />محجوز</Badge>;
-    case 'متاح':
-      return <Badge className="bg-sky-100 text-sky-700 hover:bg-sky-100 gap-1"><Home className="w-3 h-3" />متاح</Badge>;
-    default:
-      return <Badge variant="secondary">{status}</Badge>;
-  }
-};
+import { usePermissions } from '@/hooks/usePermissions';
+import { useUserRole } from '@/hooks/useUserRole';
 
 const formatDate = (d?: string | null) => {
   if (!d) return '-';
@@ -42,23 +35,30 @@ const formatPrice = (p?: number | null) =>
   typeof p === 'number' && p > 0 ? p.toLocaleString('en-US') + ' ر.س' : '-';
 
 export const ReservationsPage = () => {
-  const { sales, isLoading } = useSales();
-  const [filter, setFilter] = useState<'all' | 'متاح' | 'محجوز' | 'مباع'>('all');
+  const { sales, isLoading, updateSale } = useSales();
+  const { checkPermission } = usePermissions();
+  const { isAdmin } = useUserRole();
+  const canConvert = isAdmin || checkPermission('reservations', 'edit');
+
   const [search, setSearch] = useState('');
   const [projectFilter, setProjectFilter] = useState<string>('all');
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [convertTarget, setConvertTarget] = useState<any>(null);
 
-  const units = useMemo(() => (Array.isArray(sales) ? sales : []), [sales]);
+  // Reservations page only deals with reserved units
+  const reservedUnits = useMemo(
+    () => (Array.isArray(sales) ? sales : []).filter((u: any) => u.status === 'محجوز'),
+    [sales]
+  );
 
   const projects = useMemo(() => {
     const set = new Set<string>();
-    units.forEach((u: any) => u?.project_name && set.add(u.project_name));
+    reservedUnits.forEach((u: any) => u?.project_name && set.add(u.project_name));
     return Array.from(set);
-  }, [units]);
+  }, [reservedUnits]);
 
   const filtered = useMemo(() => {
-    return units.filter((u: any) => {
-      if (filter !== 'all' && u.status !== filter) return false;
+    return reservedUnits.filter((u: any) => {
       if (projectFilter !== 'all' && u.project_name !== projectFilter) return false;
       if (search) {
         const t = search.toLowerCase();
@@ -70,21 +70,14 @@ export const ReservationsPage = () => {
       }
       return true;
     });
-  }, [units, filter, projectFilter, search]);
+  }, [reservedUnits, projectFilter, search]);
 
-  const stats = useMemo(() => {
-    const scope = projectFilter === 'all'
-      ? units
-      : units.filter((u: any) => u.project_name === projectFilter);
-    return {
-      total: scope.length,
-      available: scope.filter((u: any) => u.status === 'متاح').length,
-      reserved: scope.filter((u: any) => u.status === 'محجوز').length,
-      sold: scope.filter((u: any) => u.status === 'مباع').length,
-    };
-  }, [units, projectFilter]);
+  const totalReservedValue = useMemo(
+    () => filtered.reduce((sum, u: any) => sum + (Number(u.price) || 0), 0),
+    [filtered]
+  );
 
-  // Group filtered by project for the gallery view
+  // Group by project
   const groupedByProject = useMemo(() => {
     const groups: Record<string, any[]> = {};
     filtered.forEach((u: any) => {
@@ -94,6 +87,17 @@ export const ReservationsPage = () => {
     });
     return groups;
   }, [filtered]);
+
+  const handleConvertToSold = async () => {
+    if (!convertTarget) return;
+    await updateSale.mutateAsync({
+      id: convertTarget.id,
+      ...convertTarget,
+      status: 'مباع',
+      sale_date: convertTarget.sale_date || new Date().toISOString().split('T')[0],
+    });
+    setConvertTarget(null);
+  };
 
   if (isLoading) {
     return (
@@ -113,7 +117,9 @@ export const ReservationsPage = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">إدارة الحجوزات</h1>
-            <p className="text-sm text-muted-foreground">عرض الشقق المتاحة والمحجوزة والمباعة لكل مشروع</p>
+            <p className="text-sm text-muted-foreground">
+              الشقق المحجوزة فقط — عند إتمام البيع تنتقل تلقائياً إلى صفحة مبيعات الشقق
+            </p>
           </div>
         </div>
         <PermissionButton
@@ -135,33 +141,23 @@ export const ReservationsPage = () => {
         onSuccess={() => setIsFormOpen(false)}
       />
 
-
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="flex items-center gap-3 pt-6">
-            <div className="p-2 rounded-lg bg-primary/10"><Building2 className="h-5 w-5 text-primary" /></div>
-            <div>
-              <p className="text-2xl font-bold">{stats.total}</p>
-              <p className="text-xs text-muted-foreground">إجمالي الوحدات</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-3 pt-6">
-            <div className="p-2 rounded-lg bg-sky-100"><Home className="h-5 w-5 text-sky-600" /></div>
-            <div>
-              <p className="text-2xl font-bold text-sky-700">{stats.available}</p>
-              <p className="text-xs text-muted-foreground">متاحة</p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card>
           <CardContent className="flex items-center gap-3 pt-6">
             <div className="p-2 rounded-lg bg-amber-100"><Clock className="h-5 w-5 text-amber-600" /></div>
             <div>
-              <p className="text-2xl font-bold text-amber-700">{stats.reserved}</p>
-              <p className="text-xs text-muted-foreground">محجوزة</p>
+              <p className="text-2xl font-bold text-amber-700">{reservedUnits.length}</p>
+              <p className="text-xs text-muted-foreground">إجمالي الوحدات المحجوزة</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-3 pt-6">
+            <div className="p-2 rounded-lg bg-primary/10"><Building2 className="h-5 w-5 text-primary" /></div>
+            <div>
+              <p className="text-2xl font-bold">{projects.length}</p>
+              <p className="text-xs text-muted-foreground">مشاريع بها حجوزات</p>
             </div>
           </CardContent>
         </Card>
@@ -169,8 +165,8 @@ export const ReservationsPage = () => {
           <CardContent className="flex items-center gap-3 pt-6">
             <div className="p-2 rounded-lg bg-emerald-100"><CheckCircle2 className="h-5 w-5 text-emerald-600" /></div>
             <div>
-              <p className="text-2xl font-bold text-emerald-700">{stats.sold}</p>
-              <p className="text-xs text-muted-foreground">مباعة</p>
+              <p className="text-2xl font-bold text-emerald-700">{formatPrice(totalReservedValue)}</p>
+              <p className="text-xs text-muted-foreground">إجمالي قيمة الحجوزات</p>
             </div>
           </CardContent>
         </Card>
@@ -179,15 +175,6 @@ export const ReservationsPage = () => {
       {/* Filters */}
       <Card>
         <CardContent className="pt-6 flex flex-col lg:flex-row gap-3 items-stretch lg:items-center">
-          <Tabs value={filter} onValueChange={(v) => setFilter(v as any)} className="w-full lg:w-auto">
-            <TabsList>
-              <TabsTrigger value="all">الكل</TabsTrigger>
-              <TabsTrigger value="متاح">المتاحة</TabsTrigger>
-              <TabsTrigger value="محجوز">المحجوزة</TabsTrigger>
-              <TabsTrigger value="مباع">المباعة</TabsTrigger>
-            </TabsList>
-          </Tabs>
-
           <Select value={projectFilter} onValueChange={setProjectFilter}>
             <SelectTrigger className="w-full lg:w-64">
               <SelectValue placeholder="كل المشاريع" />
@@ -217,83 +204,104 @@ export const ReservationsPage = () => {
         <Card>
           <CardContent className="text-center py-12 text-muted-foreground">
             <CalendarCheck className="mx-auto h-12 w-12 mb-4 opacity-50" />
-            <p>لا توجد وحدات مطابقة للبحث</p>
+            <p>لا توجد حجوزات حالياً</p>
+            <p className="text-sm mt-2">اضغط "إضافة حجز" لإنشاء حجز جديد</p>
           </CardContent>
         </Card>
       ) : (
-        Object.entries(groupedByProject).map(([projectName, list]) => {
-          const pStats = {
-            available: list.filter((u: any) => u.status === 'متاح').length,
-            reserved: list.filter((u: any) => u.status === 'محجوز').length,
-            sold: list.filter((u: any) => u.status === 'مباع').length,
-          };
-          return (
-            <Card key={projectName}>
-              <CardHeader className="pb-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Building2 className="w-5 h-5 text-primary" />
-                    {projectName}
-                  </CardTitle>
-                  <div className="flex flex-wrap gap-2 text-xs">
-                    <Badge className="bg-sky-100 text-sky-700 hover:bg-sky-100">متاح: {pStats.available}</Badge>
-                    <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">محجوز: {pStats.reserved}</Badge>
-                    <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">مباع: {pStats.sold}</Badge>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="border rounded-lg overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="bg-muted/40">
-                        <TableHead className="text-right">رقم الوحدة</TableHead>
-                        <TableHead className="text-right">النوع</TableHead>
-                        <TableHead className="text-right">المساحة</TableHead>
-                        <TableHead className="text-right">الحالة</TableHead>
-                        <TableHead className="text-right">العميل</TableHead>
-                        <TableHead className="text-right">الهاتف</TableHead>
-                        <TableHead className="text-right">تاريخ الحجز/البيع</TableHead>
-                        <TableHead className="text-right">السعر</TableHead>
+        Object.entries(groupedByProject).map(([projectName, list]) => (
+          <Card key={projectName}>
+            <CardHeader className="pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-primary" />
+                  {projectName}
+                </CardTitle>
+                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">
+                  {list.length} حجز
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="border rounded-lg overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/40">
+                      <TableHead className="text-right">رقم الوحدة</TableHead>
+                      <TableHead className="text-right">النوع</TableHead>
+                      <TableHead className="text-right">المساحة</TableHead>
+                      <TableHead className="text-right">العميل</TableHead>
+                      <TableHead className="text-right">رقم الهوية</TableHead>
+                      <TableHead className="text-right">الهاتف</TableHead>
+                      <TableHead className="text-right">تاريخ الحجز</TableHead>
+                      <TableHead className="text-right">السعر</TableHead>
+                      <TableHead className="text-center">إجراءات</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {list.map((u: any) => (
+                      <TableRow key={u.id}>
+                        <TableCell className="font-semibold">{u.unit_number || '-'}</TableCell>
+                        <TableCell>{u.unit_type || '-'}</TableCell>
+                        <TableCell>{u.area ? `${u.area} م²` : '-'}</TableCell>
+                        <TableCell>
+                          <span className="flex items-center gap-1">
+                            <User className="w-3 h-3 text-muted-foreground" />
+                            {u.customer_name || '-'}
+                          </span>
+                        </TableCell>
+                        <TableCell dir="ltr" className="text-right">{u.customer_id_number || '-'}</TableCell>
+                        <TableCell>
+                          {u.customer_phone ? (
+                            <span className="flex items-center gap-1" dir="ltr">
+                              <Phone className="w-3 h-3 text-muted-foreground" />
+                              {u.customer_phone}
+                            </span>
+                          ) : '-'}
+                        </TableCell>
+                        <TableCell>{formatDate(u.sale_date)}</TableCell>
+                        <TableCell className="font-medium">{formatPrice(u.price)}</TableCell>
+                        <TableCell className="text-center">
+                          {canConvert && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="gap-1 text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                              onClick={() => setConvertTarget(u)}
+                            >
+                              <CheckCircle2 className="w-4 h-4" />
+                              تحويل إلى مبيع
+                            </Button>
+                          )}
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {list.map((u: any) => (
-                        <TableRow key={u.id}>
-                          <TableCell className="font-semibold">{u.unit_number || '-'}</TableCell>
-                          <TableCell>{u.unit_type || '-'}</TableCell>
-                          <TableCell>{u.area ? `${u.area} م²` : '-'}</TableCell>
-                          <TableCell>{statusBadge(u.status)}</TableCell>
-                          <TableCell>
-                            {u.status === 'متاح' ? (
-                              <span className="text-muted-foreground">—</span>
-                            ) : (
-                              <span className="flex items-center gap-1">
-                                <User className="w-3 h-3 text-muted-foreground" />
-                                {u.customer_name || '-'}
-                              </span>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {u.customer_phone ? (
-                              <span className="flex items-center gap-1" dir="ltr">
-                                <Phone className="w-3 h-3 text-muted-foreground" />
-                                {u.customer_phone}
-                              </span>
-                            ) : '-'}
-                          </TableCell>
-                          <TableCell>{formatDate(u.sale_date)}</TableCell>
-                          <TableCell className="font-medium">{formatPrice(u.price)}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        ))
       )}
+
+      {/* Confirm convert */}
+      <AlertDialog open={!!convertTarget} onOpenChange={(open) => !open && setConvertTarget(null)}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد إتمام البيع</AlertDialogTitle>
+            <AlertDialogDescription>
+              سيتم تحويل حجز الوحدة <strong>{convertTarget?.unit_number}</strong> في مشروع{' '}
+              <strong>{convertTarget?.project_name}</strong> إلى حالة "مباع"، وستظهر تلقائياً في صفحة مبيعات الشقق.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConvertToSold} className="bg-emerald-600 hover:bg-emerald-700">
+              تأكيد البيع
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

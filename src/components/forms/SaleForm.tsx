@@ -172,10 +172,10 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {sale ? 'تعديل عملية البيع' : 'إضافة عملية بيع جديدة'}
+            {title || (sale ? 'تعديل عملية البيع' : 'إضافة عملية بيع جديدة')}
           </DialogTitle>
           <DialogDescription>
-            {sale ? 'قم بتعديل بيانات عملية البيع' : 'أدخل بيانات عملية البيع الجديدة'}
+            {description || (sale ? 'قم بتعديل بيانات عملية البيع' : 'أدخل بيانات عملية البيع الجديدة')}
           </DialogDescription>
         </DialogHeader>
 

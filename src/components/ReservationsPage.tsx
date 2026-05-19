@@ -44,6 +44,7 @@ export const ReservationsPage = () => {
   const [projectFilter, setProjectFilter] = useState<string>('all');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [convertTarget, setConvertTarget] = useState<any>(null);
+  const [cancelTarget, setCancelTarget] = useState<any>(null);
 
   // Reservations page only deals with reserved units
   const reservedUnits = useMemo(

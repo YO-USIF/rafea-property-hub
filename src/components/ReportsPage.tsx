@@ -286,6 +286,8 @@ const ReportsPage = () => {
     switch (type) {
       case 'sales':
         return <SalesReport data={data} period={selectedPeriod} />;
+      case 'reservations-sales':
+        return <ReservationsSalesReport sales={data} period={selectedPeriod} />;
       case 'invoices':
         return <InvoicesReport data={data} period={selectedPeriod} />;
       case 'purchases':

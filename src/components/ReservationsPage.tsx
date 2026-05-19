@@ -278,17 +278,30 @@ export const ReservationsPage = () => {
                         <TableCell>{formatDate(u.sale_date)}</TableCell>
                         <TableCell className="font-medium">{formatPrice(u.price)}</TableCell>
                         <TableCell className="text-center">
-                          {canConvert && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="gap-1 text-emerald-700 border-emerald-300 hover:bg-emerald-50"
-                              onClick={() => setConvertTarget(u)}
-                            >
-                              <CheckCircle2 className="w-4 h-4" />
-                              تحويل إلى مبيع
-                            </Button>
-                          )}
+                          <div className="flex items-center justify-center gap-2">
+                            {canConvert && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="gap-1 text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                                onClick={() => setConvertTarget(u)}
+                              >
+                                <CheckCircle2 className="w-4 h-4" />
+                                تحويل إلى مبيع
+                              </Button>
+                            )}
+                            {canConvert && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="gap-1 text-red-700 border-red-300 hover:bg-red-50"
+                                onClick={() => setCancelTarget(u)}
+                              >
+                                <XCircle className="w-4 h-4" />
+                                إلغاء الحجز
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}

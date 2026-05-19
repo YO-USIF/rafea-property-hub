@@ -30,6 +30,7 @@ const AVAILABLE_PAGES = [
   { name: "dashboard", label: "لوحة التحكم" },
   { name: "projects", label: "المشاريع" },
   { name: "sales", label: "المبيعات" },
+  { name: "reservations", label: "الحجوزات" },
   { name: "purchases", label: "المشتريات" },
   { name: "invoices", label: "الفواتير" },
   { name: "extracts", label: "المستخلصات" },

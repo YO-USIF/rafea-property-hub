@@ -19,6 +19,7 @@ import SettingsPage from '../components/SettingsPage';
 import NotificationsManagement from '../components/NotificationsManagement';
 import { WarehousePage } from '../components/WarehousePage';
 import { PermissionsManagement } from '../components/PermissionsManagement';
+import { ReservationsPage } from '../components/ReservationsPage';
 import { ProtectedPage } from '../components/ProtectedPage';
 
 const Index = () => {
@@ -43,6 +44,12 @@ const Index = () => {
         return (
           <ProtectedPage pageName="sales">
             <SalesPage />
+          </ProtectedPage>
+        );
+      case 'reservations':
+        return (
+          <ProtectedPage pageName="reservations">
+            <ReservationsPage />
           </ProtectedPage>
         );
       case 'contractors':

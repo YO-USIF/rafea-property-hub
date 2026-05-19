@@ -215,6 +215,17 @@ export const useSales = () => {
       
       if (error) throw error;
 
+      // إشعار المستخدمين أصحاب الصلاحية بتغيير حالة الوحدة إلى محجوز أو مباع
+      if (saleData.status === 'محجوز' || saleData.status === 'مباع') {
+        const isSold = saleData.status === 'مباع';
+        await notifySalesPermitted(
+          user?.id,
+          isSold ? '🏠 تحويل إلى مبيع' : '📌 حجز شقة',
+          `${isSold ? 'تم تحويل الوحدة إلى مبيع' : 'تم حجز الوحدة'} ${data?.unit_number || ''} في مشروع ${data?.project_name || ''}${data?.customer_name ? ` - العميل: ${data.customer_name}` : ''}`,
+          isSold ? 'success' : 'info'
+        );
+      }
+
       return data;
     },
     onSuccess: () => {

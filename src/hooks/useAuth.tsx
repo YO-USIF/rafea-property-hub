@@ -91,59 +91,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // إيقاف تحديث الحالة مؤقتاً
-      setLoading(true);
-      
-      // تنظيف الحالة محلياً أولاً
+      // إنهاء الجلسة من الخادم أولاً (قبل مسح التخزين حتى يجد الـ token)
+      try {
+        await supabase.auth.signOut({ scope: 'local' });
+      } catch (e) {
+        console.warn('signOut server call failed, continuing local cleanup', e);
+      }
+
+      // تنظيف الحالة محلياً
       setUser(null);
       setSession(null);
-      
-      // تنظيف localStorage يدوياً
-      const keysToRemove = [];
+
+      // مسح جميع مفاتيح Supabase من localStorage (sb-* و supabase.*)
+      const keysToRemove: string[] = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && (key.startsWith('supabase.auth.token') || key.includes('supabase'))) {
+        if (key && (key.startsWith('sb-') || key.startsWith('supabase.') || key.includes('supabase'))) {
           keysToRemove.push(key);
         }
       }
       keysToRemove.forEach(key => localStorage.removeItem(key));
-      
-      // تنظيف sessionStorage أيضاً
       sessionStorage.clear();
-      
-      // إنهاء الجلسة من الخادم
-      await supabase.auth.signOut({ scope: 'global' });
-      
-      // إظهار رسالة النجاح
+
       toast({
         title: "تم تسجيل الخروج",
         description: "شكراً لك على استخدام النظام",
       });
-      
-      // إعادة تعيين حالة التحميل
-      setLoading(false);
-      
-      // تأكد من إعادة توجيه للصفحة الرئيسية
+
       window.location.href = '/';
-      
     } catch (error) {
       console.error('خطأ في تسجيل الخروج:', error);
-      
-      // في حالة أي خطأ، نظف كل شيء محلياً
       setUser(null);
       setSession(null);
-      setLoading(false);
-      
-      // تنظيف شامل للتخزين
       localStorage.clear();
       sessionStorage.clear();
-      
-      toast({
-        title: "تم تسجيل الخروج",
-        description: "تم تسجيل الخروج بنجاح",
-      });
-      
-      // إعادة توجيه قسري
       window.location.href = '/';
     }
   };

@@ -149,6 +149,22 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
     setLoading(true);
 
     try {
+      // منع حجز/بيع نفس الوحدة مرتين في نفس المشروع
+      if (
+        (formData.status === 'محجوز' || formData.status === 'مباع') &&
+        formData.project_id &&
+        formData.unit_number &&
+        takenUnitsInProject.includes(String(formData.unit_number).trim())
+      ) {
+        toast({
+          title: 'الوحدة محجوزة بالفعل',
+          description: `الوحدة رقم ${formData.unit_number} في مشروع ${formData.project_name} محجوزة أو مباعة بالفعل. يرجى اختيار وحدة أخرى أو إلغاء الحجز الحالي أولاً.`,
+          variant: 'destructive',
+        });
+        setLoading(false);
+        return;
+      }
+
       // التحقق من صحة البيانات باستخدام Zod
       const validatedData = saleFormSchema.parse({
         ...formData,

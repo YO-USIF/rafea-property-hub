@@ -21,6 +21,7 @@ import SaleForm from '@/components/forms/SaleForm';
 import { PermissionButton } from '@/components/PermissionButton';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useProjects } from '@/hooks/useProjects';
 
 const formatDate = (d?: string | null) => {
   if (!d) return '-';
@@ -36,6 +37,7 @@ const formatPrice = (p?: number | null) =>
 
 export const ReservationsPage = () => {
   const { sales, isLoading, updateSale } = useSales();
+  const { projects: allProjects } = useProjects();
   const { checkPermission } = usePermissions();
   const { isAdmin } = useUserRole();
   const canConvert = isAdmin || checkPermission('reservations', 'edit');
@@ -54,9 +56,35 @@ export const ReservationsPage = () => {
 
   const projects = useMemo(() => {
     const set = new Set<string>();
+    (Array.isArray(allProjects) ? allProjects : []).forEach((p: any) => p?.name && set.add(p.name));
     reservedUnits.forEach((u: any) => u?.project_name && set.add(u.project_name));
     return Array.from(set);
-  }, [reservedUnits]);
+  }, [allProjects, reservedUnits]);
+
+  const selectedProject = useMemo(() => {
+    if (projectFilter === 'all') return null;
+    return (Array.isArray(allProjects) ? allProjects : []).find((p: any) => p.name === projectFilter) || null;
+  }, [allProjects, projectFilter]);
+
+  const projectUnitsMap = useMemo(() => {
+    if (!selectedProject) return null;
+    const total = Number(selectedProject.total_units) || 0;
+    if (!total) return null;
+    const taken: Record<string, any> = {};
+    (Array.isArray(sales) ? sales : []).forEach((s: any) => {
+      if (s.project_id === selectedProject.id && s.unit_number) {
+        taken[String(s.unit_number)] = s;
+      }
+    });
+    const units = [] as Array<{ number: string; sale: any | null; status: 'متاح' | 'محجوز' | 'مباع' }>;
+    for (let i = 1; i <= total; i++) {
+      const key = String(i);
+      const sale = taken[key];
+      const status = sale?.status === 'مباع' ? 'مباع' : sale?.status === 'محجوز' ? 'محجوز' : 'متاح';
+      units.push({ number: key, sale: sale || null, status });
+    }
+    return units;
+  }, [selectedProject, sales]);
 
   const filtered = useMemo(() => {
     return reservedUnits.filter((u: any) => {
@@ -212,6 +240,77 @@ export const ReservationsPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Visual unit map (per selected project) */}
+      {projectUnitsMap && (
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-primary" />
+                خريطة وحدات مشروع: {selectedProject?.name}
+              </CardTitle>
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-500 inline-block" /> متاح</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-amber-500 inline-block" /> محجوز</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-500 inline-block" /> مباع</span>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-2 mb-4">
+              {projectUnitsMap.map((u) => {
+                const color =
+                  u.status === 'مباع'
+                    ? 'bg-red-100 border-red-300 text-red-800 hover:bg-red-200'
+                    : u.status === 'محجوز'
+                    ? 'bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200'
+                    : 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100';
+                return (
+                  <div
+                    key={u.number}
+                    title={
+                      u.sale
+                        ? `وحدة ${u.number} — ${u.status}${u.sale.customer_name ? ` — ${u.sale.customer_name}` : ''}`
+                        : `وحدة ${u.number} — متاحة`
+                    }
+                    className={`relative border rounded-lg p-2 text-center cursor-default transition-colors ${color}`}
+                  >
+                    <div className="text-sm font-bold">{u.number}</div>
+                    <div className="text-[10px] opacity-80">{u.status}</div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t">
+              <div className="text-center">
+                <p className="text-2xl font-bold">{projectUnitsMap.length}</p>
+                <p className="text-xs text-muted-foreground">إجمالي الوحدات</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-emerald-600">
+                  {projectUnitsMap.filter((u) => u.status === 'متاح').length}
+                </p>
+                <p className="text-xs text-muted-foreground">متاحة</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-amber-600">
+                  {projectUnitsMap.filter((u) => u.status === 'محجوز').length}
+                </p>
+                <p className="text-xs text-muted-foreground">محجوزة</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-red-600">
+                  {projectUnitsMap.filter((u) => u.status === 'مباع').length}
+                </p>
+                <p className="text-xs text-muted-foreground">مباعة</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+
 
       {/* Content */}
       {filtered.length === 0 ? (

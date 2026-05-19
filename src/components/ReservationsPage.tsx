@@ -21,6 +21,7 @@ import SaleForm from '@/components/forms/SaleForm';
 import { PermissionButton } from '@/components/PermissionButton';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useProjects } from '@/hooks/useProjects';
 
 const formatDate = (d?: string | null) => {
   if (!d) return '-';

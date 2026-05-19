@@ -37,6 +37,7 @@ const formatPrice = (p?: number | null) =>
 
 export const ReservationsPage = () => {
   const { sales, isLoading, updateSale } = useSales();
+  const { projects: allProjects } = useProjects();
   const { checkPermission } = usePermissions();
   const { isAdmin } = useUserRole();
   const canConvert = isAdmin || checkPermission('reservations', 'edit');

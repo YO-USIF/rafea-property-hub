@@ -4,6 +4,49 @@ import { useAuth } from './useAuth';
 import { useUserRole } from './useUserRole';
 import { useToast } from './use-toast';
 
+// إرسال إشعارات لكل من لديه صلاحية عرض أو تعديل صفحة المبيعات (بالإضافة إلى مديري النظام)
+const notifySalesPermitted = async (
+  actorId: string | undefined,
+  title: string,
+  message: string,
+  type: string = 'info'
+) => {
+  try {
+    const recipientIds = new Set<string>();
+
+    // مستخدمون لديهم صلاحية عرض أو تعديل المبيعات
+    const { data: perms } = await supabase
+      .from('user_permissions')
+      .select('user_id, can_view, can_edit')
+      .eq('page_name', 'sales');
+    perms?.forEach((p: any) => {
+      if (p.can_view || p.can_edit) recipientIds.add(p.user_id);
+    });
+
+    // مديرو النظام
+    const { data: admins } = await supabase
+      .from('user_roles')
+      .select('user_id')
+      .eq('role', 'مدير النظام');
+    admins?.forEach((a: any) => recipientIds.add(a.user_id));
+
+    if (actorId) recipientIds.delete(actorId);
+
+    const rows = Array.from(recipientIds).map((uid) => ({
+      user_id: uid,
+      title,
+      message,
+      type,
+    }));
+
+    if (rows.length > 0) {
+      await supabase.from('notifications').insert(rows);
+    }
+  } catch (err) {
+    console.warn('Could not send sales notifications:', err);
+  }
+};
+
 export const useSales = () => {
   const { user } = useAuth();
   const { isManager, isAdmin } = useUserRole();
@@ -120,6 +163,17 @@ export const useSales = () => {
         }
       }
       
+      // إشعار المستخدمين أصحاب الصلاحية بالحجز/البيع الجديد
+      if (saleData.status === 'محجوز' || saleData.status === 'مباع') {
+        const isSold = saleData.status === 'مباع';
+        await notifySalesPermitted(
+          user?.id,
+          isSold ? '🏠 بيع شقة جديد' : '📌 حجز شقة جديد',
+          `${isSold ? 'تم بيع' : 'تم حجز'} الوحدة ${saleData.unit_number || ''} في مشروع ${saleData.project_name || ''}${saleData.customer_name ? ` - العميل: ${saleData.customer_name}` : ''}`,
+          isSold ? 'success' : 'info'
+        );
+      }
+
       return data;
     },
     onSuccess: () => {
@@ -160,6 +214,17 @@ export const useSales = () => {
       const { data, error } = await query.select().single();
       
       if (error) throw error;
+
+      // إشعار المستخدمين أصحاب الصلاحية بتغيير حالة الوحدة إلى محجوز أو مباع
+      if (saleData.status === 'محجوز' || saleData.status === 'مباع') {
+        const isSold = saleData.status === 'مباع';
+        await notifySalesPermitted(
+          user?.id,
+          isSold ? '🏠 تحويل إلى مبيع' : '📌 حجز شقة',
+          `${isSold ? 'تم تحويل الوحدة إلى مبيع' : 'تم حجز الوحدة'} ${data?.unit_number || ''} في مشروع ${data?.project_name || ''}${data?.customer_name ? ` - العميل: ${data.customer_name}` : ''}`,
+          isSold ? 'success' : 'info'
+        );
+      }
 
       return data;
     },

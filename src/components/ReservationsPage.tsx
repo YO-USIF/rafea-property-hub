@@ -100,6 +100,21 @@ export const ReservationsPage = () => {
     setConvertTarget(null);
   };
 
+  const handleCancelReservation = async () => {
+    if (!cancelTarget) return;
+    await updateSale.mutateAsync({
+      id: cancelTarget.id,
+      ...cancelTarget,
+      status: 'متاح',
+      customer_id: null,
+      customer_name: '',
+      customer_phone: '',
+      customer_id_number: '',
+      sale_date: null,
+    });
+    setCancelTarget(null);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">

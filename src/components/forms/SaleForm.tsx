@@ -45,9 +45,6 @@ interface SaleFormProps {
 const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, description }: SaleFormProps) => {
   const { createSale, updateSale, sales } = useSales();
   const { projects } = useProjects();
-
-  // الوحدات المتاحة في المشروع المختار (تستبعد المحجوزة والمباعة)
-  const selectedProject = projects.find((p: any) => p.id === (undefined as any));
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Sale>({

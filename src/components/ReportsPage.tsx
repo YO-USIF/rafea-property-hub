@@ -14,6 +14,7 @@ import ProfitLossReport from '@/components/reports/ProfitLossReport';
 import { ProjectCostCenterReport } from '@/components/reports/ProjectCostCenterReport';
 import { ProjectDetailedReport } from '@/components/reports/ProjectDetailedReport';
 import ExtractsAndOrdersReport from '@/components/reports/ExtractsAndOrdersReport';
+import ReservationsSalesReport from '@/components/reports/ReservationsSalesReport';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';

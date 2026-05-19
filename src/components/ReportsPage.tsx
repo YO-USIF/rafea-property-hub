@@ -239,6 +239,7 @@ const ReportsPage = () => {
 
     switch (reportType) {
       case 'sales': reportData = salesData; break;
+      case 'reservations-sales': reportData = salesData; break;
       case 'invoices': reportData = invoicesData; break;
       case 'purchases': reportData = purchasesData; break;
       case 'profit-loss': reportData = { salesData, invoicesData, purchasesData, extractsData }; break;

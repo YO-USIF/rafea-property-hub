@@ -134,7 +134,7 @@ export const ReservationsPage = () => {
         description="أدخل بيانات العميل والوحدة المراد حجزها"
         onSuccess={() => setIsFormOpen(false)}
       />
-      </div>
+
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

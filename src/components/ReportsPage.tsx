@@ -63,6 +63,7 @@ const ReportsPage = () => {
       description: 'تقارير مبيعات الشقق والعقود',
       icon: TrendingUp,
       reports: [
+        { name: 'تقرير الحجوزات والمبيعات (احترافي)', type: 'reservations-sales' },
         { name: 'تقرير المبيعات', type: 'sales' },
         { name: 'تقرير المشتريات', type: 'purchases' },
       ]

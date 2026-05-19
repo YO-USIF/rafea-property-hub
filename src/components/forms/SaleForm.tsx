@@ -258,7 +258,7 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
               <Label htmlFor="project_id">المشروع</Label>
               <Select
                 value={formData.project_id}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, project_id: value }))}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, project_id: value, unit_number: '' }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر المشروع" />

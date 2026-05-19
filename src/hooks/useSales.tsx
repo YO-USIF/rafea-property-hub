@@ -4,6 +4,49 @@ import { useAuth } from './useAuth';
 import { useUserRole } from './useUserRole';
 import { useToast } from './use-toast';
 
+// إرسال إشعارات لكل من لديه صلاحية عرض أو تعديل صفحة المبيعات (بالإضافة إلى مديري النظام)
+const notifySalesPermitted = async (
+  actorId: string | undefined,
+  title: string,
+  message: string,
+  type: string = 'info'
+) => {
+  try {
+    const recipientIds = new Set<string>();
+
+    // مستخدمون لديهم صلاحية عرض أو تعديل المبيعات
+    const { data: perms } = await supabase
+      .from('user_permissions')
+      .select('user_id, can_view, can_edit')
+      .eq('page_name', 'sales');
+    perms?.forEach((p: any) => {
+      if (p.can_view || p.can_edit) recipientIds.add(p.user_id);
+    });
+
+    // مديرو النظام
+    const { data: admins } = await supabase
+      .from('user_roles')
+      .select('user_id')
+      .eq('role', 'مدير النظام');
+    admins?.forEach((a: any) => recipientIds.add(a.user_id));
+
+    if (actorId) recipientIds.delete(actorId);
+
+    const rows = Array.from(recipientIds).map((uid) => ({
+      user_id: uid,
+      title,
+      message,
+      type,
+    }));
+
+    if (rows.length > 0) {
+      await supabase.from('notifications').insert(rows);
+    }
+  } catch (err) {
+    console.warn('Could not send sales notifications:', err);
+  }
+};
+
 export const useSales = () => {
   const { user } = useAuth();
   const { isManager, isAdmin } = useUserRole();

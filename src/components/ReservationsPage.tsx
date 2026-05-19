@@ -3,7 +3,6 @@ import { useSales } from '@/hooks/useSales';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
@@ -12,8 +11,10 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import {
-  CalendarCheck, CheckCircle2, Clock, Home, Search, Building2, Phone, User,
+  CalendarCheck, CheckCircle2, Clock, Home, Search, Building2, Phone, User, Plus,
 } from 'lucide-react';
+import SaleForm from '@/components/forms/SaleForm';
+import { PermissionButton } from '@/components/PermissionButton';
 
 const statusBadge = (status: string) => {
   switch (status) {
@@ -45,6 +46,7 @@ export const ReservationsPage = () => {
   const [filter, setFilter] = useState<'all' | 'متاح' | 'محجوز' | 'مباع'>('all');
   const [search, setSearch] = useState('');
   const [projectFilter, setProjectFilter] = useState<string>('all');
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const units = useMemo(() => (Array.isArray(sales) ? sales : []), [sales]);
 
@@ -114,7 +116,25 @@ export const ReservationsPage = () => {
             <p className="text-sm text-muted-foreground">عرض الشقق المتاحة والمحجوزة والمباعة لكل مشروع</p>
           </div>
         </div>
+        <PermissionButton
+          pageName="reservations"
+          requirePermission="create"
+          onClick={() => setIsFormOpen(true)}
+        >
+          <Plus className="ml-2 h-4 w-4" />
+          إضافة حجز
+        </PermissionButton>
       </div>
+
+      <SaleForm
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        defaultStatus="محجوز"
+        title="إضافة حجز جديد"
+        description="أدخل بيانات العميل والوحدة المراد حجزها"
+        onSuccess={() => setIsFormOpen(false)}
+      />
+
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

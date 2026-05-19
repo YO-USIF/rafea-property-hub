@@ -26,6 +26,7 @@ import {
   Briefcase,
   CreditCard,
   LayoutDashboard,
+  CalendarCheck,
   type LucideIcon
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -56,6 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
     { id: 'dashboard', name: 'لوحة التحكم', icon: LayoutDashboard, group: 'main' },
     { id: 'projects', name: 'إدارة المشاريع', icon: Building, group: 'projects' },
     { id: 'sales', name: 'مبيعات الشقق', icon: ShoppingCart, group: 'projects' },
+    { id: 'reservations', name: 'الحجوزات', icon: CalendarCheck, group: 'projects' },
     { id: 'contractors', name: 'المقاولون', icon: Users, group: 'operations' },
     { id: 'suppliers', name: 'الموردون', icon: Truck, group: 'operations' },
     { id: 'purchases', name: 'المشتريات', icon: CreditCard, group: 'operations' },

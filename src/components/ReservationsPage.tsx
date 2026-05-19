@@ -15,7 +15,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {
-  CalendarCheck, Clock, Search, Building2, Phone, User, Plus, CheckCircle2,
+  CalendarCheck, Clock, Search, Building2, Phone, User, Plus, CheckCircle2, XCircle,
 } from 'lucide-react';
 import SaleForm from '@/components/forms/SaleForm';
 import { PermissionButton } from '@/components/PermissionButton';
@@ -44,6 +44,7 @@ export const ReservationsPage = () => {
   const [projectFilter, setProjectFilter] = useState<string>('all');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [convertTarget, setConvertTarget] = useState<any>(null);
+  const [cancelTarget, setCancelTarget] = useState<any>(null);
 
   // Reservations page only deals with reserved units
   const reservedUnits = useMemo(
@@ -97,6 +98,21 @@ export const ReservationsPage = () => {
       sale_date: convertTarget.sale_date || new Date().toISOString().split('T')[0],
     });
     setConvertTarget(null);
+  };
+
+  const handleCancelReservation = async () => {
+    if (!cancelTarget) return;
+    await updateSale.mutateAsync({
+      id: cancelTarget.id,
+      ...cancelTarget,
+      status: 'متاح',
+      customer_id: null,
+      customer_name: '',
+      customer_phone: '',
+      customer_id_number: '',
+      sale_date: null,
+    });
+    setCancelTarget(null);
   };
 
   if (isLoading) {
@@ -262,17 +278,30 @@ export const ReservationsPage = () => {
                         <TableCell>{formatDate(u.sale_date)}</TableCell>
                         <TableCell className="font-medium">{formatPrice(u.price)}</TableCell>
                         <TableCell className="text-center">
-                          {canConvert && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="gap-1 text-emerald-700 border-emerald-300 hover:bg-emerald-50"
-                              onClick={() => setConvertTarget(u)}
-                            >
-                              <CheckCircle2 className="w-4 h-4" />
-                              تحويل إلى مبيع
-                            </Button>
-                          )}
+                          <div className="flex items-center justify-center gap-2">
+                            {canConvert && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="gap-1 text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                                onClick={() => setConvertTarget(u)}
+                              >
+                                <CheckCircle2 className="w-4 h-4" />
+                                تحويل إلى مبيع
+                              </Button>
+                            )}
+                            {canConvert && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="gap-1 text-red-700 border-red-300 hover:bg-red-50"
+                                onClick={() => setCancelTarget(u)}
+                              >
+                                <XCircle className="w-4 h-4" />
+                                إلغاء الحجز
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -298,6 +327,25 @@ export const ReservationsPage = () => {
             <AlertDialogCancel>إلغاء</AlertDialogCancel>
             <AlertDialogAction onClick={handleConvertToSold} className="bg-emerald-600 hover:bg-emerald-700">
               تأكيد البيع
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Confirm cancel reservation */}
+      <AlertDialog open={!!cancelTarget} onOpenChange={(open) => !open && setCancelTarget(null)}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد إلغاء الحجز</AlertDialogTitle>
+            <AlertDialogDescription>
+              سيتم إلغاء حجز الوحدة <strong>{cancelTarget?.unit_number}</strong> في مشروع{' '}
+              <strong>{cancelTarget?.project_name}</strong> وستصبح متاحة للحجز مرة أخرى.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>تراجع</AlertDialogCancel>
+            <AlertDialogAction onClick={handleCancelReservation} className="bg-red-600 hover:bg-red-700">
+              تأكيد الإلغاء
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

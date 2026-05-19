@@ -275,13 +275,42 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
 
             <div className="space-y-2">
               <Label htmlFor="unit_number">رقم الوحدة</Label>
-              <Input
-                id="unit_number"
-                value={formData.unit_number}
-                onChange={(e) => setFormData(prev => ({ ...prev, unit_number: e.target.value }))}
-                required
-              />
+              {formData.project_id && totalUnits > 0 ? (
+                <>
+                  <Select
+                    value={formData.unit_number}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, unit_number: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={availableUnitNumbers.length ? 'اختر الوحدة المتاحة' : 'لا توجد وحدات متاحة'} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50 max-h-60">
+                      {/* السماح بإبقاء رقم الوحدة الحالي عند التعديل حتى لو كان محجوزاً */}
+                      {sale?.unit_number && !availableUnitNumbers.includes(String(sale.unit_number)) && (
+                        <SelectItem value={String(sale.unit_number)}>
+                          {sale.unit_number} (الوحدة الحالية)
+                        </SelectItem>
+                      )}
+                      {availableUnitNumbers.map((n) => (
+                        <SelectItem key={n} value={n}>{n}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    متاح: {availableUnitNumbers.length} من إجمالي {totalUnits} وحدة
+                  </p>
+                </>
+              ) : (
+                <Input
+                  id="unit_number"
+                  value={formData.unit_number}
+                  onChange={(e) => setFormData(prev => ({ ...prev, unit_number: e.target.value }))}
+                  placeholder={formData.project_id ? 'أدخل رقم الوحدة' : 'اختر المشروع أولاً'}
+                  required
+                />
+              )}
             </div>
+
 
             <div className="space-y-2">
               <Label htmlFor="unit_type">نوع الوحدة</Label>

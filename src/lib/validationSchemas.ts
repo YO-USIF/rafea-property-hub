@@ -48,7 +48,7 @@ export const saleFormSchema = z.object({
     .min(1, { message: errorMessages.required })
     .max(50, { message: errorMessages.maxLength(50) }),
   
-  unit_type: z.enum(['شقة', 'فيلا', 'أرض', 'محل تجاري', 'مكتب', 'مستودع'], {
+  unit_type: z.enum(['شقة', 'فيلا', 'دوبلكس', 'استوديو', 'أرض', 'محل تجاري', 'مكتب', 'مستودع'], {
     errorMap: () => ({ message: 'نوع الوحدة غير صحيح' })
   }),
   

@@ -163,6 +163,17 @@ export const useSales = () => {
         }
       }
       
+      // إشعار المستخدمين أصحاب الصلاحية بالحجز/البيع الجديد
+      if (saleData.status === 'محجوز' || saleData.status === 'مباع') {
+        const isSold = saleData.status === 'مباع';
+        await notifySalesPermitted(
+          user?.id,
+          isSold ? '🏠 بيع شقة جديد' : '📌 حجز شقة جديد',
+          `${isSold ? 'تم بيع' : 'تم حجز'} الوحدة ${saleData.unit_number || ''} في مشروع ${saleData.project_name || ''}${saleData.customer_name ? ` - العميل: ${saleData.customer_name}` : ''}`,
+          isSold ? 'success' : 'info'
+        );
+      }
+
       return data;
     },
     onSuccess: () => {

@@ -56,9 +56,35 @@ export const ReservationsPage = () => {
 
   const projects = useMemo(() => {
     const set = new Set<string>();
+    (Array.isArray(allProjects) ? allProjects : []).forEach((p: any) => p?.name && set.add(p.name));
     reservedUnits.forEach((u: any) => u?.project_name && set.add(u.project_name));
     return Array.from(set);
-  }, [reservedUnits]);
+  }, [allProjects, reservedUnits]);
+
+  const selectedProject = useMemo(() => {
+    if (projectFilter === 'all') return null;
+    return (Array.isArray(allProjects) ? allProjects : []).find((p: any) => p.name === projectFilter) || null;
+  }, [allProjects, projectFilter]);
+
+  const projectUnitsMap = useMemo(() => {
+    if (!selectedProject) return null;
+    const total = Number(selectedProject.total_units) || 0;
+    if (!total) return null;
+    const taken: Record<string, any> = {};
+    (Array.isArray(sales) ? sales : []).forEach((s: any) => {
+      if (s.project_id === selectedProject.id && s.unit_number) {
+        taken[String(s.unit_number)] = s;
+      }
+    });
+    const units = [] as Array<{ number: string; sale: any | null; status: 'متاح' | 'محجوز' | 'مباع' }>;
+    for (let i = 1; i <= total; i++) {
+      const key = String(i);
+      const sale = taken[key];
+      const status = sale?.status === 'مباع' ? 'مباع' : sale?.status === 'محجوز' ? 'محجوز' : 'متاح';
+      units.push({ number: key, sale: sale || null, status });
+    }
+    return units;
+  }, [selectedProject, sales]);
 
   const filtered = useMemo(() => {
     return reservedUnits.filter((u: any) => {

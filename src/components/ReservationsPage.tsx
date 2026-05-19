@@ -241,6 +241,77 @@ export const ReservationsPage = () => {
         </CardContent>
       </Card>
 
+      {/* Visual unit map (per selected project) */}
+      {projectUnitsMap && (
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-primary" />
+                خريطة وحدات مشروع: {selectedProject?.name}
+              </CardTitle>
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-500 inline-block" /> متاح</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-amber-500 inline-block" /> محجوز</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-500 inline-block" /> مباع</span>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-2 mb-4">
+              {projectUnitsMap.map((u) => {
+                const color =
+                  u.status === 'مباع'
+                    ? 'bg-red-100 border-red-300 text-red-800 hover:bg-red-200'
+                    : u.status === 'محجوز'
+                    ? 'bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200'
+                    : 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100';
+                return (
+                  <div
+                    key={u.number}
+                    title={
+                      u.sale
+                        ? `وحدة ${u.number} — ${u.status}${u.sale.customer_name ? ` — ${u.sale.customer_name}` : ''}`
+                        : `وحدة ${u.number} — متاحة`
+                    }
+                    className={`relative border rounded-lg p-2 text-center cursor-default transition-colors ${color}`}
+                  >
+                    <div className="text-sm font-bold">{u.number}</div>
+                    <div className="text-[10px] opacity-80">{u.status}</div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t">
+              <div className="text-center">
+                <p className="text-2xl font-bold">{projectUnitsMap.length}</p>
+                <p className="text-xs text-muted-foreground">إجمالي الوحدات</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-emerald-600">
+                  {projectUnitsMap.filter((u) => u.status === 'متاح').length}
+                </p>
+                <p className="text-xs text-muted-foreground">متاحة</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-amber-600">
+                  {projectUnitsMap.filter((u) => u.status === 'محجوز').length}
+                </p>
+                <p className="text-xs text-muted-foreground">محجوزة</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-red-600">
+                  {projectUnitsMap.filter((u) => u.status === 'مباع').length}
+                </p>
+                <p className="text-xs text-muted-foreground">مباعة</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+
+
       {/* Content */}
       {filtered.length === 0 ? (
         <Card>

@@ -15,8 +15,13 @@ export const PermissionButton = ({
   requirePermission,
   ...buttonProps
 }: PermissionButtonProps) => {
-  const { checkPermission } = usePermissions();
-  const { isAdmin } = useUserRole();
+  const { checkPermission, isLoadingMy, authLoading } = usePermissions();
+  const { isAdmin, loading: roleLoading } = useUserRole();
+
+  // أثناء تحميل الصلاحيات/الدور، أظهر زراً معطلاً مؤقتاً لتجنب الوميض
+  if (authLoading || roleLoading || isLoadingMy) {
+    return <Button {...buttonProps} disabled>{children}</Button>;
+  }
 
   // مدير النظام فقط لديه جميع الصلاحيات تلقائياً
   if (isAdmin) {

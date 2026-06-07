@@ -357,6 +357,11 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
           <div class="signatures">
             <div class="signature-box">
               <div class="signature-name">${escapeHtml(order.created_by_name) || 'غير معروف'}</div>
+              ${getUserSignature(order.created_by_name) ? `
+              <div style="height: 55px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
+                <img src="${window.location.origin}${getUserSignature(order.created_by_name)}" alt="توقيع المُعد" style="height: 55px; object-fit: contain; mix-blend-mode: multiply;" />
+              </div>
+              ` : ''}
               <div class="signature-line">
                 <div class="signature-title">المُعد</div>
                 <div class="signature-title-en">Preparer</div>

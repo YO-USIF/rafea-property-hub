@@ -480,19 +480,22 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
             <div className="text-center">
               <p className="text-sm font-bold text-primary mb-1">{preparerName}</p>
               {preparerSignature && (
-                <div className="flex items-center justify-center h-20 mb-1">
-                  <img src={preparerSignature} alt="توقيع المُعد" className="h-20 max-w-full object-contain" style={{ mixBlendMode: 'multiply' }} />
+                <div className="flex items-end justify-center h-28 mb-1">
+                  <img src={preparerSignature} alt="توقيع المُعد" className="h-24 max-w-full object-contain" style={{ mixBlendMode: 'multiply' }} />
                 </div>
               )}
+              {!preparerSignature && <div className="h-28" />}
               <div className="border-t mt-2 pt-2 text-sm font-semibold">المُعد</div>
               <div className="text-xs text-muted-foreground">Preparer</div>
             </div>
             <div className="text-center">
-              <div className="border-t mt-10 pt-2 text-sm font-semibold">فني الصيانة</div>
+              <div className="h-28" />
+              <div className="border-t mt-2 pt-2 text-sm font-semibold">فني الصيانة</div>
               <div className="text-xs text-muted-foreground">Maintenance Technician</div>
             </div>
             <div className="text-center">
-              <div className="border-t mt-10 pt-2 text-sm font-semibold">المُعتمد</div>
+              <div className="h-28" />
+              <div className="border-t mt-2 pt-2 text-sm font-semibold">المُعتمد</div>
               <div className="text-xs text-muted-foreground">Approver</div>
             </div>
           </div>

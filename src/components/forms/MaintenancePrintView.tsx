@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Printer } from 'lucide-react';
+import { getUserSignature } from '@/lib/userSignatures';
+import { useAuth } from '@/hooks/useAuth';
 
 interface MaintenancePrintViewProps {
   open: boolean;

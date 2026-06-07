@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Printer, X } from 'lucide-react';
 import { useCompanySettings } from '@/hooks/useCompanySettings';
 import suhailLogo from '@/assets/suhail-logo.jpeg';
-import { getUserSignature } from '@/lib/userSignatures';
+import { getUserSignature, getUserDisplayName } from '@/lib/userSignatures';
 interface ExtractPrintViewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;

@@ -2,6 +2,7 @@
 // لإضافة توقيع جديد: ضع الصورة في public/signatures وأضف سطراً هنا
 const SIGNATURE_MAP: { match: string; path: string }[] = [
   { match: 'ريان', path: '/signatures/rayan-signature.png' },
+  { match: 'رياض', path: '/signatures/riyad-signature.jpeg' },
 ];
 
 /**

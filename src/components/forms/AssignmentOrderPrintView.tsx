@@ -613,6 +613,9 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
                 </div>
               )}
               {!getUserSignature(order.created_by_name) && <div className="h-28" />}
+              {getUserDisplayName(order.created_by_name) && (
+                <p className="text-sm font-bold text-gray-800 mb-1">{getUserDisplayName(order.created_by_name)}</p>
+              )}
               <div className="border-t-2 border-gray-400 pt-2 mt-2">
                 <p className="font-semibold text-gray-700">المُعد</p>
                 <p className="text-sm text-gray-500">Preparer</p>

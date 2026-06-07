@@ -250,13 +250,19 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             color: #9ca3af;
             margin-top: 2px;
           }
-          .signature-name {
-            font-size: 13px;
-            font-weight: bold;
-            color: #3b82f6;
-            margin-bottom: 4px;
-          }
-          .footer {
+           .signature-name {
+             font-size: 13px;
+             font-weight: bold;
+             color: #3b82f6;
+             margin-bottom: 4px;
+           }
+           .signature-display-name {
+             font-size: 12px;
+             font-weight: bold;
+             color: #1f2937;
+             margin-bottom: 4px;
+           }
+           .footer {
             margin-top: 20px;
             padding-top: 10px;
             border-top: 1px solid #e5e7eb;

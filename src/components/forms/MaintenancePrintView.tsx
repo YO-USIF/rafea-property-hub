@@ -461,7 +461,13 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
 
           <div className="grid grid-cols-3 gap-6 mt-8 pt-4 border-t">
             <div className="text-center">
-              <div className="border-t mt-10 pt-2 text-sm font-semibold">المُعد</div>
+              <p className="text-sm font-bold text-primary mb-1">{preparerName}</p>
+              {preparerSignature && (
+                <div className="flex items-center justify-center h-12 mb-1">
+                  <img src={preparerSignature} alt="توقيع المُعد" className="h-12 object-contain" style={{ mixBlendMode: 'multiply' }} />
+                </div>
+              )}
+              <div className="border-t mt-2 pt-2 text-sm font-semibold">المُعد</div>
               <div className="text-xs text-muted-foreground">Preparer</div>
             </div>
             <div className="text-center">

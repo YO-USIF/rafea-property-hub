@@ -578,6 +578,16 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
           <div className="grid grid-cols-3 gap-8 mt-16 pt-8 border-t-2">
             <div className="text-center">
               <p className="font-bold text-primary mb-2">{order.created_by_name || 'غير معروف'}</p>
+              {getUserSignature(order.created_by_name) && (
+                <div className="flex items-center justify-center h-14 mb-2">
+                  <img
+                    src={getUserSignature(order.created_by_name)!}
+                    alt="توقيع المُعد"
+                    className="h-14 object-contain"
+                    style={{ mixBlendMode: 'multiply' }}
+                  />
+                </div>
+              )}
               <div className="border-t-2 border-gray-400 pt-2 mt-12">
                 <p className="font-semibold text-gray-700">المُعد</p>
                 <p className="text-sm text-gray-500">Preparer</p>

@@ -192,7 +192,7 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
           .signature-line {
             border-top: 1px solid #9ca3af;
             padding-top: 6px;
-            margin-top: 35px;
+            margin-top: 10px;
             font-size: 12px;
           }
           .signature-title { font-weight: 600; color: #374151; }
@@ -309,7 +309,7 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
             <div class="signature-box">
               <div class="signature-line">
                 <div style="font-size: 11px; font-weight: bold; color: #1e3a5f; margin-bottom: 4px;">${escapeHtml(preparerName)}</div>
-                ${preparerSignature ? `<div style="height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;"><img src="${window.location.origin}${preparerSignature}" alt="توقيع المُعد" style="height: 50px; object-fit: contain; mix-blend-mode: multiply;" /></div>` : ''}
+                ${preparerSignature ? `<div style="height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;"><img src="${window.location.origin}${preparerSignature}" alt="توقيع المُعد" style="height: 80px; max-width: 100%; object-fit: contain; mix-blend-mode: multiply;" /></div>` : ''}
                 <div class="signature-title">المُعد</div>
                 <div class="signature-title-en">Preparer</div>
               </div>
@@ -322,7 +322,7 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
             </div>
             <div class="signature-box">
               <div class="signature-line">
-                ${request.approved ? `<div style="height: 55px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;"><img src="${window.location.origin}/signatures/yousef-signature.jpeg" alt="توقيع المُعتمد" style="height: 55px; object-fit: contain; mix-blend-mode: multiply;" /></div><div style="font-size: 11px; font-weight: bold; color: #1e3a5f; margin-bottom: 4px;">م. يوسف صلاح يوسف</div>` : ''}
+                ${request.approved ? `<div style="height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;"><img src="${window.location.origin}/signatures/yousef-signature.jpeg" alt="توقيع المُعتمد" style="height: 80px; max-width: 100%; object-fit: contain; mix-blend-mode: multiply;" /></div><div style="font-size: 11px; font-weight: bold; color: #1e3a5f; margin-bottom: 4px;">م. يوسف صلاح يوسف</div>` : ''}
                 <div class="signature-title">المُعتمد</div>
                 <div class="signature-title-en">Approver</div>
                 ${request.approved && request.approved_at ? `<div style="font-size: 10px; color: #16a34a; margin-top: 4px;">تاريخ التعميد: ${formatDate(request.approved_at)}</div>` : ''}
@@ -463,8 +463,8 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
             <div className="text-center">
               <p className="text-sm font-bold text-primary mb-1">{preparerName}</p>
               {preparerSignature && (
-                <div className="flex items-center justify-center h-12 mb-1">
-                  <img src={preparerSignature} alt="توقيع المُعد" className="h-12 object-contain" style={{ mixBlendMode: 'multiply' }} />
+                <div className="flex items-center justify-center h-20 mb-1">
+                  <img src={preparerSignature} alt="توقيع المُعد" className="h-20 max-w-full object-contain" style={{ mixBlendMode: 'multiply' }} />
                 </div>
               )}
               <div className="border-t mt-2 pt-2 text-sm font-semibold">المُعد</div>

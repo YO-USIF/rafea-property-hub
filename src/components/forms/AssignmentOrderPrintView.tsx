@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { escapeHtml } from '@/lib/utils';
+import { getUserSignature } from '@/lib/userSignatures';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

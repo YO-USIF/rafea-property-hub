@@ -308,6 +308,8 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
           <div class="signatures">
             <div class="signature-box">
               <div class="signature-line">
+                <div style="font-size: 11px; font-weight: bold; color: #1e3a5f; margin-bottom: 4px;">${escapeHtml(preparerName)}</div>
+                ${preparerSignature ? `<div style="height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;"><img src="${window.location.origin}${preparerSignature}" alt="توقيع المُعد" style="height: 50px; object-fit: contain; mix-blend-mode: multiply;" /></div>` : ''}
                 <div class="signature-title">المُعد</div>
                 <div class="signature-title-en">Preparer</div>
               </div>

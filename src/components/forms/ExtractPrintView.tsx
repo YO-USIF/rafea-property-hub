@@ -283,23 +283,23 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
             <div className="text-center p-2 bg-muted/30 rounded border border-muted-foreground/20">
               <p className="font-bold text-xs text-primary mb-1">{extract.created_by_name || 'غير معروف'}</p>
               {getUserSignature(extract.created_by_name) ? (
-                <div className="h-10 flex items-center justify-center mb-1.5">
+                <div className="h-16 flex items-center justify-center mb-1.5">
                   <img
                     src={getUserSignature(extract.created_by_name)!}
                     alt="توقيع المُعد"
-                    className="h-10 object-contain"
+                    className="h-16 max-w-full object-contain"
                     style={{ mixBlendMode: 'multiply' }}
                   />
                 </div>
               ) : (
-                <div className="h-10 border-b border-foreground/30 mb-1.5"></div>
+                <div className="h-16 border-b border-foreground/30 mb-1.5"></div>
               )}
               <p className="font-bold text-xs text-foreground">المُعد</p>
               <p className="text-[10px] text-foreground/60 mt-0.5">التوقيع</p>
             </div>
             <div className="text-center p-2 bg-muted/30 rounded border border-muted-foreground/20">
               <p className="font-bold text-xs text-primary mb-1">المراجع</p>
-              <div className="h-10 border-b border-foreground/30 mb-1.5"></div>
+              <div className="h-16 border-b border-foreground/30 mb-1.5"></div>
               <p className="font-bold text-xs text-foreground">المراجع</p>
               <p className="text-[10px] text-foreground/60 mt-0.5">التوقيع</p>
             </div>
@@ -307,18 +307,18 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
               <p className="font-bold text-xs text-primary mb-1">{extract.approver_name || 'م. يوسف صلاح يوسف'}</p>
               {extract.approved ? (
                 <>
-                  <div className="h-14 flex items-center justify-center mb-1.5 relative">
+                  <div className="h-16 flex items-center justify-center mb-1.5 relative">
                     <img
                       src="/signatures/yousef-signature.jpeg"
                       alt="توقيع المُعتمد"
-                      className="h-14 object-contain"
+                      className="h-16 max-w-full object-contain"
                       style={{ mixBlendMode: 'multiply' }}
                     />
                   </div>
                   <p className="text-[9px] text-green-600 mb-0.5">✅ تم التعميد {extract.approved_at ? new Date(extract.approved_at).toLocaleDateString('en-GB') : ''}</p>
                 </>
               ) : (
-                <div className="h-12 flex items-center justify-center mb-1.5">
+                <div className="h-16 flex items-center justify-center mb-1.5">
                   <span className="text-xs text-red-500 font-bold">لم يتم التعميد بعد</span>
                 </div>
               )}

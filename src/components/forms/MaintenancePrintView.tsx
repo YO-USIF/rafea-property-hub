@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Printer } from 'lucide-react';
+import { getUserSignature } from '@/lib/userSignatures';
+import { useAuth } from '@/hooks/useAuth';
 
 interface MaintenancePrintViewProps {
   open: boolean;
@@ -15,6 +17,9 @@ interface MaintenancePrintViewProps {
 
 const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintViewProps) => {
   const [selectedCompany, setSelectedCompany] = useState<'suhail' | 'tamlik'>('suhail');
+  const { user } = useAuth();
+  const preparerName = request?.created_by_name || (user?.user_metadata as any)?.full_name || user?.email || 'غير معروف';
+  const preparerSignature = getUserSignature(preparerName);
 
   const companyInfo = {
     suhail: {
@@ -303,6 +308,8 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
           <div class="signatures">
             <div class="signature-box">
               <div class="signature-line">
+                <div style="font-size: 11px; font-weight: bold; color: #1e3a5f; margin-bottom: 4px;">${escapeHtml(preparerName)}</div>
+                ${preparerSignature ? `<div style="height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;"><img src="${window.location.origin}${preparerSignature}" alt="توقيع المُعد" style="height: 50px; object-fit: contain; mix-blend-mode: multiply;" /></div>` : ''}
                 <div class="signature-title">المُعد</div>
                 <div class="signature-title-en">Preparer</div>
               </div>
@@ -454,7 +461,13 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
 
           <div className="grid grid-cols-3 gap-6 mt-8 pt-4 border-t">
             <div className="text-center">
-              <div className="border-t mt-10 pt-2 text-sm font-semibold">المُعد</div>
+              <p className="text-sm font-bold text-primary mb-1">{preparerName}</p>
+              {preparerSignature && (
+                <div className="flex items-center justify-center h-12 mb-1">
+                  <img src={preparerSignature} alt="توقيع المُعد" className="h-12 object-contain" style={{ mixBlendMode: 'multiply' }} />
+                </div>
+              )}
+              <div className="border-t mt-2 pt-2 text-sm font-semibold">المُعد</div>
               <div className="text-xs text-muted-foreground">Preparer</div>
             </div>
             <div className="text-center">

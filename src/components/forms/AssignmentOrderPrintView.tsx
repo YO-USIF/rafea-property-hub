@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { escapeHtml } from '@/lib/utils';
+import { getUserSignature } from '@/lib/userSignatures';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -357,6 +358,11 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
           <div class="signatures">
             <div class="signature-box">
               <div class="signature-name">${escapeHtml(order.created_by_name) || 'غير معروف'}</div>
+              ${getUserSignature(order.created_by_name) ? `
+              <div style="height: 55px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
+                <img src="${window.location.origin}${getUserSignature(order.created_by_name)}" alt="توقيع المُعد" style="height: 55px; object-fit: contain; mix-blend-mode: multiply;" />
+              </div>
+              ` : ''}
               <div class="signature-line">
                 <div class="signature-title">المُعد</div>
                 <div class="signature-title-en">Preparer</div>
@@ -572,6 +578,16 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
           <div className="grid grid-cols-3 gap-8 mt-16 pt-8 border-t-2">
             <div className="text-center">
               <p className="font-bold text-primary mb-2">{order.created_by_name || 'غير معروف'}</p>
+              {getUserSignature(order.created_by_name) && (
+                <div className="flex items-center justify-center h-14 mb-2">
+                  <img
+                    src={getUserSignature(order.created_by_name)!}
+                    alt="توقيع المُعد"
+                    className="h-14 object-contain"
+                    style={{ mixBlendMode: 'multiply' }}
+                  />
+                </div>
+              )}
               <div className="border-t-2 border-gray-400 pt-2 mt-12">
                 <p className="font-semibold text-gray-700">المُعد</p>
                 <p className="text-sm text-gray-500">Preparer</p>

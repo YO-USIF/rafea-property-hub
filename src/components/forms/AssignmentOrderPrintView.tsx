@@ -222,7 +222,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
           .signature-line {
             border-top: 1px solid #9ca3af;
             padding-top: 6px;
-            margin-top: 35px;
+            margin-top: 10px;
             font-size: 12px;
           }
           .signature-title {
@@ -359,8 +359,8 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             <div class="signature-box">
               <div class="signature-name">${escapeHtml(order.created_by_name) || 'غير معروف'}</div>
               ${getUserSignature(order.created_by_name) ? `
-              <div style="height: 55px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
-                <img src="${window.location.origin}${getUserSignature(order.created_by_name)}" alt="توقيع المُعد" style="height: 55px; object-fit: contain; mix-blend-mode: multiply;" />
+              <div style="height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
+                <img src="${window.location.origin}${getUserSignature(order.created_by_name)}" alt="توقيع المُعد" style="height: 80px; max-width: 100%; object-fit: contain; mix-blend-mode: multiply;" />
               </div>
               ` : ''}
               <div class="signature-line">
@@ -378,8 +378,8 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             <div class="signature-box">
               <div class="signature-name">${escapeHtml(order.approver_name) || 'م. يوسف صلاح يوسف'}</div>
               ${order.approved ? `
-              <div style="height: 55px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
-                <img src="${window.location.origin}/signatures/yousef-signature.jpeg" alt="توقيع المُعتمد" style="height: 55px; object-fit: contain; mix-blend-mode: multiply;" />
+              <div style="height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
+                <img src="${window.location.origin}/signatures/yousef-signature.jpeg" alt="توقيع المُعتمد" style="height: 80px; max-width: 100%; object-fit: contain; mix-blend-mode: multiply;" />
               </div>
               <div style="text-align: center; font-size: 9px; color: #22c55e; margin-bottom: 4px;">
                 ✅ تم التعميد بتاريخ ${order.approved_at ? new Date(order.approved_at).toLocaleDateString('en-GB') : ''}
@@ -579,23 +579,23 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             <div className="text-center">
               <p className="font-bold text-primary mb-2">{order.created_by_name || 'غير معروف'}</p>
               {getUserSignature(order.created_by_name) && (
-                <div className="flex items-center justify-center h-14 mb-2">
+                <div className="flex items-center justify-center h-20 mb-2">
                   <img
                     src={getUserSignature(order.created_by_name)!}
                     alt="توقيع المُعد"
-                    className="h-14 object-contain"
+                    className="h-20 max-w-full object-contain"
                     style={{ mixBlendMode: 'multiply' }}
                   />
                 </div>
               )}
-              <div className="border-t-2 border-gray-400 pt-2 mt-12">
+              <div className="border-t-2 border-gray-400 pt-2 mt-4">
                 <p className="font-semibold text-gray-700">المُعد</p>
                 <p className="text-sm text-gray-500">Preparer</p>
               </div>
             </div>
             <div className="text-center">
               <p className="font-bold text-primary mb-2">{order.contractor_name}</p>
-              <div className="border-t-2 border-gray-400 pt-2 mt-12">
+              <div className="border-t-2 border-gray-400 pt-2 mt-24">
                 <p className="font-semibold text-gray-700">المقاول</p>
                 <p className="text-sm text-gray-500">Contractor</p>
               </div>
@@ -604,11 +604,11 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
               <p className="font-bold text-primary mb-2">{order.approver_name || 'م. يوسف صلاح يوسف'}</p>
               {order.approved ? (
                 <>
-                  <div className="flex items-center justify-center h-14 mb-2">
+                  <div className="flex items-center justify-center h-20 mb-2">
                     <img
                       src="/signatures/yousef-signature.jpeg"
                       alt="توقيع المُعتمد"
-                      className="h-14 object-contain"
+                      className="h-20 max-w-full object-contain"
                       style={{ mixBlendMode: 'multiply' }}
                     />
                   </div>
@@ -619,7 +619,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
                   <span className="text-sm text-red-500 font-bold">لم يتم التعميد بعد</span>
                 </div>
               )}
-              <div className="border-t-2 border-gray-400 pt-2">
+              <div className="border-t-2 border-gray-400 pt-2 mt-4">
                 <p className="font-semibold text-gray-700">المُعتمد</p>
                 <p className="text-sm text-gray-500">Approver</p>
               </div>

@@ -281,7 +281,18 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
           <div className="grid grid-cols-3 gap-3 mb-3 mt-4">
             <div className="text-center p-2 bg-muted/30 rounded border border-muted-foreground/20">
               <p className="font-bold text-xs text-primary mb-1">{extract.created_by_name || 'غير معروف'}</p>
-              <div className="h-10 border-b border-foreground/30 mb-1.5"></div>
+              {getUserSignature(extract.created_by_name) ? (
+                <div className="h-10 flex items-center justify-center mb-1.5">
+                  <img
+                    src={getUserSignature(extract.created_by_name)!}
+                    alt="توقيع المُعد"
+                    className="h-10 object-contain"
+                    style={{ mixBlendMode: 'multiply' }}
+                  />
+                </div>
+              ) : (
+                <div className="h-10 border-b border-foreground/30 mb-1.5"></div>
+              )}
               <p className="font-bold text-xs text-foreground">المُعد</p>
               <p className="text-[10px] text-foreground/60 mt-0.5">التوقيع</p>
             </div>

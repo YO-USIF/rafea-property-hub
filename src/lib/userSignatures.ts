@@ -4,7 +4,7 @@ const SIGNATURE_MAP: { match: string; path: string }[] = [
   { match: 'ريان', path: '/signatures/rayan-signature.png' },
   { match: 'رياض', path: '/signatures/riyad-signature.jpeg' },
   // مطابقة أسماء المستخدمين الإنجليزية المخزّنة في الملف الشخصي
-  { match: 'reyad', path: '/signatures/riyad-signature.jpeg' },
+  { match: 'reyad', path: '/signatures/reyad-signature.jpeg' },
   { match: 'rawah', path: '/signatures/rawah-signature.png' },
 ];
 

@@ -17,6 +17,9 @@ interface MaintenancePrintViewProps {
 
 const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintViewProps) => {
   const [selectedCompany, setSelectedCompany] = useState<'suhail' | 'tamlik'>('suhail');
+  const { user } = useAuth();
+  const preparerName = request?.created_by_name || (user?.user_metadata as any)?.full_name || user?.email || 'غير معروف';
+  const preparerSignature = getUserSignature(preparerName);
 
   const companyInfo = {
     suhail: {

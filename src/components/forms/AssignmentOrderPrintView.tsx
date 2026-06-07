@@ -219,10 +219,26 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
           .signature-box {
             text-align: center;
           }
+           .signature-slot {
+             height: 110px;
+             display: flex;
+             align-items: flex-end;
+             justify-content: center;
+             margin-bottom: 8px;
+           }
+           .signature-slot img {
+             height: 100px;
+             max-width: 100%;
+             object-fit: contain;
+             mix-blend-mode: multiply;
+           }
+           .signature-slot.empty {
+             min-height: 110px;
+           }
           .signature-line {
             border-top: 1px solid #9ca3af;
             padding-top: 6px;
-            margin-top: 10px;
+             margin-top: 4px;
             font-size: 12px;
           }
           .signature-title {
@@ -359,10 +375,10 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             <div class="signature-box">
               <div class="signature-name">${escapeHtml(order.created_by_name) || 'غير معروف'}</div>
               ${getUserSignature(order.created_by_name) ? `
-              <div style="height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
-                <img src="${window.location.origin}${getUserSignature(order.created_by_name)}" alt="توقيع المُعد" style="height: 80px; max-width: 100%; object-fit: contain; mix-blend-mode: multiply;" />
+              <div class="signature-slot">
+                <img src="${window.location.origin}${getUserSignature(order.created_by_name)}" alt="توقيع المُعد" />
               </div>
-              ` : ''}
+              ` : '<div class="signature-slot empty"></div>'}
               <div class="signature-line">
                 <div class="signature-title">المُعد</div>
                 <div class="signature-title-en">Preparer</div>
@@ -370,6 +386,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             </div>
             <div class="signature-box">
               <div class="signature-name">${escapeHtml(order.contractor_name)}</div>
+              <div class="signature-slot empty"></div>
               <div class="signature-line">
                 <div class="signature-title">المقاول</div>
                 <div class="signature-title-en">Contractor</div>
@@ -378,14 +395,14 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             <div class="signature-box">
               <div class="signature-name">${escapeHtml(order.approver_name) || 'م. يوسف صلاح يوسف'}</div>
               ${order.approved ? `
-              <div style="height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
-                <img src="${window.location.origin}/signatures/yousef-signature.jpeg" alt="توقيع المُعتمد" style="height: 80px; max-width: 100%; object-fit: contain; mix-blend-mode: multiply;" />
+              <div class="signature-slot">
+                <img src="${window.location.origin}/signatures/yousef-signature.jpeg" alt="توقيع المُعتمد" />
               </div>
               <div style="text-align: center; font-size: 9px; color: #22c55e; margin-bottom: 4px;">
                 ✅ تم التعميد بتاريخ ${order.approved_at ? new Date(order.approved_at).toLocaleDateString('en-GB') : ''}
               </div>
               ` : `
-              <div style="height: 40px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
+              <div class="signature-slot">
                 <span style="color: #ef4444; font-size: 12px; font-weight: bold;">لم يتم التعميد بعد</span>
               </div>
               `}

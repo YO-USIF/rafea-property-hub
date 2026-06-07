@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Printer, X } from 'lucide-react';
 import { useCompanySettings } from '@/hooks/useCompanySettings';
 import suhailLogo from '@/assets/suhail-logo.jpeg';
-import { getUserSignature } from '@/lib/userSignatures';
+import { getUserSignature, getUserDisplayName } from '@/lib/userSignatures';
 interface ExtractPrintViewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -293,6 +293,9 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
                 </div>
               ) : (
                 <div className="h-28 border-b border-foreground/30 mb-1.5"></div>
+              )}
+              {getUserDisplayName(extract.created_by_name) && (
+                <p className="text-xs font-bold text-foreground mb-1">{getUserDisplayName(extract.created_by_name)}</p>
               )}
               <p className="font-bold text-xs text-foreground">المُعد</p>
               <p className="text-[10px] text-foreground/60 mt-0.5">التوقيع</p>

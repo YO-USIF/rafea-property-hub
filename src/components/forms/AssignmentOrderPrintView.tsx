@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { escapeHtml } from '@/lib/utils';
-import { getUserSignature } from '@/lib/userSignatures';
+import { getUserSignature, getUserDisplayName } from '@/lib/userSignatures';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -250,13 +250,19 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             color: #9ca3af;
             margin-top: 2px;
           }
-          .signature-name {
-            font-size: 13px;
-            font-weight: bold;
-            color: #3b82f6;
-            margin-bottom: 4px;
-          }
-          .footer {
+           .signature-name {
+             font-size: 13px;
+             font-weight: bold;
+             color: #3b82f6;
+             margin-bottom: 4px;
+           }
+           .signature-display-name {
+             font-size: 12px;
+             font-weight: bold;
+             color: #1f2937;
+             margin-bottom: 4px;
+           }
+           .footer {
             margin-top: 20px;
             padding-top: 10px;
             border-top: 1px solid #e5e7eb;
@@ -379,6 +385,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
                 <img src="${window.location.origin}${getUserSignature(order.created_by_name)}" alt="توقيع المُعد" />
               </div>
               ` : '<div class="signature-slot empty"></div>'}
+              <div class="signature-display-name">${escapeHtml(getUserDisplayName(order.created_by_name) || order.created_by_name || 'غير معروف')}</div>
               <div class="signature-line">
                 <div class="signature-title">المُعد</div>
                 <div class="signature-title-en">Preparer</div>
@@ -606,6 +613,9 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
                 </div>
               )}
               {!getUserSignature(order.created_by_name) && <div className="h-28" />}
+              {getUserDisplayName(order.created_by_name) && (
+                <p className="text-sm font-bold text-gray-800 mb-1">{getUserDisplayName(order.created_by_name)}</p>
+              )}
               <div className="border-t-2 border-gray-400 pt-2 mt-2">
                 <p className="font-semibold text-gray-700">المُعد</p>
                 <p className="text-sm text-gray-500">Preparer</p>

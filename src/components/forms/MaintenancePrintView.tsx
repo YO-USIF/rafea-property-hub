@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Printer } from 'lucide-react';
-import { getUserSignature } from '@/lib/userSignatures';
+import { getUserSignature, getUserDisplayName } from '@/lib/userSignatures';
 import { useAuth } from '@/hooks/useAuth';
 
 interface MaintenancePrintViewProps {
@@ -326,6 +326,7 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
               <div class="signature-line">
                 <div style="font-size: 11px; font-weight: bold; color: #1e3a5f; margin-bottom: 4px;">${escapeHtml(preparerName)}</div>
                 ${preparerSignature ? `<div class="signature-slot"><img src="${window.location.origin}${preparerSignature}" alt="توقيع المُعد" /></div>` : '<div class="signature-slot empty"></div>'}
+                <div style="font-size: 12px; font-weight: bold; color: #1f2937; margin-bottom: 4px;">${escapeHtml(getUserDisplayName(preparerName) || preparerName)}</div>
                 <div class="signature-title">المُعد</div>
                 <div class="signature-title-en">Preparer</div>
               </div>
@@ -485,6 +486,9 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
                 </div>
               )}
               {!preparerSignature && <div className="h-28" />}
+              {getUserDisplayName(preparerName) && (
+                <p className="text-sm font-bold text-gray-800 mb-1">{getUserDisplayName(preparerName)}</p>
+              )}
               <div className="border-t mt-2 pt-2 text-sm font-semibold">المُعد</div>
               <div className="text-xs text-muted-foreground">Preparer</div>
             </div>

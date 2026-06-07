@@ -16,7 +16,7 @@ function normalizeText(value: string): string {
  */
 export function getUserSignature(name: string | null | undefined): string | null {
   if (!name) return null;
-  const normalized = String(name).trim();
-  const found = SIGNATURE_MAP.find((s) => normalized.includes(s.match));
+  const normalized = normalizeText(String(name));
+  const found = SIGNATURE_MAP.find((s) => normalized.includes(normalizeText(s.match)));
   return found ? found.path : null;
 }

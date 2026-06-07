@@ -189,10 +189,26 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
             border-top: 1px solid #e5e7eb;
           }
           .signature-box { text-align: center; }
+          .signature-slot {
+            height: 110px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            margin-bottom: 6px;
+          }
+          .signature-slot img {
+            height: 100px;
+            max-width: 100%;
+            object-fit: contain;
+            mix-blend-mode: multiply;
+          }
+          .signature-slot.empty {
+            min-height: 110px;
+          }
           .signature-line {
             border-top: 1px solid #9ca3af;
             padding-top: 6px;
-            margin-top: 10px;
+            margin-top: 4px;
             font-size: 12px;
           }
           .signature-title { font-weight: 600; color: #374151; }
@@ -309,20 +325,21 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
             <div class="signature-box">
               <div class="signature-line">
                 <div style="font-size: 11px; font-weight: bold; color: #1e3a5f; margin-bottom: 4px;">${escapeHtml(preparerName)}</div>
-                ${preparerSignature ? `<div style="height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;"><img src="${window.location.origin}${preparerSignature}" alt="توقيع المُعد" style="height: 80px; max-width: 100%; object-fit: contain; mix-blend-mode: multiply;" /></div>` : ''}
+                ${preparerSignature ? `<div class="signature-slot"><img src="${window.location.origin}${preparerSignature}" alt="توقيع المُعد" /></div>` : '<div class="signature-slot empty"></div>'}
                 <div class="signature-title">المُعد</div>
                 <div class="signature-title-en">Preparer</div>
               </div>
             </div>
             <div class="signature-box">
               <div class="signature-line">
+                <div class="signature-slot empty"></div>
                 <div class="signature-title">فني الصيانة</div>
                 <div class="signature-title-en">Maintenance Technician</div>
               </div>
             </div>
             <div class="signature-box">
               <div class="signature-line">
-                ${request.approved ? `<div style="height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;"><img src="${window.location.origin}/signatures/yousef-signature.jpeg" alt="توقيع المُعتمد" style="height: 80px; max-width: 100%; object-fit: contain; mix-blend-mode: multiply;" /></div><div style="font-size: 11px; font-weight: bold; color: #1e3a5f; margin-bottom: 4px;">م. يوسف صلاح يوسف</div>` : ''}
+                ${request.approved ? `<div class="signature-slot"><img src="${window.location.origin}/signatures/yousef-signature.jpeg" alt="توقيع المُعتمد" /></div><div style="font-size: 11px; font-weight: bold; color: #1e3a5f; margin-bottom: 4px;">م. يوسف صلاح يوسف</div>` : '<div class="signature-slot empty"></div>'}
                 <div class="signature-title">المُعتمد</div>
                 <div class="signature-title-en">Approver</div>
                 ${request.approved && request.approved_at ? `<div style="font-size: 10px; color: #16a34a; margin-top: 4px;">تاريخ التعميد: ${formatDate(request.approved_at)}</div>` : ''}

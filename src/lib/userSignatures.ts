@@ -1,23 +1,35 @@
 // خريطة تواقيع المستخدمين: تربط اسم المُعد بصورة توقيعه
 // لإضافة توقيع جديد: ضع الصورة في public/signatures وأضف سطراً هنا
-const SIGNATURE_MAP: { match: string; path: string }[] = [
-  { match: 'ريان', path: '/signatures/rayan-signature.png' },
-  { match: 'رياض', path: '/signatures/riyad-signature.jpeg' },
+const SIGNATURE_MAP: { match: string; path: string; displayName?: string }[] = [
+  { match: 'ريان', path: '/signatures/rayan-signature.png', displayName: 'ريان راوه' },
+  { match: 'رياض', path: '/signatures/riyad-signature.jpeg', displayName: 'محمد رياض حمامي' },
   // مطابقة أسماء المستخدمين الإنجليزية المخزّنة في الملف الشخصي
-  { match: 'reyad', path: '/signatures/reyad-signature.jpeg' },
-  { match: 'rawah', path: '/signatures/rawah-signature.png' },
+  { match: 'reyad', path: '/signatures/reyad-signature.jpeg', displayName: 'محمد رياض حمامي' },
+  { match: 'rawah', path: '/signatures/rawah-signature.png', displayName: 'ريان راوه' },
 ];
 
 function normalizeText(value: string): string {
   return value.toLowerCase().trim();
 }
 
+function findUserSignature(name: string | null | undefined) {
+  if (!name) return null;
+  const normalized = normalizeText(String(name));
+  return SIGNATURE_MAP.find((s) => normalized.includes(normalizeText(s.match))) || null;
+}
+
 /**
  * إرجاع مسار صورة توقيع المستخدم بناءً على اسمه، أو null إن لم يوجد توقيع.
  */
 export function getUserSignature(name: string | null | undefined): string | null {
-  if (!name) return null;
-  const normalized = normalizeText(String(name));
-  const found = SIGNATURE_MAP.find((s) => normalized.includes(normalizeText(s.match)));
+  const found = findUserSignature(name);
   return found ? found.path : null;
+}
+
+/**
+ * إرجاع الاسم الكامل للمستخدم بناءً على الاسم المختصر/المعروف، أو null.
+ */
+export function getUserDisplayName(name: string | null | undefined): string | null {
+  const found = findUserSignature(name);
+  return found?.displayName || null;
 }

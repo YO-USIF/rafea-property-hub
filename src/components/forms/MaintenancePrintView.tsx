@@ -486,6 +486,9 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
                 </div>
               )}
               {!preparerSignature && <div className="h-28" />}
+              {getUserDisplayName(preparerName) && (
+                <p className="text-sm font-bold text-gray-800 mb-1">{getUserDisplayName(preparerName)}</p>
+              )}
               <div className="border-t mt-2 pt-2 text-sm font-semibold">المُعد</div>
               <div className="text-xs text-muted-foreground">Preparer</div>
             </div>

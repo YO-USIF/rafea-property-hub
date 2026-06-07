@@ -596,23 +596,25 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
             <div className="text-center">
               <p className="font-bold text-primary mb-2">{order.created_by_name || 'غير معروف'}</p>
               {getUserSignature(order.created_by_name) && (
-                <div className="flex items-center justify-center h-20 mb-2">
+                <div className="flex items-end justify-center h-28 mb-2">
                   <img
                     src={getUserSignature(order.created_by_name)!}
                     alt="توقيع المُعد"
-                    className="h-20 max-w-full object-contain"
+                    className="h-24 max-w-full object-contain"
                     style={{ mixBlendMode: 'multiply' }}
                   />
                 </div>
               )}
-              <div className="border-t-2 border-gray-400 pt-2 mt-4">
+              {!getUserSignature(order.created_by_name) && <div className="h-28" />}
+              <div className="border-t-2 border-gray-400 pt-2 mt-2">
                 <p className="font-semibold text-gray-700">المُعد</p>
                 <p className="text-sm text-gray-500">Preparer</p>
               </div>
             </div>
             <div className="text-center">
               <p className="font-bold text-primary mb-2">{order.contractor_name}</p>
-              <div className="border-t-2 border-gray-400 pt-2 mt-24">
+              <div className="h-28" />
+              <div className="border-t-2 border-gray-400 pt-2 mt-2">
                 <p className="font-semibold text-gray-700">المقاول</p>
                 <p className="text-sm text-gray-500">Contractor</p>
               </div>
@@ -621,22 +623,22 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
               <p className="font-bold text-primary mb-2">{order.approver_name || 'م. يوسف صلاح يوسف'}</p>
               {order.approved ? (
                 <>
-                  <div className="flex items-center justify-center h-20 mb-2">
+                  <div className="flex items-end justify-center h-28 mb-2">
                     <img
                       src="/signatures/yousef-signature.jpeg"
                       alt="توقيع المُعتمد"
-                      className="h-20 max-w-full object-contain"
+                      className="h-24 max-w-full object-contain"
                       style={{ mixBlendMode: 'multiply' }}
                     />
                   </div>
                   <p className="text-xs text-green-600 mb-1">✅ تم التعميد {order.approved_at ? new Date(order.approved_at).toLocaleDateString('en-GB') : ''}</p>
                 </>
               ) : (
-                <div className="flex items-center justify-center h-12 mb-2">
+                <div className="flex items-end justify-center h-28 mb-2">
                   <span className="text-sm text-red-500 font-bold">لم يتم التعميد بعد</span>
                 </div>
               )}
-              <div className="border-t-2 border-gray-400 pt-2 mt-4">
+              <div className="border-t-2 border-gray-400 pt-2 mt-2">
                 <p className="font-semibold text-gray-700">المُعتمد</p>
                 <p className="text-sm text-gray-500">Approver</p>
               </div>

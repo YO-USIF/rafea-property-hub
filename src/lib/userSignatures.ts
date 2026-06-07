@@ -3,7 +3,13 @@
 const SIGNATURE_MAP: { match: string; path: string }[] = [
   { match: 'ريان', path: '/signatures/rayan-signature.png' },
   { match: 'رياض', path: '/signatures/riyad-signature.jpeg' },
+  // مطابقة أسماء المستخدمين الإنجليزية المخزّنة في الملف الشخصي
+  { match: 'reyad', path: '/signatures/riyad-signature.jpeg' },
 ];
+
+function normalizeText(value: string): string {
+  return value.toLowerCase().trim();
+}
 
 /**
  * إرجاع مسار صورة توقيع المستخدم بناءً على اسمه، أو null إن لم يوجد توقيع.

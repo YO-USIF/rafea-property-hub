@@ -294,6 +294,9 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
               ) : (
                 <div className="h-28 border-b border-foreground/30 mb-1.5"></div>
               )}
+              {getUserDisplayName(extract.created_by_name) && (
+                <p className="text-xs font-bold text-foreground mb-1">{getUserDisplayName(extract.created_by_name)}</p>
+              )}
               <p className="font-bold text-xs text-foreground">المُعد</p>
               <p className="text-[10px] text-foreground/60 mt-0.5">التوقيع</p>
             </div>

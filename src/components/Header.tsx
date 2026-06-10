@@ -6,6 +6,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
 import { useNotifications } from '@/hooks/useNotifications';
 import NotificationPanel from './NotificationPanel';
+import { getDisplayName } from '@/lib/userDisplayNames';
 
 interface HeaderProps {
   sidebarCollapsed: boolean;
@@ -156,7 +157,7 @@ const Header: React.FC<HeaderProps> = ({ sidebarCollapsed, setActiveTab }) => {
               <User className="w-4 h-4 text-white" />
             </div>
             <div className="text-sm">
-              <p className="font-medium text-gray-900">{user?.email?.split('@')[0] || 'مستخدم'}</p>
+              <p className="font-medium text-gray-900">{getDisplayName(user?.email)}</p>
               <p className="text-gray-500">{isIdentityLoading ? 'جارٍ تحميل الصلاحية...' : userRole || 'بدون دور'}</p>
             </div>
           </div>

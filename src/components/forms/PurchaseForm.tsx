@@ -122,6 +122,29 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
     }
   }, [purchase]);
 
+  // تحميل أصناف الطلب عند التعديل
+  useEffect(() => {
+    const loadItems = async () => {
+      if (purchase?.id) {
+        const { data } = await supabase
+          .from('purchase_items')
+          .select('name, quantity, unit, unit_price')
+          .eq('purchase_id', purchase.id);
+        setItems(
+          (data || []).map((item: any) => ({
+            name: item.name || '',
+            quantity: item.quantity || 1,
+            unit: item.unit || 'قطعة',
+            unit_price: Number(item.unit_price) || 0,
+          }))
+        );
+      } else {
+        setItems([]);
+      }
+    };
+    loadItems();
+  }, [purchase]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

@@ -142,8 +142,8 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         amount_before_tax: Math.round(amountBeforeTax * 100) / 100,
         tax_amount: Math.round(taxAmount * 100) / 100,
         amount: total,
-        installment_amount: prev.payment_type === 'دفعات' && (prev.installments_count || 1) > 0 
-          ? Math.round((total / (prev.installments_count || 1)) * 100) / 100 : 0
+        installment_amount: installmentMode === 'auto' && prev.payment_type === 'دفعات' && (prev.installments_count || 1) > 0 
+          ? Math.round((total / (prev.installments_count || 1)) * 100) / 100 : prev.installment_amount
       }));
     } else {
       total = amountBeforeTax;
@@ -152,11 +152,11 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         amount_before_tax: amountBeforeTax,
         tax_amount: 0,
         amount: amountBeforeTax,
-        installment_amount: prev.payment_type === 'دفعات' && (prev.installments_count || 1) > 0 
-          ? Math.round((amountBeforeTax / (prev.installments_count || 1)) * 100) / 100 : 0
+        installment_amount: installmentMode === 'auto' && prev.payment_type === 'دفعات' && (prev.installments_count || 1) > 0 
+          ? Math.round((amountBeforeTax / (prev.installments_count || 1)) * 100) / 100 : prev.installment_amount
       }));
     }
-  }, [formData.previous_amount, formData.current_amount, formData.tax_included]);
+  }, [formData.previous_amount, formData.current_amount, formData.tax_included, installmentMode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

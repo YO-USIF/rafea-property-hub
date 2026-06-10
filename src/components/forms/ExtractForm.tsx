@@ -420,7 +420,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                 value={formData.payment_type || 'كامل'}
                 onValueChange={(value) => {
                   const count = value === 'كامل' ? 1 : (formData.installments_count || 2);
-                  const installmentAmt = value === 'دفعات' && formData.amount > 0 ? Math.round((formData.amount / count) * 100) / 100 : 0;
+                  const installmentAmt = value === 'دفعات' && installmentMode === 'auto' && formData.amount > 0 ? Math.round((formData.amount / count) * 100) / 100 : (value === 'دفعات' ? formData.installment_amount : 0);
                   setFormData(prev => ({ 
                     ...prev, 
                     payment_type: value,

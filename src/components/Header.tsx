@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Bell, Search, User, Settings, LogOut, RefreshCw } from 'lucide-react';
+import { Bell, Search, User, Settings, LogOut, RefreshCw, Menu } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
@@ -9,11 +9,12 @@ import NotificationPanel from './NotificationPanel';
 import { getDisplayName } from '@/lib/userDisplayNames';
 
 interface HeaderProps {
-  sidebarCollapsed: boolean;
+  isCollapsed: boolean;
   setActiveTab?: (tab: string) => void;
+  onMenuClick?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ sidebarCollapsed, setActiveTab }) => {
+const Header: React.FC<HeaderProps> = ({ isCollapsed, setActiveTab, onMenuClick }) => {
   const { user, signOut, loading: authLoading } = useAuth();
   const { userRole, loading: roleLoading } = useUserRole();
   const { toast } = useToast();

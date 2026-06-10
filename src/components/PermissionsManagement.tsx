@@ -206,7 +206,7 @@ export const PermissionsManagement = () => {
                   <SelectContent>
                     {profiles.map((profile) => (
                       <SelectItem key={profile.user_id} value={profile.user_id}>
-                        {profile.full_name || profile.email}
+                        {getDisplayName(profile.full_name || profile.email)}
                       </SelectItem>
                     ))}
                   </SelectContent>

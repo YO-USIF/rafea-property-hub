@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { getDisplayName } from '@/lib/userDisplayNames';
 
 interface SidebarProps {
   activeTab: string;
@@ -202,7 +203,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
           {!isCollapsed && user && (
             <div className="px-3 py-2 rounded-lg bg-sidebar-accent/40">
               <p className="text-[11px] text-sidebar-foreground/40">مسجل باسم</p>
-              <p className="text-xs font-medium text-sidebar-foreground/80 truncate">{user.email}</p>
+              <p className="text-xs font-medium text-sidebar-foreground/80 truncate">{getDisplayName(user.email)}</p>
             </div>
           )}
           {isCollapsed ? (

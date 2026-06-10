@@ -65,6 +65,24 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
     attached_file_url: purchase?.attached_file_url || '',
     attached_file_name: purchase?.attached_file_name || ''
   });
+  const [items, setItems] = useState<PurchaseItem[]>([]);
+
+  const itemsTotal = items.reduce(
+    (sum, item) => sum + (Number(item.quantity) || 0) * (Number(item.unit_price) || 0),
+    0
+  );
+
+  const addItem = () => {
+    setItems(prev => [...prev, { name: '', quantity: 1, unit: 'قطعة', unit_price: 0 }]);
+  };
+
+  const updateItem = (index: number, field: keyof PurchaseItem, value: string | number) => {
+    setItems(prev => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
+  };
+
+  const removeItem = (index: number) => {
+    setItems(prev => prev.filter((_, i) => i !== index));
+  };
 
   // تحديث البيانات عند تغيير العنصر المرسل للتعديل
   useEffect(() => {

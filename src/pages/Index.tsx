@@ -24,7 +24,8 @@ import { ProtectedPage } from '../components/ProtectedPage';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const renderContent = () => {
     switch (activeTab) {

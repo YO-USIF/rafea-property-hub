@@ -52,6 +52,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
   const { projects } = useProjects();
   const { contractors } = useContractors();
   const [loading, setLoading] = useState(false);
+  const [installmentMode, setInstallmentMode] = useState<'auto' | 'manual'>('auto');
   const [formData, setFormData] = useState<Extract>({
     extract_number: extract?.extract_number || '',
     contractor_name: extract?.contractor_name || '',

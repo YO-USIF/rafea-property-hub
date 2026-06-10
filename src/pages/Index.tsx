@@ -24,7 +24,8 @@ import { ProtectedPage } from '../components/ProtectedPage';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -138,10 +139,18 @@ const Index = () => {
       <Sidebar 
         activeTab={activeTab} 
         setActiveTab={setActiveTab}
+        isCollapsed={isCollapsed}
+        setIsCollapsed={setIsCollapsed}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
       />
-      <Header sidebarCollapsed={sidebarCollapsed} setActiveTab={setActiveTab} />
+      <Header 
+        isCollapsed={isCollapsed} 
+        setActiveTab={setActiveTab} 
+        onMenuClick={() => setMobileOpen(true)}
+      />
       
-      <main className="transition-all duration-300 pt-16 pr-64 pl-6 pb-6 overflow-x-auto">
+      <main className={`transition-all duration-300 pt-16 pb-6 px-4 lg:pl-6 overflow-x-auto ${isCollapsed ? 'lg:pr-[68px]' : 'lg:pr-64'}`}>
         <div className="min-w-0 py-6">
           {renderContent()}
         </div>

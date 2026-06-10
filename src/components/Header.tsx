@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Bell, Search, User, Settings, LogOut, RefreshCw } from 'lucide-react';
+import { Bell, Search, User, Settings, LogOut, RefreshCw, Menu } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
@@ -9,11 +9,12 @@ import NotificationPanel from './NotificationPanel';
 import { getDisplayName } from '@/lib/userDisplayNames';
 
 interface HeaderProps {
-  sidebarCollapsed: boolean;
+  isCollapsed: boolean;
   setActiveTab?: (tab: string) => void;
+  onMenuClick?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ sidebarCollapsed, setActiveTab }) => {
+const Header: React.FC<HeaderProps> = ({ isCollapsed, setActiveTab, onMenuClick }) => {
   const { user, signOut, loading: authLoading } = useAuth();
   const { userRole, loading: roleLoading } = useUserRole();
   const { toast } = useToast();
@@ -69,10 +70,19 @@ const Header: React.FC<HeaderProps> = ({ sidebarCollapsed, setActiveTab }) => {
     <header 
       className={`
         fixed top-0 h-16 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm z-40 transition-all duration-300
-        ${sidebarCollapsed ? 'right-16 left-0' : 'right-64 left-0'}
+        left-0 right-0 ${isCollapsed ? 'lg:right-[68px]' : 'lg:right-64'}
       `}
     >
-      <div className="flex items-center justify-between h-full px-6">
+      <div className="flex items-center justify-between h-full gap-2 px-3 sm:px-6">
+        {/* Mobile menu button */}
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors shrink-0"
+          aria-label="فتح القائمة"
+        >
+          <Menu className="w-5 h-5 text-gray-600" />
+        </button>
+
         {/* Search */}
         <div className="flex-1 max-w-md">
           <div className="relative">
@@ -100,8 +110,9 @@ const Header: React.FC<HeaderProps> = ({ sidebarCollapsed, setActiveTab }) => {
           </div>
         </div>
 
+
         {/* Actions */}
-        <div className="flex items-center space-x-4 space-x-reverse">
+        <div className="flex items-center gap-1 sm:gap-2 space-x-reverse shrink-0">
           {/* Notifications */}
           <div className="relative">
             <button 
@@ -152,11 +163,11 @@ const Header: React.FC<HeaderProps> = ({ sidebarCollapsed, setActiveTab }) => {
           </button>
 
           {/* User Profile */}
-          <div className="flex items-center space-x-3 space-x-reverse px-3 py-2 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors">
-            <div className="w-8 h-8 bg-gradient-real-estate rounded-full flex items-center justify-center">
+          <div className="flex items-center gap-3 space-x-reverse px-2 sm:px-3 py-2 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors">
+            <div className="w-8 h-8 bg-gradient-real-estate rounded-full flex items-center justify-center shrink-0">
               <User className="w-4 h-4 text-white" />
             </div>
-            <div className="text-sm">
+            <div className="text-sm hidden md:block">
               <p className="font-medium text-gray-900">{getDisplayName(user?.email)}</p>
               <p className="text-gray-500">{isIdentityLoading ? 'جارٍ تحميل الصلاحية...' : userRole || 'بدون دور'}</p>
             </div>

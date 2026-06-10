@@ -150,9 +150,20 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
     setLoading(true);
 
     try {
+      const validItems = items
+        .filter(item => item.name.trim() !== '')
+        .map(item => ({
+          name: item.name.trim(),
+          quantity: Number(item.quantity) || 0,
+          unit: item.unit?.trim() || 'قطعة',
+          unit_price: Number(item.unit_price) || 0,
+        }));
+
       const purchasePayload = {
         ...formData,
-        project_id: formData.project_id === "none" || formData.project_id === "multiple" ? null : formData.project_id
+        total_amount: validItems.length > 0 ? itemsTotal : formData.total_amount,
+        project_id: formData.project_id === "none" || formData.project_id === "multiple" ? null : formData.project_id,
+        items: validItems,
       };
       
       if (purchase?.id) {
@@ -162,6 +173,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
       }
       onSuccess();
       onOpenChange(false);
+
     } catch (error: any) {
       toast({
         title: "خطأ",

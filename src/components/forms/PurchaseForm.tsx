@@ -343,6 +343,85 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
             </div>
           </div>
 
+          {/* أصناف وكميات الطلب */}
+          <div className="space-y-3 rounded-lg border p-4 bg-muted/20">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Package className="w-4 h-4 text-primary" />
+                <Label className="text-base font-semibold">الأصناف والكميات</Label>
+              </div>
+              <Button type="button" size="sm" variant="outline" onClick={addItem}>
+                <Plus className="w-4 h-4 ml-1" />
+                إضافة صنف
+              </Button>
+            </div>
+
+            {items.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                لم تتم إضافة أصناف بعد. اضغط "إضافة صنف" لكتابة المواد والكميات المطلوبة.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                <div className="hidden md:grid grid-cols-12 gap-2 px-1 text-xs font-medium text-muted-foreground">
+                  <div className="col-span-5">المادة / الصنف</div>
+                  <div className="col-span-2">الكمية</div>
+                  <div className="col-span-2">الوحدة</div>
+                  <div className="col-span-2">سعر الوحدة</div>
+                  <div className="col-span-1"></div>
+                </div>
+                {items.map((item, index) => (
+                  <div key={index} className="grid grid-cols-12 gap-2 items-center">
+                    <Input
+                      className="col-span-12 md:col-span-5"
+                      placeholder="اسم المادة المطلوبة"
+                      value={item.name}
+                      onChange={(e) => updateItem(index, 'name', e.target.value)}
+                    />
+                    <Input
+                      className="col-span-4 md:col-span-2"
+                      type="number"
+                      min="0"
+                      placeholder="الكمية"
+                      value={item.quantity}
+                      onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                    />
+                    <Input
+                      className="col-span-4 md:col-span-2"
+                      placeholder="الوحدة"
+                      value={item.unit}
+                      onChange={(e) => updateItem(index, 'unit', e.target.value)}
+                    />
+                    <Input
+                      className="col-span-3 md:col-span-2"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="السعر"
+                      value={item.unit_price}
+                      onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                    />
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="col-span-1 text-destructive"
+                      onClick={() => removeItem(index)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+                <div className="flex justify-between items-center pt-2 border-t mt-2">
+                  <span className="text-sm font-medium">الإجمالي</span>
+                  <span className="text-base font-bold text-primary">
+                    {itemsTotal.toLocaleString()} ر.س
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+
           <FileUpload
             onFileUploaded={(fileUrl, fileName) => {
               setFormData(prev => ({

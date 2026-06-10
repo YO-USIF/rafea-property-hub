@@ -285,11 +285,17 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
                 id="total_amount"
                 type="number"
                 step="0.01"
-                value={formData.total_amount}
+                value={items.length > 0 ? itemsTotal : formData.total_amount}
                 onChange={(e) => setFormData(prev => ({ ...prev, total_amount: parseFloat(e.target.value) || 0 }))}
+                readOnly={items.length > 0}
+                className={items.length > 0 ? 'bg-muted' : ''}
                 required
               />
+              {items.length > 0 && (
+                <p className="text-xs text-muted-foreground">يُحسب تلقائياً من الأصناف المضافة</p>
+              )}
             </div>
+
 
             <div className="space-y-2">
               <Label htmlFor="status">حالة الموافقة</Label>

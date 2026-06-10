@@ -9,6 +9,16 @@ import { useToast } from '@/hooks/use-toast';
 import { usePurchases } from '@/hooks/usePurchases';
 import { useProjects } from '@/hooks/useProjects';
 import { useUserRole } from '@/hooks/useUserRole';
+import { supabase } from '@/integrations/supabase/client';
+import { Plus, Trash2, Package } from 'lucide-react';
+
+interface PurchaseItem {
+  name: string;
+  quantity: number;
+  unit: string;
+  unit_price: number;
+}
+
 
 interface Purchase {
   id?: string;

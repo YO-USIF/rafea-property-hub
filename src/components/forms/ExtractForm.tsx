@@ -451,21 +451,54 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                     value={formData.installments_count}
                     onChange={(e) => {
                       const count = parseInt(e.target.value) || 2;
-                      const installmentAmt = formData.amount > 0 ? Math.round((formData.amount / count) * 100) / 100 : 0;
-                      setFormData(prev => ({ ...prev, installments_count: count, installment_amount: installmentAmt }));
+                      setFormData(prev => ({
+                        ...prev,
+                        installments_count: count,
+                        installment_amount: installmentMode === 'auto' && prev.amount > 0
+                          ? Math.round((prev.amount / count) * 100) / 100
+                          : prev.installment_amount,
+                      }));
                     }}
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label>طريقة تقسيم الدفعات</Label>
+                  <Select
+                    value={installmentMode}
+                    onValueChange={(value: 'auto' | 'manual') => {
+                      setInstallmentMode(value);
+                      if (value === 'auto') {
+                        const count = formData.installments_count || 2;
+                        const amt = formData.amount > 0 ? Math.round((formData.amount / count) * 100) / 100 : 0;
+                        setFormData(prev => ({ ...prev, installment_amount: amt }));
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="auto">تقسيم تلقائي متساوٍ</SelectItem>
+                      <SelectItem value="manual">إدخال يدوي</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2 md:col-span-2">
                   <Label>قيمة كل دفعة</Label>
                   <Input
                     type="number"
+                    step="0.01"
                     value={formData.installment_amount}
-                    disabled
-                    className="bg-muted/50 font-semibold"
+                    disabled={installmentMode === 'auto'}
+                    onChange={(e) =>
+                      setFormData(prev => ({ ...prev, installment_amount: parseFloat(e.target.value) || 0 }))
+                    }
+                    className={installmentMode === 'auto' ? 'bg-muted/50 font-semibold' : 'font-semibold'}
                   />
                   <p className="text-xs text-muted-foreground">
-                    يحسب تلقائياً: إجمالي المبلغ ÷ عدد الدفعات
+                    {installmentMode === 'auto'
+                      ? 'يحسب تلقائياً: إجمالي المبلغ ÷ عدد الدفعات'
+                      : 'أدخل قيمة الدفعة يدوياً'}
                   </p>
                 </div>
               </>

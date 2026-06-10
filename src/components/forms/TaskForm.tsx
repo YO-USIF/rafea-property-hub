@@ -142,7 +142,7 @@ const TaskForm = ({ open, onOpenChange, task, onSuccess }: TaskFormProps) => {
                 <SelectContent>
                   {usersWithPhone.map((profile) => (
                     <SelectItem key={profile.id} value={profile.full_name || profile.email || ''}>
-                      {profile.full_name || profile.email?.split('@')[0]}
+                      {getDisplayName(profile.full_name || profile.email)}
                       {profile.phone && (
                         <span className="text-xs text-muted-foreground mr-2">
                           ({profile.phone})

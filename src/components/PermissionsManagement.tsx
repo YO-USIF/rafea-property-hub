@@ -25,6 +25,7 @@ import {
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
+import { getDisplayName } from "@/lib/userDisplayNames";
 
 const AVAILABLE_PAGES = [
   { name: "dashboard", label: "لوحة التحكم" },
@@ -76,7 +77,7 @@ export const PermissionsManagement = () => {
         const profile = profiles.find((pr) => pr.user_id === p.user_id);
         groups[p.user_id] = {
           userId: p.user_id,
-          userName: profile?.full_name || "مستخدم غير معروف",
+          userName: getDisplayName(profile?.full_name || profile?.email, "مستخدم غير معروف"),
           email: profile?.email || "",
           permissions: [],
         };
@@ -119,7 +120,7 @@ export const PermissionsManagement = () => {
 
   const getUserName = (userId: string) => {
     const profile = profiles.find((p) => p.user_id === userId);
-    return profile?.full_name || profile?.email || "مستخدم غير معروف";
+    return getDisplayName(profile?.full_name || profile?.email, "مستخدم غير معروف");
   };
 
   const handleSubmit = () => {
@@ -205,7 +206,7 @@ export const PermissionsManagement = () => {
                   <SelectContent>
                     {profiles.map((profile) => (
                       <SelectItem key={profile.user_id} value={profile.user_id}>
-                        {profile.full_name || profile.email}
+                        {getDisplayName(profile.full_name || profile.email)}
                       </SelectItem>
                     ))}
                   </SelectContent>

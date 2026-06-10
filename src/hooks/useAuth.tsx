@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { getDisplayName } from '@/lib/userDisplayNames';
 
 interface AuthContextType {
   user: User | null;
@@ -55,7 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } else {
       toast({
         title: "تم تسجيل الدخول بنجاح",
-        description: "مرحباً بك في نظام إدارة العقارات",
+        description: `مرحباً ${getDisplayName(email)} في نظام إدارة العقارات`,
       });
     }
     

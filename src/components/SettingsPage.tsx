@@ -13,6 +13,7 @@ import { useCompanySettings } from '@/hooks/useCompanySettings';
 import { useNotificationSettings } from '@/hooks/useNotificationSettings';
 import { useBackupLogs, useSecuritySettings } from '@/hooks/useSystemSettings';
 import UserForm from '@/components/forms/UserForm';
+import { getDisplayName } from '@/lib/userDisplayNames';
 
 const rolePriority = ['مدير النظام', 'مدير', 'مدير مشروع', 'موظف مبيعات', 'محاسب', 'موظف'];
 
@@ -213,7 +214,7 @@ const SettingsPage = () => {
               <TableBody>
                 {profiles.map((profile) => (
                   <TableRow key={profile.id}>
-                    <TableCell className="font-medium">{profile.full_name}</TableCell>
+                    <TableCell className="font-medium">{getDisplayName(profile.full_name || profile.email)}</TableCell>
                     <TableCell>{profile.email}</TableCell>
                     <TableCell>
                       <Select

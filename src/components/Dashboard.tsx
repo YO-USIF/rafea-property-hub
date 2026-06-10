@@ -16,6 +16,7 @@ import {
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
+import { getDisplayName } from '@/lib/userDisplayNames';
 
 const Dashboard = () => {
   const { user } = useAuth();

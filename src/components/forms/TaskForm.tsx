@@ -9,6 +9,7 @@ import { FileUpload } from '@/components/ui/file-upload';
 import { useToast } from '@/hooks/use-toast';
 import { useTasks } from '@/hooks/useTasks';
 import { useProfiles } from '@/hooks/useProfiles';
+import { getDisplayName } from '@/lib/userDisplayNames';
 
 interface Task {
   id?: string;

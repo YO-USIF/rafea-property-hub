@@ -6,6 +6,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
 import { useNotifications } from '@/hooks/useNotifications';
 import NotificationPanel from './NotificationPanel';
+import { getDisplayName } from '@/lib/userDisplayNames';
 
 interface HeaderProps {
   sidebarCollapsed: boolean;

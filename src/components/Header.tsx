@@ -112,7 +112,7 @@ const Header: React.FC<HeaderProps> = ({ isCollapsed, setActiveTab, onMenuClick 
 
 
         {/* Actions */}
-        <div className="flex items-center space-x-4 space-x-reverse">
+        <div className="flex items-center gap-1 sm:gap-2 space-x-reverse shrink-0">
           {/* Notifications */}
           <div className="relative">
             <button 

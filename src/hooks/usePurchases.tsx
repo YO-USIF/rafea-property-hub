@@ -61,7 +61,7 @@ export const usePurchases = () => {
   });
 
   const updatePurchase = useMutation({
-    mutationFn: async ({ id, ...purchaseData }: any) => {
+    mutationFn: async ({ id, items, ...purchaseData }: any) => {
       let query = supabase
         .from('purchases')
         .update(purchaseData)
@@ -75,6 +75,23 @@ export const usePurchases = () => {
       const { data, error } = await query.select().single();
       
       if (error) throw error;
+
+      // تحديث أصناف الطلب: حذف القديم وإضافة الجديد
+      if (items !== undefined) {
+        const { error: deleteError } = await supabase
+          .from('purchase_items')
+          .delete()
+          .eq('purchase_id', id);
+        if (deleteError) throw deleteError;
+
+        if (items && items.length > 0) {
+          const { error: itemsError } = await supabase
+            .from('purchase_items')
+            .insert(items.map((item: any) => ({ ...item, purchase_id: id })));
+          if (itemsError) throw itemsError;
+        }
+      }
+
       return data;
     },
     onSuccess: () => {

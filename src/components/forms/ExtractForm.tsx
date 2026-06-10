@@ -52,6 +52,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
   const { projects } = useProjects();
   const { contractors } = useContractors();
   const [loading, setLoading] = useState(false);
+  const [installmentMode, setInstallmentMode] = useState<'auto' | 'manual'>('auto');
   const [formData, setFormData] = useState<Extract>({
     extract_number: extract?.extract_number || '',
     contractor_name: extract?.contractor_name || '',
@@ -141,8 +142,8 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         amount_before_tax: Math.round(amountBeforeTax * 100) / 100,
         tax_amount: Math.round(taxAmount * 100) / 100,
         amount: total,
-        installment_amount: prev.payment_type === 'دفعات' && (prev.installments_count || 1) > 0 
-          ? Math.round((total / (prev.installments_count || 1)) * 100) / 100 : 0
+        installment_amount: installmentMode === 'auto' && prev.payment_type === 'دفعات' && (prev.installments_count || 1) > 0 
+          ? Math.round((total / (prev.installments_count || 1)) * 100) / 100 : prev.installment_amount
       }));
     } else {
       total = amountBeforeTax;
@@ -151,11 +152,11 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         amount_before_tax: amountBeforeTax,
         tax_amount: 0,
         amount: amountBeforeTax,
-        installment_amount: prev.payment_type === 'دفعات' && (prev.installments_count || 1) > 0 
-          ? Math.round((amountBeforeTax / (prev.installments_count || 1)) * 100) / 100 : 0
+        installment_amount: installmentMode === 'auto' && prev.payment_type === 'دفعات' && (prev.installments_count || 1) > 0 
+          ? Math.round((amountBeforeTax / (prev.installments_count || 1)) * 100) / 100 : prev.installment_amount
       }));
     }
-  }, [formData.previous_amount, formData.current_amount, formData.tax_included]);
+  }, [formData.previous_amount, formData.current_amount, formData.tax_included, installmentMode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -419,7 +420,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                 value={formData.payment_type || 'كامل'}
                 onValueChange={(value) => {
                   const count = value === 'كامل' ? 1 : (formData.installments_count || 2);
-                  const installmentAmt = value === 'دفعات' && formData.amount > 0 ? Math.round((formData.amount / count) * 100) / 100 : 0;
+                  const installmentAmt = value === 'دفعات' && installmentMode === 'auto' && formData.amount > 0 ? Math.round((formData.amount / count) * 100) / 100 : (value === 'دفعات' ? formData.installment_amount : 0);
                   setFormData(prev => ({ 
                     ...prev, 
                     payment_type: value,
@@ -450,21 +451,54 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
                     value={formData.installments_count}
                     onChange={(e) => {
                       const count = parseInt(e.target.value) || 2;
-                      const installmentAmt = formData.amount > 0 ? Math.round((formData.amount / count) * 100) / 100 : 0;
-                      setFormData(prev => ({ ...prev, installments_count: count, installment_amount: installmentAmt }));
+                      setFormData(prev => ({
+                        ...prev,
+                        installments_count: count,
+                        installment_amount: installmentMode === 'auto' && prev.amount > 0
+                          ? Math.round((prev.amount / count) * 100) / 100
+                          : prev.installment_amount,
+                      }));
                     }}
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label>طريقة تقسيم الدفعات</Label>
+                  <Select
+                    value={installmentMode}
+                    onValueChange={(value: 'auto' | 'manual') => {
+                      setInstallmentMode(value);
+                      if (value === 'auto') {
+                        const count = formData.installments_count || 2;
+                        const amt = formData.amount > 0 ? Math.round((formData.amount / count) * 100) / 100 : 0;
+                        setFormData(prev => ({ ...prev, installment_amount: amt }));
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="auto">تقسيم تلقائي متساوٍ</SelectItem>
+                      <SelectItem value="manual">إدخال يدوي</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2 md:col-span-2">
                   <Label>قيمة كل دفعة</Label>
                   <Input
                     type="number"
+                    step="0.01"
                     value={formData.installment_amount}
-                    disabled
-                    className="bg-muted/50 font-semibold"
+                    disabled={installmentMode === 'auto'}
+                    onChange={(e) =>
+                      setFormData(prev => ({ ...prev, installment_amount: parseFloat(e.target.value) || 0 }))
+                    }
+                    className={installmentMode === 'auto' ? 'bg-muted/50 font-semibold' : 'font-semibold'}
                   />
                   <p className="text-xs text-muted-foreground">
-                    يحسب تلقائياً: إجمالي المبلغ ÷ عدد الدفعات
+                    {installmentMode === 'auto'
+                      ? 'يحسب تلقائياً: إجمالي المبلغ ÷ عدد الدفعات'
+                      : 'أدخل قيمة الدفعة يدوياً'}
                   </p>
                 </div>
               </>

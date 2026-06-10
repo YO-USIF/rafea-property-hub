@@ -10,6 +10,7 @@ import { useProfiles } from '@/hooks/useProfiles';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Send, Users, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { getDisplayName } from '@/lib/userDisplayNames';
 
 const rolePriority = ['مدير النظام', 'مدير', 'مدير مشروع', 'موظف مبيعات', 'محاسب', 'موظف'];
 
@@ -229,7 +230,7 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
                       />
                       <Label htmlFor={profile.user_id} className="flex-1 cursor-pointer">
                         <div className="flex justify-between items-center">
-                          <span>{profile.full_name || profile.email}</span>
+                          <span>{getDisplayName(profile.full_name || profile.email)}</span>
                           <span className="text-xs text-muted-foreground">
                             {getDisplayRole(profile.roles)}
                           </span>

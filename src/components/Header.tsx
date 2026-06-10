@@ -163,11 +163,11 @@ const Header: React.FC<HeaderProps> = ({ isCollapsed, setActiveTab, onMenuClick 
           </button>
 
           {/* User Profile */}
-          <div className="flex items-center space-x-3 space-x-reverse px-3 py-2 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors">
-            <div className="w-8 h-8 bg-gradient-real-estate rounded-full flex items-center justify-center">
+          <div className="flex items-center gap-3 space-x-reverse px-2 sm:px-3 py-2 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors">
+            <div className="w-8 h-8 bg-gradient-real-estate rounded-full flex items-center justify-center shrink-0">
               <User className="w-4 h-4 text-white" />
             </div>
-            <div className="text-sm">
+            <div className="text-sm hidden md:block">
               <p className="font-medium text-gray-900">{getDisplayName(user?.email)}</p>
               <p className="text-gray-500">{isIdentityLoading ? 'جارٍ تحميل الصلاحية...' : userRole || 'بدون دور'}</p>
             </div>

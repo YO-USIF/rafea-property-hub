@@ -70,10 +70,19 @@ const Header: React.FC<HeaderProps> = ({ isCollapsed, setActiveTab, onMenuClick 
     <header 
       className={`
         fixed top-0 h-16 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm z-40 transition-all duration-300
-        ${sidebarCollapsed ? 'right-16 left-0' : 'right-64 left-0'}
+        left-0 right-0 ${isCollapsed ? 'lg:right-[68px]' : 'lg:right-64'}
       `}
     >
-      <div className="flex items-center justify-between h-full px-6">
+      <div className="flex items-center justify-between h-full gap-2 px-3 sm:px-6">
+        {/* Mobile menu button */}
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors shrink-0"
+          aria-label="فتح القائمة"
+        >
+          <Menu className="w-5 h-5 text-gray-600" />
+        </button>
+
         {/* Search */}
         <div className="flex-1 max-w-md">
           <div className="relative">
@@ -100,6 +109,7 @@ const Header: React.FC<HeaderProps> = ({ isCollapsed, setActiveTab, onMenuClick 
             )}
           </div>
         </div>
+
 
         {/* Actions */}
         <div className="flex items-center space-x-4 space-x-reverse">

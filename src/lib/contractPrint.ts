@@ -89,14 +89,15 @@ export function printContract(
   const sigPath = getUserSignature(approverName);
   const sigName = getUserDisplayName(approverName) || approverName || 'مدير النظام';
   const firstPartySig = contract.approved
-    ? `<div class="sig">الطرف الأول (المالك)<br/>
+    ? `<div class="sig">
+        <div class="role">الطرف الأول (المالك)</div>
         <div style="color:#16a34a;font-size:0.78em;margin-top:4px;">✅ معتمد من الإدارة ${
           contract.approved_at ? new Date(contract.approved_at).toLocaleDateString('en-GB') : ''
         }</div>
-        ${sigPath ? `<img src="${sigPath}" style="height:55px;object-fit:contain;margin:4px auto;" />` : '<br/><br/>'}
-        <div style="font-weight:600;">${escapeHtml(sigName)}</div>
+        ${sigPath ? `<img src="${sigPath}" style="height:55px;object-fit:contain;margin:4px auto;display:block;" />` : '<br/><br/>'}
+        <div style="font-weight:700;">${escapeHtml(sigName)}</div>
       </div>`
-    : `<div class="sig">الطرف الأول (المالك)<br/><br/>الاسم والتوقيع</div>`;
+    : `<div class="sig"><div class="role">الطرف الأول (المالك)</div><br/><br/>الاسم والتوقيع</div>`;
 
   const todayStr = new Date().toLocaleDateString('en-GB');
 

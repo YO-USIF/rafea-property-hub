@@ -70,6 +70,8 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [], contra
       setPaymentTerms(contract.payment_terms || '');
       setTerms(contract.terms || defaultTerms);
       setVatEnabled(contract.vat_enabled ?? true);
+      setAttachmentUrl(contract.attachment_url || null);
+      setAttachmentName(contract.attachment_name || null);
       setItems(
         Array.isArray(contract.items) && contract.items.length > 0
           ? contract.items
@@ -87,6 +89,8 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [], contra
       setPaymentTerms('دفعات حسب نسبة الإنجاز والمستخلصات المعتمدة');
       setTerms(defaultTerms);
       setVatEnabled(true);
+      setAttachmentUrl(null);
+      setAttachmentName(null);
       setItems([{ description: '', quantity: 1, unit: 'مقطوعية', unit_price: 0 }]);
     }
   }, [open, contract]);

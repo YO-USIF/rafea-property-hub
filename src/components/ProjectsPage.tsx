@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import ProjectForm from './forms/ProjectForm';
+import { PermissionButton } from '@/components/PermissionButton';
 
 interface Project {
   id: string;

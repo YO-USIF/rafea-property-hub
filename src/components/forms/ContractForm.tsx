@@ -13,6 +13,7 @@ interface ContractFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   contractor?: any;
+  contractors?: any[];
 }
 
 interface ClauseItem {

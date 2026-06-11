@@ -30,6 +30,7 @@ interface ClauseItem {
 const ContractForm = ({ open, onOpenChange, contractor, contractors = [], contract, onSaved }: ContractFormProps) => {
   const { toast } = useToast();
   const { createContract, updateContract } = useContracts();
+  const { uploadFile, viewFile, uploading } = useFileHandler();
   const [selectedId, setSelectedId] = useState<string>('');
   const [company, setCompany] = useState('suhail');
   const [contractNumber, setContractNumber] = useState('');
@@ -42,6 +43,8 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [], contra
   const [terms, setTerms] = useState(defaultTerms);
   const [vatEnabled, setVatEnabled] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [attachmentUrl, setAttachmentUrl] = useState<string | null>(null);
+  const [attachmentName, setAttachmentName] = useState<string | null>(null);
   const [items, setItems] = useState<ClauseItem[]>([
     { description: '', quantity: 1, unit: 'مقطوعية', unit_price: 0 },
   ]);

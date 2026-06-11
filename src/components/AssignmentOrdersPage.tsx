@@ -310,14 +310,16 @@ const AssignmentOrdersPage = () => {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button
+                        <PermissionButton
+                          pageName="assignment_orders"
+                          requirePermission="delete"
                           variant="destructive"
                           size="sm"
                           onClick={() => setDeletingOrder(order)}
                           title="حذف أمر التكليف"
                         >
                           <Trash2 className="w-4 h-4" />
-                        </Button>
+                        </PermissionButton>
                       </div>
                     </TableCell>
                   </TableRow>

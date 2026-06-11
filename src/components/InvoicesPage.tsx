@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { escapeHtml } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PermissionButton } from "@/components/PermissionButton";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -491,14 +492,16 @@ const InvoicesPage = () => {
                         >
                           <Printer className="w-4 h-4" />
                         </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
+                        <PermissionButton
+                          pageName="invoices"
+                          requirePermission="delete"
+                          size="sm"
+                          variant="outline"
                           onClick={() => handleDelete(invoice.id)}
                           className="text-red-600 hover:text-red-700"
                         >
                           <Trash2 className="w-4 h-4" />
-                        </Button>
+                        </PermissionButton>
                       </div>
                     </TableCell>
                   </TableRow>

@@ -758,13 +758,15 @@ const SalesPage = () => {
                         >
                           <Printer className="w-4 h-4" />
                         </Button>
-                        <Button 
-                          size="sm" 
+                        <PermissionButton
+                          pageName="sales"
+                          requirePermission="delete"
+                          size="sm"
                           variant="outline"
                           onClick={() => deleteSale.mutate(sale.id)}
                         >
                           <Trash2 className="w-4 h-4" />
-                        </Button>
+                        </PermissionButton>
                       </div>
                     </TableCell>
                   </TableRow>

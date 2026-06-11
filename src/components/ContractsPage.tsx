@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Plus, Search, FileSignature, Printer, Edit, Trash2, CheckCircle2, XCircle, FileText, ShieldCheck } from 'lucide-react';
 import ContractForm from '@/components/forms/ContractForm';
+import { PermissionButton } from '@/components/PermissionButton';
 import { useContracts } from '@/hooks/useContracts';
 import { useContractors } from '@/hooks/useContractors';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -215,7 +216,9 @@ const ContractsPage = () => {
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
-                          <Button
+                          <PermissionButton
+                            pageName="contractors"
+                            requirePermission="delete"
                             size="sm"
                             variant="outline"
                             className="text-red-600"
@@ -223,7 +226,7 @@ const ContractsPage = () => {
                             onClick={() => setDeleteId(contract.id)}
                           >
                             <Trash2 className="w-4 h-4" />
-                          </Button>
+                          </PermissionButton>
                         </div>
                       </TableCell>
                     </TableRow>

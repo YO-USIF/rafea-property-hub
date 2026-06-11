@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PermissionButton } from "@/components/PermissionButton";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -309,14 +310,16 @@ const AssignmentOrdersPage = () => {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button
+                        <PermissionButton
+                          pageName="assignment_orders"
+                          requirePermission="delete"
                           variant="destructive"
                           size="sm"
                           onClick={() => setDeletingOrder(order)}
                           title="حذف أمر التكليف"
                         >
                           <Trash2 className="w-4 h-4" />
-                        </Button>
+                        </PermissionButton>
                       </div>
                     </TableCell>
                   </TableRow>

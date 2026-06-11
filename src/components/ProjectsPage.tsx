@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import ProjectForm from './forms/ProjectForm';
+import { PermissionButton } from '@/components/PermissionButton';
 
 interface Project {
   id: string;
@@ -367,13 +368,15 @@ const ProjectsPage = () => {
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button
+                            <PermissionButton
+                              pageName="projects"
+                              requirePermission="delete"
                               variant="outline"
                               size="sm"
                               className="hover:bg-red-50 hover:text-red-600"
                             >
                               <Trash2 className="w-4 h-4" />
-                            </Button>
+                            </PermissionButton>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>

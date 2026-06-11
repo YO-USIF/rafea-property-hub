@@ -6,6 +6,7 @@ import TaskProgressReportForm from '@/components/forms/TaskProgressReportForm';
 import AttachFileForm from '@/components/forms/AttachFileForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PermissionButton } from "@/components/PermissionButton";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -317,13 +318,15 @@ const TasksPage = () => {
                               >
                                 <Edit className="w-4 h-4" />
                               </Button>
-                              <Button 
-                                size="sm" 
+                              <PermissionButton
+                                pageName="tasks"
+                                requirePermission="delete"
+                                size="sm"
                                 variant="outline"
                                 onClick={() => deleteTask.mutate(task.id)}
                               >
                                 <Trash2 className="w-4 h-4" />
-                              </Button>
+                              </PermissionButton>
                             </>
                           )}
                         </div>
@@ -365,13 +368,15 @@ const TasksPage = () => {
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
-                          <Button 
-                            size="sm" 
+                          <PermissionButton
+                            pageName="tasks"
+                            requirePermission="delete"
+                            size="sm"
                             variant="outline"
                             onClick={() => deleteReport.mutate(report.id)}
                           >
                             <Trash2 className="w-4 h-4" />
-                          </Button>
+                          </PermissionButton>
                         </>
                       )}
                     </div>

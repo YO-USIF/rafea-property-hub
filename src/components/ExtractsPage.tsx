@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PermissionButton } from "@/components/PermissionButton";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -365,7 +366,9 @@ const ExtractsPage = () => {
                           <Edit className="w-4 h-4" />
                         </Button>
                         {(isAdmin || isManager) && (
-                          <Button
+                          <PermissionButton
+                            pageName="extracts"
+                            requirePermission="delete"
                             variant="outline"
                             size="sm"
                             onClick={() => handleDelete(extract.id)}
@@ -373,7 +376,7 @@ const ExtractsPage = () => {
                             className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
                           >
                             <Trash2 className="w-4 h-4" />
-                          </Button>
+                          </PermissionButton>
                         )}
                       </div>
                     </TableCell>

@@ -5,6 +5,7 @@ import ExtractForm from '@/components/forms/ExtractForm';
 import ContractForm from '@/components/forms/ContractForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PermissionButton } from "@/components/PermissionButton";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -657,13 +658,15 @@ const ContractorsPage = () => {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button 
-                          size="sm" 
+                        <PermissionButton
+                          pageName="contractors"
+                          requirePermission="delete"
+                          size="sm"
                           variant="outline"
                           onClick={() => deleteContractor.mutate(contractor.id)}
                         >
                           <Trash2 className="w-4 h-4" />
-                        </Button>
+                        </PermissionButton>
                       </div>
                     </TableCell>
                   </TableRow>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PermissionGate } from "@/components/PermissionGate";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -178,11 +179,13 @@ const HOAManagementTab = () => {
                     <TableCell>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" onClick={() => openEditMember(m)}><Edit className="w-4 h-4" /></Button>
+                        <PermissionGate pageName="maintenance" requirePermission="delete">
                         <AlertDialog>
                           <AlertDialogTrigger asChild><Button variant="outline" size="sm" className="hover:bg-red-50"><Trash2 className="w-4 h-4" /></Button></AlertDialogTrigger>
                           <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>تأكيد الحذف</AlertDialogTitle><AlertDialogDescription>سيتم حذف العضو وجميع الرسوم المرتبطة به</AlertDialogDescription></AlertDialogHeader>
                           <AlertDialogFooter><AlertDialogCancel>إلغاء</AlertDialogCancel><AlertDialogAction onClick={() => deleteMember(m.id)}>حذف</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
                         </AlertDialog>
+                        </PermissionGate>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -221,11 +224,13 @@ const HOAManagementTab = () => {
                     <TableCell>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" onClick={() => openEditFee(f)}><Edit className="w-4 h-4" /></Button>
+                        <PermissionGate pageName="maintenance" requirePermission="delete">
                         <AlertDialog>
                           <AlertDialogTrigger asChild><Button variant="outline" size="sm" className="hover:bg-red-50"><Trash2 className="w-4 h-4" /></Button></AlertDialogTrigger>
                           <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>تأكيد الحذف</AlertDialogTitle><AlertDialogDescription>هل أنت متأكد؟</AlertDialogDescription></AlertDialogHeader>
                           <AlertDialogFooter><AlertDialogCancel>إلغاء</AlertDialogCancel><AlertDialogAction onClick={() => deleteFee(f.id)}>حذف</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
                         </AlertDialog>
+                        </PermissionGate>
                       </div>
                     </TableCell>
                   </TableRow>

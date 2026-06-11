@@ -290,7 +290,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
               <div class="company-name-en">${escapeHtml(company.nameEn)}</div>
               <div class="company-details">
                 <div>السجل التجاري: ${escapeHtml(company.cr)}</div>
-                <div>الرقم الضريبي: ${escapeHtml(company.vat)}</div>
+                ${company.vat ? `<div>الرقم الضريبي: ${escapeHtml(company.vat)}</div>` : ''}
                 <div>${escapeHtml(company.address)}</div>
                 <div>هاتف: ${escapeHtml(company.phone)} | بريد: ${escapeHtml(company.email)}</div>
               </div>

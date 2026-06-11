@@ -496,6 +496,16 @@ const ContractorsPage = () => {
             <FileText className="w-4 h-4 ml-2" />
             إضافة مستخلص
           </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setSelectedContractor(null);
+              setShowContractForm(true);
+            }}
+          >
+            <FileSignature className="w-4 h-4 ml-2" />
+            إضافة عقد
+          </Button>
         </div>
       </div>
 

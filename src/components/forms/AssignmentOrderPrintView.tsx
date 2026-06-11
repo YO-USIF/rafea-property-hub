@@ -494,7 +494,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
                 <p className="text-sm text-gray-600 mb-2">{company.nameEn}</p>
                 <div className="text-xs text-gray-600 space-y-1">
                   <p>السجل التجاري: {company.cr}</p>
-                  <p>الرقم الضريبي: {company.vat}</p>
+                  {company.vat && <p>الرقم الضريبي: {company.vat}</p>}
               </div>
             </div>
             {selectedCompany === 'suhail' && (

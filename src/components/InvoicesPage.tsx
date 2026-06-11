@@ -492,14 +492,16 @@ const InvoicesPage = () => {
                         >
                           <Printer className="w-4 h-4" />
                         </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
+                        <PermissionButton
+                          pageName="invoices"
+                          requirePermission="delete"
+                          size="sm"
+                          variant="outline"
                           onClick={() => handleDelete(invoice.id)}
                           className="text-red-600 hover:text-red-700"
                         >
                           <Trash2 className="w-4 h-4" />
-                        </Button>
+                        </PermissionButton>
                       </div>
                     </TableCell>
                   </TableRow>

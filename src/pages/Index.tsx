@@ -60,6 +60,12 @@ const Index = () => {
             <ContractorsPage />
           </ProtectedPage>
         );
+      case 'contracts':
+        return (
+          <ProtectedPage pageName="contractors">
+            <ContractsPage />
+          </ProtectedPage>
+        );
       case 'suppliers':
         return (
           <ProtectedPage pageName="suppliers">

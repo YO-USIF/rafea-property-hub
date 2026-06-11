@@ -415,13 +415,15 @@ const PurchasesPage = () => {
                         >
                           <Printer className="w-4 h-4" />
                         </Button>
-                        <Button 
-                          size="sm" 
+                        <PermissionButton
+                          pageName="purchases"
+                          requirePermission="delete"
+                          size="sm"
                           variant="outline"
                           onClick={() => deletePurchase.mutate(order.id)}
                         >
                           <Trash2 className="w-4 h-4" />
-                        </Button>
+                        </PermissionButton>
                       </div>
                     </TableCell>
                   </TableRow>

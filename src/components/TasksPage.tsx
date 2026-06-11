@@ -6,6 +6,7 @@ import TaskProgressReportForm from '@/components/forms/TaskProgressReportForm';
 import AttachFileForm from '@/components/forms/AttachFileForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PermissionButton } from "@/components/PermissionButton";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";

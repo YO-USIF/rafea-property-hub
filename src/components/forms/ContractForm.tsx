@@ -101,7 +101,7 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [] }: Cont
   const fmt = (n: number) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const handlePrint = () => {
-    if (!contractor) return;
+    const ct = activeContractor; if (!ct) { toast({ title: "الرجاء اختيار المقاول", variant: "destructive" }); return; }
     const c = companyInfo[company];
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
@@ -174,11 +174,11 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [] }: Cont
           </div>
           <div class="party">
             <h3>الطرف الثاني (المقاول)</h3>
-            <div><strong>${escapeHtml(contractor.name || '')}</strong></div>
-            ${contractor.company ? `<div>الشركة: ${escapeHtml(contractor.company)}</div>` : ''}
-            ${contractor.specialization ? `<div>التخصص: ${escapeHtml(contractor.specialization)}</div>` : ''}
-            ${contractor.phone ? `<div>الهاتف: ${escapeHtml(contractor.phone)}</div>` : ''}
-            ${contractor.email ? `<div>البريد: ${escapeHtml(contractor.email)}</div>` : ''}
+            <div><strong>${escapeHtml(ct.name || '')}</strong></div>
+            ${ct.company ? `<div>الشركة: ${escapeHtml(ct.company)}</div>` : ''}
+            ${ct.specialization ? `<div>التخصص: ${escapeHtml(ct.specialization)}</div>` : ''}
+            ${ct.phone ? `<div>الهاتف: ${escapeHtml(ct.phone)}</div>` : ''}
+            ${ct.email ? `<div>البريد: ${escapeHtml(ct.email)}</div>` : ''}
           </div>
         </div>
 
@@ -213,7 +213,7 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [] }: Cont
 
         <div class="signatures">
           <div class="sig">الطرف الأول (المالك)<br/><br/>الاسم والتوقيع</div>
-          <div class="sig">الطرف الثاني (المقاول)<br/><br/>${escapeHtml(contractor.name || '')}<br/>الاسم والتوقيع</div>
+          <div class="sig">الطرف الثاني (المقاول)<br/><br/>${escapeHtml(ct.name || '')}<br/>الاسم والتوقيع</div>
         </div>
 
         <script>

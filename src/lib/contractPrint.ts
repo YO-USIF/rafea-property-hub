@@ -96,7 +96,6 @@ export function printContract(
         }</div>
         <img src="${presidentSig}" style="height:60px;object-fit:contain;margin:4px auto;display:block;mix-blend-mode:multiply;" />
         <div style="font-weight:800;">${escapeHtml(presidentName)}</div>
-        <div style="font-size:0.75em;color:#4a5568;">المدير العام</div>
       </div>`
     : `<div class="sig"><div class="role">الطرف الأول (المالك)</div><br/><br/>الاسم والتوقيع</div>`;
 

@@ -730,6 +730,18 @@ const ContractorsPage = () => {
         }}
       />
 
+      <ContractForm
+        open={showContractForm}
+        onOpenChange={(open) => {
+          setShowContractForm(open);
+          if (!open) setSelectedContractor(null);
+        }}
+        contractor={selectedContractor}
+        contractors={contractors}
+      />
+
+
+
       <ExtractForm
         open={showExtractForm}
         onOpenChange={setShowExtractForm}

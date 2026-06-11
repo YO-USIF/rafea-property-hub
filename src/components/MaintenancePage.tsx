@@ -330,6 +330,7 @@ const MaintenancePage = () => {
                               <Button variant="outline" size="sm" onClick={() => { setEditingRequest(request); setFormOpen(true); }}>
                                 <Edit className="w-4 h-4" />
                               </Button>
+                              <PermissionGate pageName="maintenance" requirePermission="delete">
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                   <Button variant="outline" size="sm" className="hover:bg-red-50"><Trash2 className="w-4 h-4" /></Button>
@@ -345,6 +346,7 @@ const MaintenancePage = () => {
                                   </AlertDialogFooter>
                                 </AlertDialogContent>
                               </AlertDialog>
+                              </PermissionGate>
                             </div>
                           </TableCell>
                         </TableRow>

@@ -52,8 +52,9 @@ const defaultTerms = `1. يلتزم الطرف الثاني (المقاول) ب�
 6. مدة الضمان للأعمال المنفذة سنة واحدة من تاريخ الاستلام الابتدائي.
 7. يخضع هذا العقد لأنظمة المملكة العربية السعودية، وأي نزاع يحل ودياً أو عبر الجهات المختصة.`;
 
-const ContractForm = ({ open, onOpenChange, contractor }: ContractFormProps) => {
+const ContractForm = ({ open, onOpenChange, contractor, contractors = [] }: ContractFormProps) => {
   const { toast } = useToast();
+  const [selectedId, setSelectedId] = useState<string>('');
   const [company, setCompany] = useState('suhail');
   const [contractNumber, setContractNumber] = useState('');
   const [contractDate, setContractDate] = useState(new Date().toISOString().split('T')[0]);

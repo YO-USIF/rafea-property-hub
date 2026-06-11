@@ -136,8 +136,23 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [], contra
       subtotal,
       vat_amount: vatAmount,
       total,
+      attachment_url: attachmentUrl,
+      attachment_name: attachmentName,
     };
   };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const result = await uploadFile(file);
+    if (result) {
+      setAttachmentUrl(result.url);
+      setAttachmentName(result.fileName);
+      toast({ title: 'تم رفع المرفق بنجاح' });
+    }
+    e.target.value = '';
+  };
+
 
   const handleSave = async (thenPrint = false) => {
     const ct = activeContractor;

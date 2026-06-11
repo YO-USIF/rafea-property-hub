@@ -260,7 +260,7 @@ const ContractsPage = () => {
               حذف
             </AlertDialogAction>
           </AlertDialogFooter>
-        </AlertDialogFooter>
+        </AlertDialogContent>
       </AlertDialog>
     </div>
   );

@@ -221,6 +221,8 @@ export type Database = {
           approved: boolean
           approved_at: string | null
           approved_by: string | null
+          attachment_name: string | null
+          attachment_url: string | null
           company: string
           contract_date: string
           contract_number: string
@@ -247,6 +249,8 @@ export type Database = {
           approved?: boolean
           approved_at?: string | null
           approved_by?: string | null
+          attachment_name?: string | null
+          attachment_url?: string | null
           company?: string
           contract_date?: string
           contract_number: string
@@ -273,6 +277,8 @@ export type Database = {
           approved?: boolean
           approved_at?: string | null
           approved_by?: string | null
+          attachment_name?: string | null
+          attachment_url?: string | null
           company?: string
           contract_date?: string
           contract_number?: string

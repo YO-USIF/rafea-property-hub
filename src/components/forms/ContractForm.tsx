@@ -5,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Trash2, Printer, Save } from 'lucide-react';
+import { Plus, Trash2, Printer, Save, Upload, FileText, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useContracts } from '@/hooks/useContracts';
+import { useFileHandler } from '@/hooks/useFileHandler';
 import { companyInfo, defaultTerms, printContract } from '@/lib/contractPrint';
 
 interface ContractFormProps {
@@ -29,6 +30,7 @@ interface ClauseItem {
 const ContractForm = ({ open, onOpenChange, contractor, contractors = [], contract, onSaved }: ContractFormProps) => {
   const { toast } = useToast();
   const { createContract, updateContract } = useContracts();
+  const { uploadFile, viewFile, uploading } = useFileHandler();
   const [selectedId, setSelectedId] = useState<string>('');
   const [company, setCompany] = useState('suhail');
   const [contractNumber, setContractNumber] = useState('');
@@ -41,6 +43,8 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [], contra
   const [terms, setTerms] = useState(defaultTerms);
   const [vatEnabled, setVatEnabled] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [attachmentUrl, setAttachmentUrl] = useState<string | null>(null);
+  const [attachmentName, setAttachmentName] = useState<string | null>(null);
   const [items, setItems] = useState<ClauseItem[]>([
     { description: '', quantity: 1, unit: 'مقطوعية', unit_price: 0 },
   ]);
@@ -66,6 +70,8 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [], contra
       setPaymentTerms(contract.payment_terms || '');
       setTerms(contract.terms || defaultTerms);
       setVatEnabled(contract.vat_enabled ?? true);
+      setAttachmentUrl(contract.attachment_url || null);
+      setAttachmentName(contract.attachment_name || null);
       setItems(
         Array.isArray(contract.items) && contract.items.length > 0
           ? contract.items
@@ -83,6 +89,8 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [], contra
       setPaymentTerms('دفعات حسب نسبة الإنجاز والمستخلصات المعتمدة');
       setTerms(defaultTerms);
       setVatEnabled(true);
+      setAttachmentUrl(null);
+      setAttachmentName(null);
       setItems([{ description: '', quantity: 1, unit: 'مقطوعية', unit_price: 0 }]);
     }
   }, [open, contract]);
@@ -128,8 +136,23 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [], contra
       subtotal,
       vat_amount: vatAmount,
       total,
+      attachment_url: attachmentUrl,
+      attachment_name: attachmentName,
     };
   };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const result = await uploadFile(file);
+    if (result) {
+      setAttachmentUrl(result.url);
+      setAttachmentName(result.fileName);
+      toast({ title: 'تم رفع المرفق بنجاح' });
+    }
+    e.target.value = '';
+  };
+
 
   const handleSave = async (thenPrint = false) => {
     const ct = activeContractor;
@@ -295,6 +318,44 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [], contra
             <Label>الشروط والأحكام</Label>
             <Textarea value={terms} onChange={(e) => setTerms(e.target.value)} rows={8} />
           </div>
+
+          {/* مرفق العقد */}
+          <div className="space-y-2">
+            <Label>مرفق العقد (PDF أو صورة)</Label>
+            {attachmentName ? (
+              <div className="flex items-center justify-between bg-muted/30 p-3 rounded-lg">
+                <button
+                  type="button"
+                  className="flex items-center gap-2 text-primary hover:underline"
+                  onClick={() => attachmentUrl && viewFile(attachmentUrl)}
+                >
+                  <FileText className="w-4 h-4" /> {attachmentName}
+                </button>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="text-red-600"
+                  onClick={() => { setAttachmentUrl(null); setAttachmentName(null); }}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <label className="flex items-center justify-center gap-2 border-2 border-dashed rounded-lg p-4 cursor-pointer hover:bg-muted/30">
+                <Upload className="w-4 h-4" />
+                <span>{uploading ? 'جارٍ الرفع...' : 'اختر ملفاً لرفعه'}</span>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  disabled={uploading}
+                  onChange={handleFileChange}
+                />
+              </label>
+            )}
+          </div>
+
 
           <div className="flex flex-wrap gap-2 pt-2">
             <Button onClick={() => handleSave(false)} disabled={saving} className="flex-1 min-w-[120px]">

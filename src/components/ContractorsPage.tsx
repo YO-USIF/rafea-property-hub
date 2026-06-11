@@ -658,13 +658,15 @@ const ContractorsPage = () => {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button 
-                          size="sm" 
+                        <PermissionButton
+                          pageName="contractors"
+                          requirePermission="delete"
+                          size="sm"
                           variant="outline"
                           onClick={() => deleteContractor.mutate(contractor.id)}
                         >
                           <Trash2 className="w-4 h-4" />
-                        </Button>
+                        </PermissionButton>
                       </div>
                     </TableCell>
                   </TableRow>

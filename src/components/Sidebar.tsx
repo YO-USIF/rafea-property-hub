@@ -24,6 +24,7 @@ import {
   Clipboard,
   CreditCard,
   LayoutDashboard,
+  FileSignature,
   CalendarCheck,
   X,
   type LucideIcon

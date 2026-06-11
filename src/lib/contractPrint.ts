@@ -10,8 +10,8 @@ export const companyInfo: Record<string, { name: string; cr: string; vat: string
   },
   tamlik: {
     name: 'شركة تمليك الغامدي للتطوير العقاري',
-    cr: '١١٠٣٢٥٧٩٨١',
-    vat: '٣١١٣٨١٧٥٤٠٠٠٠٣',
+    cr: '٤٠٣٠٢٩٢٩٥٣',
+    vat: '',
     address: 'المدينة المنورة، المملكة العربية السعودية',
   },
   rafea: {

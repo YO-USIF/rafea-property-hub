@@ -368,13 +368,15 @@ const TasksPage = () => {
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
-                          <Button 
-                            size="sm" 
+                          <PermissionButton
+                            pageName="tasks"
+                            requirePermission="delete"
+                            size="sm"
                             variant="outline"
                             onClick={() => deleteReport.mutate(report.id)}
                           >
                             <Trash2 className="w-4 h-4" />
-                          </Button>
+                          </PermissionButton>
                         </>
                       )}
                     </div>

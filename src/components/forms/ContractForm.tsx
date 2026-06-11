@@ -26,7 +26,7 @@ interface ClauseItem {
 const companyInfo: Record<string, { name: string; cr: string; vat: string; address: string }> = {
   suhail: {
     name: 'شركة سهيل طيبة للمقاولات',
-    cr: '١١٠٢٠٤٤٣٠٣',
+    cr: '٧٠٤٠٦٢٩٧١٤',
     vat: '٣٠٠٢٨٩٨٨٥٢٠٠٠٠٣',
     address: 'المدينة المنورة، المملكة العربية السعودية',
   },

@@ -47,6 +47,7 @@ interface MenuItem {
   icon: LucideIcon;
   adminOnly?: boolean;
   managerOnly?: boolean;
+  permissionKey?: string;
   group: string;
 }
 

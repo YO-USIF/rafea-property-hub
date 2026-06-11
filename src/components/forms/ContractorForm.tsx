@@ -121,6 +121,16 @@ const ContractorForm = ({ open, onOpenChange, contractor, onSuccess }: Contracto
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="commercial_registration">السجل التجاري (اختياري)</Label>
+              <Input
+                id="commercial_registration"
+                value={formData.commercial_registration}
+                onChange={(e) => setFormData(prev => ({ ...prev, commercial_registration: e.target.value }))}
+                placeholder="رقم السجل التجاري"
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="specialization">التخصص</Label>
               <Select
                 value={formData.specialization}

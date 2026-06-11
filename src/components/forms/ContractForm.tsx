@@ -69,11 +69,14 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [] }: Cont
     { description: '', quantity: 1, unit: 'مقطوعية', unit_price: 0 },
   ]);
 
+  const activeContractor = contractor || contractors.find((c) => c.id === selectedId);
+
   useEffect(() => {
     if (open) {
       setContractNumber(`CON-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
+      if (!contractor) setSelectedId('');
     }
-  }, [open]);
+  }, [open, contractor]);
 
   // حساب مدة العقد تلقائياً من التواريخ
   useEffect(() => {

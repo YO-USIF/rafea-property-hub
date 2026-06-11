@@ -636,6 +636,17 @@ const ContractorsPage = () => {
                         >
                           <Receipt className="w-4 h-4" />
                         </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          title="إنشاء عقد"
+                          onClick={() => {
+                            setSelectedContractor(contractor);
+                            setShowContractForm(true);
+                          }}
+                        >
+                          <FileSignature className="w-4 h-4" />
+                        </Button>
                         <Button 
                           size="sm" 
                           variant="outline"

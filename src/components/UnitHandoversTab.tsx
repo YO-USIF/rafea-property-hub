@@ -278,6 +278,7 @@ const UnitHandoversTab = () => {
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" onClick={() => { setPrintingHandover(h); setPrintDialogOpen(true); }}><Printer className="w-4 h-4" /></Button>
                         <Button variant="outline" size="sm" onClick={() => { setEditing(h); setFormOpen(true); }}><Edit className="w-4 h-4" /></Button>
+                        <PermissionGate pageName="maintenance" requirePermission="delete">
                         <AlertDialog>
                           <AlertDialogTrigger asChild><Button variant="outline" size="sm" className="hover:bg-red-50"><Trash2 className="w-4 h-4" /></Button></AlertDialogTrigger>
                           <AlertDialogContent>
@@ -285,6 +286,7 @@ const UnitHandoversTab = () => {
                             <AlertDialogFooter><AlertDialogCancel>إلغاء</AlertDialogCancel><AlertDialogAction onClick={() => handleDelete(h.id)}>حذف</AlertDialogAction></AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
+                        </PermissionGate>
                       </div>
                     </TableCell>
                   </TableRow>

@@ -319,6 +319,44 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [], contra
             <Textarea value={terms} onChange={(e) => setTerms(e.target.value)} rows={8} />
           </div>
 
+          {/* مرفق العقد */}
+          <div className="space-y-2">
+            <Label>مرفق العقد (PDF أو صورة)</Label>
+            {attachmentName ? (
+              <div className="flex items-center justify-between bg-muted/30 p-3 rounded-lg">
+                <button
+                  type="button"
+                  className="flex items-center gap-2 text-primary hover:underline"
+                  onClick={() => attachmentUrl && viewFile(attachmentUrl)}
+                >
+                  <FileText className="w-4 h-4" /> {attachmentName}
+                </button>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="text-red-600"
+                  onClick={() => { setAttachmentUrl(null); setAttachmentName(null); }}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <label className="flex items-center justify-center gap-2 border-2 border-dashed rounded-lg p-4 cursor-pointer hover:bg-muted/30">
+                <Upload className="w-4 h-4" />
+                <span>{uploading ? 'جارٍ الرفع...' : 'اختر ملفاً لرفعه'}</span>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  disabled={uploading}
+                  onChange={handleFileChange}
+                />
+              </label>
+            )}
+          </div>
+
+
           <div className="flex flex-wrap gap-2 pt-2">
             <Button onClick={() => handleSave(false)} disabled={saving} className="flex-1 min-w-[120px]">
               <Save className="w-4 h-4 ml-2" /> {saving ? 'جارٍ الحفظ...' : 'حفظ العقد'}

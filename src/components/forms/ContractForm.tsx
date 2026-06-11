@@ -5,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Trash2, Printer, Save } from 'lucide-react';
+import { Plus, Trash2, Printer, Save, Upload, FileText, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useContracts } from '@/hooks/useContracts';
+import { useFileHandler } from '@/hooks/useFileHandler';
 import { companyInfo, defaultTerms, printContract } from '@/lib/contractPrint';
 
 interface ContractFormProps {

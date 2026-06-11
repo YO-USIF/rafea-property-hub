@@ -27,10 +27,10 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
       email: 'info@suhail.sa'
     },
     tamlik: {
-      name: 'شركة تمليك للتطوير العقاري',
+      name: 'شركة تمليك الغامدي للتطوير العقاري',
       nameEn: 'Tamlik Real Estate Development Company',
-      cr: '١١٠٣٢٥٧٩٨١',
-      vat: '٣١١٣٨١٧٥٤٠٠٠٠٣',
+      cr: '٤٠٣٠٢٩٢٩٥٣',
+      vat: '',
       address: 'الرياض، المملكة العربية السعودية',
       phone: '+966 XX XXX XXXX',
       email: 'info@tamlik.sa'

@@ -94,11 +94,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed,
       return false;
     }
     if (isProjectManager) {
-      return item.id === 'contractors' || item.id === 'extracts';
+      return item.id === 'contractors' || item.id === 'contracts' || item.id === 'extracts';
     }
     if (isAdmin) return true;
     if (item.adminOnly) return false;
-    return canAccessPage(item.id);
+    return canAccessPage(item.permissionKey || item.id);
   });
 
   const groupedItems = Object.keys(groups).reduce((acc, groupKey) => {

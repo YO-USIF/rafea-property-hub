@@ -234,11 +234,24 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [] }: Cont
         <DialogHeader>
           <DialogTitle>إنشاء عقد للمقاول</DialogTitle>
           <DialogDescription>
-            إنشاء عقد مقاولة ذكي للمقاول: {contractor?.name} مع إمكانية الطباعة المباشرة
+            إنشاء عقد مقاولة ذكي مع إمكانية الطباعة المباشرة
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
+          {!contractor && (
+            <div className="space-y-2">
+              <Label>المقاول</Label>
+              <Select value={selectedId} onValueChange={setSelectedId}>
+                <SelectTrigger><SelectValue placeholder="اختر المقاول" /></SelectTrigger>
+                <SelectContent>
+                  {contractors.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>الجهة (الطرف الأول)</Label>

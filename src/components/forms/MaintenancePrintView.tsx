@@ -405,7 +405,7 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
                 <p className="text-sm text-muted-foreground mb-2">{company.nameEn}</p>
                 <div className="text-xs text-muted-foreground space-y-1">
                   <p>السجل التجاري: {company.cr}</p>
-                  <p>الرقم الضريبي: {company.vat}</p>
+                  {company.vat && <p>الرقم الضريبي: {company.vat}</p>}
                 </div>
               </div>
             </div>

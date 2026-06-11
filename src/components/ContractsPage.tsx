@@ -216,7 +216,9 @@ const ContractsPage = () => {
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
-                          <Button
+                          <PermissionButton
+                            pageName="contractors"
+                            requirePermission="delete"
                             size="sm"
                             variant="outline"
                             className="text-red-600"
@@ -224,7 +226,7 @@ const ContractsPage = () => {
                             onClick={() => setDeleteId(contract.id)}
                           >
                             <Trash2 className="w-4 h-4" />
-                          </Button>
+                          </PermissionButton>
                         </div>
                       </TableCell>
                     </TableRow>

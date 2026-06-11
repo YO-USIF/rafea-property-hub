@@ -218,6 +218,7 @@ export type Database = {
       }
       contractors: {
         Row: {
+          commercial_registration: string | null
           company: string | null
           created_at: string
           email: string | null
@@ -230,6 +231,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          commercial_registration?: string | null
           company?: string | null
           created_at?: string
           email?: string | null
@@ -242,6 +244,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          commercial_registration?: string | null
           company?: string | null
           created_at?: string
           email?: string | null

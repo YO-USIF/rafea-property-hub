@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { escapeHtml } from '@/lib/utils';
 import ContractorForm from '@/components/forms/ContractorForm';
 import ExtractForm from '@/components/forms/ExtractForm';
+import ContractForm from '@/components/forms/ContractForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Plus, Search, HardHat, FileText, DollarSign, Clock, Trash2, Edit, Printer, Receipt } from 'lucide-react';
+import { Plus, Search, HardHat, FileText, DollarSign, Clock, Trash2, Edit, Printer, Receipt, FileSignature } from 'lucide-react';
 import { useContractors } from '@/hooks/useContractors';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -22,6 +23,7 @@ const ContractorsPage = () => {
   const [extracts, setExtracts] = useState<any[]>([]);
   const [contractorStats, setContractorStats] = useState<any>({});
   const [showAccountStatement, setShowAccountStatement] = useState(false);
+  const [showContractForm, setShowContractForm] = useState(false);
   const [selectedContractor, setSelectedContractor] = useState<any>(null);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');

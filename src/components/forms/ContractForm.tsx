@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { escapeHtml } from '@/lib/utils';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Trash2, Printer } from 'lucide-react';
+import { Plus, Trash2, Printer, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useContracts } from '@/hooks/useContracts';
+import { companyInfo, defaultTerms, printContract } from '@/lib/contractPrint';
 
 interface ContractFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   contractor?: any;
   contractors?: any[];
+  contract?: any;
+  onSaved?: () => void;
 }
 
 interface ClauseItem {
@@ -23,37 +26,9 @@ interface ClauseItem {
   unit_price: number;
 }
 
-const companyInfo: Record<string, { name: string; cr: string; vat: string; address: string }> = {
-  suhail: {
-    name: 'شركة سهيل طيبة للمقاولات',
-    cr: '٧٠٤٠٦٢٩٧١٤',
-    vat: '٣٠٠٢٨٩٨٨٥٢٠٠٠٠٣',
-    address: 'المدينة المنورة، المملكة العربية السعودية',
-  },
-  tamlik: {
-    name: 'شركة تمليك الغامدي للتطوير العقاري',
-    cr: '١١٠٣٢٥٧٩٨١',
-    vat: '٣١١٣٨١٧٥٤٠٠٠٠٣',
-    address: 'المدينة المنورة، المملكة العربية السعودية',
-  },
-  rafea: {
-    name: 'شركة رافع العقارية',
-    cr: '١١٠٤٤٥٦٧٨٩',
-    vat: '٣١٢٤٥٦٧٨٩٠٠٠٠٣',
-    address: 'المدينة المنورة، المملكة العربية السعودية',
-  },
-};
-
-const defaultTerms = `1. يلتزم الطرف الثاني (المقاول) بتنفيذ الأعمال وفقاً للمواصفات والمخططات المعتمدة.
-2. يلتزم المقاول بإنجاز الأعمال خلال المدة المتفق عليها، وفي حال التأخير يحق للطرف الأول فرض غرامة تأخير.
-3. تصرف الدفعات بناءً على المستخلصات المعتمدة ونسبة الإنجاز الفعلية.
-4. يتحمل المقاول مسؤولية سلامة العمال والموقع طوال فترة تنفيذ المشروع.
-5. لا يحق للمقاول التنازل عن العقد أو التعاقد من الباطن إلا بموافقة خطية من الطرف الأول.
-6. مدة الضمان للأعمال المنفذة سنة واحدة من تاريخ الاستلام الابتدائي.
-7. يخضع هذا العقد لأنظمة المملكة العربية السعودية، وأي نزاع يحل ودياً أو عبر الجهات المختصة.`;
-
-const ContractForm = ({ open, onOpenChange, contractor, contractors = [] }: ContractFormProps) => {
+const ContractForm = ({ open, onOpenChange, contractor, contractors = [], contract, onSaved }: ContractFormProps) => {
   const { toast } = useToast();
+  const { createContract, updateContract } = useContracts();
   const [selectedId, setSelectedId] = useState<string>('');
   const [company, setCompany] = useState('suhail');
   const [contractNumber, setContractNumber] = useState('');
@@ -65,18 +40,52 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [] }: Cont
   const [paymentTerms, setPaymentTerms] = useState('دفعات حسب نسبة الإنجاز والمستخلصات المعتمدة');
   const [terms, setTerms] = useState(defaultTerms);
   const [vatEnabled, setVatEnabled] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [items, setItems] = useState<ClauseItem[]>([
     { description: '', quantity: 1, unit: 'مقطوعية', unit_price: 0 },
   ]);
 
-  const activeContractor = contractor || contractors.find((c) => c.id === selectedId);
+  const activeContractor =
+    contractor ||
+    contractors.find((c) => c.id === selectedId) ||
+    (contract?.contractor_id ? contractors.find((c) => c.id === contract.contractor_id) : null) ||
+    (contract ? { name: contract.contractor_name } : null);
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+    if (contract) {
+      // وضع التعديل
+      setSelectedId(contract.contractor_id || '');
+      setCompany(contract.company || 'suhail');
+      setContractNumber(contract.contract_number || '');
+      setContractDate(contract.contract_date || new Date().toISOString().split('T')[0]);
+      setProjectName(contract.project_name || '');
+      setStartDate(contract.start_date || '');
+      setEndDate(contract.end_date || '');
+      setDurationDays(contract.duration_days ? String(contract.duration_days) : '');
+      setPaymentTerms(contract.payment_terms || '');
+      setTerms(contract.terms || defaultTerms);
+      setVatEnabled(contract.vat_enabled ?? true);
+      setItems(
+        Array.isArray(contract.items) && contract.items.length > 0
+          ? contract.items
+          : [{ description: '', quantity: 1, unit: 'مقطوعية', unit_price: 0 }]
+      );
+    } else {
       setContractNumber(`CON-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
-      if (!contractor) setSelectedId('');
+      setSelectedId('');
+      setCompany('suhail');
+      setContractDate(new Date().toISOString().split('T')[0]);
+      setProjectName('');
+      setStartDate('');
+      setEndDate('');
+      setDurationDays('');
+      setPaymentTerms('دفعات حسب نسبة الإنجاز والمستخلصات المعتمدة');
+      setTerms(defaultTerms);
+      setVatEnabled(true);
+      setItems([{ description: '', quantity: 1, unit: 'مقطوعية', unit_price: 0 }]);
     }
-  }, [open, contractor]);
+  }, [open, contract]);
 
   // حساب مدة العقد تلقائياً من التواريخ
   useEffect(() => {
@@ -100,142 +109,70 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [] }: Cont
 
   const fmt = (n: number) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  const handlePrint = () => {
-    const ct = activeContractor; if (!ct) { toast({ title: "الرجاء اختيار المقاول", variant: "destructive" }); return; }
-    const c = companyInfo[company];
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
+  const buildPayload = () => {
+    const ct = activeContractor;
+    return {
+      contractor_id: ct?.id || null,
+      contractor_name: ct?.name || '',
+      company,
+      contract_number: contractNumber,
+      contract_date: contractDate,
+      project_name: projectName || null,
+      start_date: startDate || null,
+      end_date: endDate || null,
+      duration_days: durationDays ? Number(durationDays) : null,
+      payment_terms: paymentTerms,
+      terms,
+      vat_enabled: vatEnabled,
+      items,
+      subtotal,
+      vat_amount: vatAmount,
+      total,
+    };
+  };
 
-    const itemsRows = items
-      .filter((it) => it.description.trim())
-      .map(
-        (it, idx) => `
-        <tr>
-          <td>${idx + 1}</td>
-          <td style="text-align:right;">${escapeHtml(it.description)}</td>
-          <td>${it.quantity}</td>
-          <td>${escapeHtml(it.unit)}</td>
-          <td>${fmt(Number(it.unit_price))}</td>
-          <td>${fmt(Number(it.quantity) * Number(it.unit_price))}</td>
-        </tr>`
-      )
-      .join('');
+  const handleSave = async (thenPrint = false) => {
+    const ct = activeContractor;
+    if (!ct) {
+      toast({ title: 'الرجاء اختيار المقاول', variant: 'destructive' });
+      return;
+    }
+    setSaving(true);
+    try {
+      const payload = buildPayload();
+      if (contract?.id) {
+        await updateContract.mutateAsync({ id: contract.id, ...payload });
+      } else {
+        await createContract.mutateAsync(payload);
+      }
+      if (thenPrint) {
+        printContract({ ...payload, approved: contract?.approved, approved_at: contract?.approved_at }, ct);
+      }
+      onSaved?.();
+      onOpenChange(false);
+    } catch (e) {
+      // الأخطاء تُعرض من الهوك
+    } finally {
+      setSaving(false);
+    }
+  };
 
-    const content = `
-      <!DOCTYPE html>
-      <html dir="rtl" lang="ar">
-      <head>
-        <meta charset="UTF-8" />
-        <title>عقد مقاولة - ${escapeHtml(contractNumber)}</title>
-        <style>
-          @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
-          * { margin:0; padding:0; box-sizing:border-box; }
-          body { font-family:'Tajawal',Arial,sans-serif; color:#1a202c; direction:rtl; padding:30px; line-height:1.8; }
-          .header { text-align:center; border-bottom:3px solid #2c5282; padding-bottom:16px; margin-bottom:24px; }
-          .header h1 { font-size:1.6em; color:#2c5282; }
-          .header p { color:#4a5568; font-size:0.9em; margin-top:4px; }
-          .meta { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; background:#f7fafc; padding:14px; border-radius:8px; margin-bottom:20px; font-size:0.9em; }
-          .parties { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
-          .party { border:1px solid #e2e8f0; border-radius:8px; padding:14px; }
-          .party h3 { color:#2c5282; font-size:1em; margin-bottom:8px; border-bottom:1px solid #e2e8f0; padding-bottom:6px; }
-          .party div { font-size:0.88em; margin-bottom:4px; }
-          h2.section { color:#2c5282; font-size:1.1em; margin:20px 0 10px; border-right:4px solid #2c5282; padding-right:10px; }
-          table { width:100%; border-collapse:collapse; margin:12px 0; font-size:0.85em; }
-          th,td { border:1px solid #cbd5e0; padding:8px; text-align:center; }
-          th { background:#2c5282; color:#fff; }
-          .totals { margin-top:8px; width:50%; margin-left:auto; }
-          .totals td { text-align:left; }
-          .totals tr:last-child td { font-weight:700; background:#ebf8ff; }
-          .terms { white-space:pre-line; font-size:0.88em; background:#f7fafc; padding:14px; border-radius:8px; }
-          .signatures { display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-top:50px; text-align:center; }
-          .sig { border-top:1px solid #1a202c; padding-top:8px; font-size:0.9em; }
-          @media print { body { padding:15px; } }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <h1>عقد مقاولة</h1>
-          <p>${escapeHtml(c.name)}</p>
-        </div>
-
-        <div class="meta">
-          <span><strong>رقم العقد:</strong> ${escapeHtml(contractNumber)}</span>
-          <span><strong>تاريخ العقد:</strong> ${escapeHtml(contractDate)}</span>
-          ${projectName ? `<span><strong>المشروع:</strong> ${escapeHtml(projectName)}</span>` : ''}
-        </div>
-
-        <div class="parties">
-          <div class="party">
-            <h3>الطرف الأول (المالك)</h3>
-            <div><strong>${escapeHtml(c.name)}</strong></div>
-            <div>السجل التجاري: ${escapeHtml(c.cr)}</div>
-            <div>الرقم الضريبي: ${escapeHtml(c.vat)}</div>
-            <div>${escapeHtml(c.address)}</div>
-          </div>
-          <div class="party">
-            <h3>الطرف الثاني (المقاول)</h3>
-            <div><strong>${escapeHtml(ct.name || '')}</strong></div>
-            ${ct.company ? `<div>الشركة: ${escapeHtml(ct.company)}</div>` : ''}
-            ${ct.commercial_registration ? `<div>السجل التجاري: ${escapeHtml(ct.commercial_registration)}</div>` : ''}
-            ${ct.specialization ? `<div>التخصص: ${escapeHtml(ct.specialization)}</div>` : ''}
-            ${ct.phone ? `<div>الهاتف: ${escapeHtml(ct.phone)}</div>` : ''}
-            ${ct.email ? `<div>البريد: ${escapeHtml(ct.email)}</div>` : ''}
-          </div>
-        </div>
-
-        <h2 class="section">مدة التنفيذ</h2>
-        <div class="meta">
-          <span><strong>تاريخ البدء:</strong> ${escapeHtml(startDate || 'غير محدد')}</span>
-          <span><strong>تاريخ الانتهاء:</strong> ${escapeHtml(endDate || 'غير محدد')}</span>
-          <span><strong>المدة:</strong> ${escapeHtml(durationDays || 'غير محدد')} يوم</span>
-        </div>
-
-        <h2 class="section">بنود الأعمال والقيمة المالية</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>م</th><th>وصف العمل</th><th>الكمية</th><th>الوحدة</th><th>سعر الوحدة</th><th>الإجمالي</th>
-            </tr>
-          </thead>
-          <tbody>${itemsRows || '<tr><td colspan="6">لا توجد بنود</td></tr>'}</tbody>
-        </table>
-
-        <table class="totals">
-          <tr><td>الإجمالي قبل الضريبة:</td><td>${fmt(subtotal)} ر.س</td></tr>
-          ${vatEnabled ? `<tr><td>ضريبة القيمة المضافة (15%):</td><td>${fmt(vatAmount)} ر.س</td></tr>` : ''}
-          <tr><td>الإجمالي النهائي:</td><td>${fmt(total)} ر.س</td></tr>
-        </table>
-
-        <h2 class="section">شروط الدفع</h2>
-        <div class="terms">${escapeHtml(paymentTerms)}</div>
-
-        <h2 class="section">الشروط والأحكام العامة</h2>
-        <div class="terms">${escapeHtml(terms)}</div>
-
-        <div class="signatures">
-          <div class="sig">الطرف الأول (المالك)<br/><br/>الاسم والتوقيع</div>
-          <div class="sig">الطرف الثاني (المقاول)<br/><br/>${escapeHtml(ct.name || '')}<br/>الاسم والتوقيع</div>
-        </div>
-
-        <script>
-          window.onload = function() { window.print(); window.onafterprint = function(){ window.close(); }; };
-        </script>
-      </body>
-      </html>
-    `;
-
-    printWindow.document.write(content);
-    printWindow.document.close();
-    toast({ title: 'تم إنشاء العقد', description: 'جاري فتح نافذة الطباعة' });
+  const handlePrintOnly = () => {
+    const ct = activeContractor;
+    if (!ct) {
+      toast({ title: 'الرجاء اختيار المقاول', variant: 'destructive' });
+      return;
+    }
+    printContract({ ...buildPayload(), approved: contract?.approved, approved_at: contract?.approved_at }, ct);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>إنشاء عقد للمقاول</DialogTitle>
+          <DialogTitle>{contract ? 'تعديل العقد' : 'إنشاء عقد للمقاول'}</DialogTitle>
           <DialogDescription>
-            إنشاء عقد مقاولة ذكي مع إمكانية الطباعة المباشرة
+            إنشاء عقد مقاولة ذكي مع الحفظ في النظام وإمكانية الطباعة المباشرة
           </DialogDescription>
         </DialogHeader>
 
@@ -259,9 +196,9 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [] }: Cont
               <Select value={company} onValueChange={setCompany}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="suhail">شركة سهيل طيبة للمقاولات</SelectItem>
-                  <SelectItem value="tamlik">شركة تمليك الغامدي للتطوير العقاري</SelectItem>
-                  <SelectItem value="rafea">شركة رافع العقارية</SelectItem>
+                  {Object.entries(companyInfo).map(([key, info]) => (
+                    <SelectItem key={key} value={key}>{info.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -359,11 +296,17 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [] }: Cont
             <Textarea value={terms} onChange={(e) => setTerms(e.target.value)} rows={8} />
           </div>
 
-          <div className="flex gap-2 pt-2">
-            <Button onClick={handlePrint} className="flex-1">
-              <Printer className="w-4 h-4 ml-2" /> إنشاء وطباعة العقد
+          <div className="flex flex-wrap gap-2 pt-2">
+            <Button onClick={() => handleSave(false)} disabled={saving} className="flex-1 min-w-[120px]">
+              <Save className="w-4 h-4 ml-2" /> {saving ? 'جارٍ الحفظ...' : 'حفظ العقد'}
             </Button>
-            <Button variant="outline" onClick={() => onOpenChange(false)}>إلغاء</Button>
+            <Button onClick={() => handleSave(true)} disabled={saving} variant="secondary" className="flex-1 min-w-[120px]">
+              <Printer className="w-4 h-4 ml-2" /> حفظ وطباعة
+            </Button>
+            <Button variant="outline" onClick={handlePrintOnly}>
+              <Printer className="w-4 h-4 ml-2" /> طباعة فقط
+            </Button>
+            <Button variant="ghost" onClick={() => onOpenChange(false)}>إلغاء</Button>
           </div>
         </div>
       </DialogContent>

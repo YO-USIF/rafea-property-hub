@@ -216,6 +216,87 @@ export type Database = {
         }
         Relationships: []
       }
+      contractor_contracts: {
+        Row: {
+          approved: boolean
+          approved_at: string | null
+          approved_by: string | null
+          company: string
+          contract_date: string
+          contract_number: string
+          contractor_id: string | null
+          contractor_name: string | null
+          created_at: string
+          duration_days: number | null
+          end_date: string | null
+          id: string
+          items: Json
+          payment_terms: string | null
+          project_name: string | null
+          start_date: string | null
+          status: string
+          subtotal: number
+          terms: string | null
+          total: number
+          updated_at: string
+          user_id: string
+          vat_amount: number
+          vat_enabled: boolean
+        }
+        Insert: {
+          approved?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
+          company?: string
+          contract_date?: string
+          contract_number: string
+          contractor_id?: string | null
+          contractor_name?: string | null
+          created_at?: string
+          duration_days?: number | null
+          end_date?: string | null
+          id?: string
+          items?: Json
+          payment_terms?: string | null
+          project_name?: string | null
+          start_date?: string | null
+          status?: string
+          subtotal?: number
+          terms?: string | null
+          total?: number
+          updated_at?: string
+          user_id: string
+          vat_amount?: number
+          vat_enabled?: boolean
+        }
+        Update: {
+          approved?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
+          company?: string
+          contract_date?: string
+          contract_number?: string
+          contractor_id?: string | null
+          contractor_name?: string | null
+          created_at?: string
+          duration_days?: number | null
+          end_date?: string | null
+          id?: string
+          items?: Json
+          payment_terms?: string | null
+          project_name?: string | null
+          start_date?: string | null
+          status?: string
+          subtotal?: number
+          terms?: string | null
+          total?: number
+          updated_at?: string
+          user_id?: string
+          vat_amount?: number
+          vat_enabled?: boolean
+        }
+        Relationships: []
+      }
       contractors: {
         Row: {
           commercial_registration: string | null

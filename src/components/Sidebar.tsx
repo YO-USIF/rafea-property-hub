@@ -24,6 +24,7 @@ import {
   Clipboard,
   CreditCard,
   LayoutDashboard,
+  FileSignature,
   CalendarCheck,
   X,
   type LucideIcon
@@ -47,6 +48,7 @@ interface MenuItem {
   icon: LucideIcon;
   adminOnly?: boolean;
   managerOnly?: boolean;
+  permissionKey?: string;
   group: string;
 }
 
@@ -62,6 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed,
     { id: 'sales', name: 'مبيعات الشقق', icon: ShoppingCart, group: 'projects' },
     { id: 'reservations', name: 'الحجوزات', icon: CalendarCheck, group: 'projects' },
     { id: 'contractors', name: 'المقاولون', icon: Users, group: 'operations' },
+    { id: 'contracts', name: 'عقود المقاولين', icon: FileSignature, permissionKey: 'contractors', group: 'operations' },
     { id: 'suppliers', name: 'الموردون', icon: Truck, group: 'operations' },
     { id: 'purchases', name: 'المشتريات', icon: CreditCard, group: 'operations' },
     { id: 'warehouse', name: 'المستودع', icon: Package, managerOnly: true, group: 'operations' },
@@ -91,11 +94,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed,
       return false;
     }
     if (isProjectManager) {
-      return item.id === 'contractors' || item.id === 'extracts';
+      return item.id === 'contractors' || item.id === 'contracts' || item.id === 'extracts';
     }
     if (isAdmin) return true;
     if (item.adminOnly) return false;
-    return canAccessPage(item.id);
+    return canAccessPage(item.permissionKey || item.id);
   });
 
   const groupedItems = Object.keys(groups).reduce((acc, groupKey) => {

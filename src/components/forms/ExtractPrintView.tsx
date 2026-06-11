@@ -23,8 +23,8 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
       logo: suhailLogo
     },
     tamlik: {
-      name: 'شركة تمليك الغامدي للمقاولات',
-      taxNumber: '311411107300003',
+      name: 'شركة تمليك الغامدي للتطوير العقاري',
+      taxNumber: null,
       logo: 'ت غ'
     }
   };

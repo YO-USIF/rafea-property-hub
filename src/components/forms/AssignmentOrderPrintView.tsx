@@ -27,10 +27,10 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
       email: 'info@suhail.sa'
     },
     tamlik: {
-      name: 'شركة تمليك للتطوير العقاري',
+      name: 'شركة تمليك الغامدي للتطوير العقاري',
       nameEn: 'Tamlik Real Estate Development Company',
-      cr: '١١٠٣٢٥٧٩٨١',
-      vat: '٣١١٣٨١٧٥٤٠٠٠٠٣',
+      cr: '٤٠٣٠٢٩٢٩٥٣',
+      vat: '',
       address: 'الرياض، المملكة العربية السعودية',
       phone: '+966 XX XXX XXXX',
       email: 'info@tamlik.sa'
@@ -290,7 +290,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
               <div class="company-name-en">${escapeHtml(company.nameEn)}</div>
               <div class="company-details">
                 <div>السجل التجاري: ${escapeHtml(company.cr)}</div>
-                <div>الرقم الضريبي: ${escapeHtml(company.vat)}</div>
+                ${company.vat ? `<div>الرقم الضريبي: ${escapeHtml(company.vat)}</div>` : ''}
                 <div>${escapeHtml(company.address)}</div>
                 <div>هاتف: ${escapeHtml(company.phone)} | بريد: ${escapeHtml(company.email)}</div>
               </div>
@@ -494,7 +494,7 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
                 <p className="text-sm text-gray-600 mb-2">{company.nameEn}</p>
                 <div className="text-xs text-gray-600 space-y-1">
                   <p>السجل التجاري: {company.cr}</p>
-                  <p>الرقم الضريبي: {company.vat}</p>
+                  {company.vat && <p>الرقم الضريبي: {company.vat}</p>}
               </div>
             </div>
             {selectedCompany === 'suhail' && (

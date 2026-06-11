@@ -10,8 +10,8 @@ export const companyInfo: Record<string, { name: string; cr: string; vat: string
   },
   tamlik: {
     name: 'شركة تمليك الغامدي للتطوير العقاري',
-    cr: '١١٠٣٢٥٧٩٨١',
-    vat: '٣١١٣٨١٧٥٤٠٠٠٠٣',
+    cr: '٤٠٣٠٢٩٢٩٥٣',
+    vat: '',
     address: 'المدينة المنورة، المملكة العربية السعودية',
   },
   rafea: {
@@ -168,7 +168,7 @@ export function printContract(
         <div class="brand">
           <div class="company-block">
             <h2>${escapeHtml(c.name)}</h2>
-            <span>السجل التجاري: ${escapeHtml(c.cr)} • الرقم الضريبي: ${escapeHtml(c.vat)}</span>
+            <span>السجل التجاري: ${escapeHtml(c.cr)}${c.vat ? ` • الرقم الضريبي: ${escapeHtml(c.vat)}` : ''}</span>
             <span>${escapeHtml(c.address)}</span>
           </div>
           <div class="doc-block">
@@ -188,7 +188,7 @@ export function printContract(
             <h3>الطرف الأول (المالك)</h3>
             <div><strong>${escapeHtml(c.name)}</strong></div>
             <div>السجل التجاري: ${escapeHtml(c.cr)}</div>
-            <div>الرقم الضريبي: ${escapeHtml(c.vat)}</div>
+            ${c.vat ? `<div>الرقم الضريبي: ${escapeHtml(c.vat)}</div>` : ''}
             <div>${escapeHtml(c.address)}</div>
           </div>
           <div class="party">

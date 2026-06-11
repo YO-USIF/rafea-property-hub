@@ -11,6 +11,7 @@ interface Contractor {
   id?: string;
   name: string;
   company?: string;
+  commercial_registration?: string;
   specialization?: string;
   phone?: string;
   email?: string;
@@ -31,6 +32,7 @@ const ContractorForm = ({ open, onOpenChange, contractor, onSuccess }: Contracto
   const [formData, setFormData] = useState<Contractor>({
     name: '',
     company: '',
+    commercial_registration: '',
     specialization: 'البناء والتشييد',
     phone: '',
     email: '',
@@ -43,6 +45,7 @@ const ContractorForm = ({ open, onOpenChange, contractor, onSuccess }: Contracto
       setFormData({
         name: contractor.name || '',
         company: contractor.company || '',
+        commercial_registration: contractor.commercial_registration || '',
         specialization: contractor.specialization || 'البناء والتشييد',
         phone: contractor.phone || '',
         email: contractor.email || '',
@@ -52,6 +55,7 @@ const ContractorForm = ({ open, onOpenChange, contractor, onSuccess }: Contracto
       setFormData({
         name: '',
         company: '',
+        commercial_registration: '',
         specialization: 'البناء والتشييد',
         phone: '',
         email: '',
@@ -113,6 +117,16 @@ const ContractorForm = ({ open, onOpenChange, contractor, onSuccess }: Contracto
                 id="company"
                 value={formData.company}
                 onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="commercial_registration">السجل التجاري (اختياري)</Label>
+              <Input
+                id="commercial_registration"
+                value={formData.commercial_registration}
+                onChange={(e) => setFormData(prev => ({ ...prev, commercial_registration: e.target.value }))}
+                placeholder="رقم السجل التجاري"
               />
             </div>
 

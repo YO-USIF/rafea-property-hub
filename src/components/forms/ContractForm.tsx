@@ -176,6 +176,7 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [] }: Cont
             <h3>الطرف الثاني (المقاول)</h3>
             <div><strong>${escapeHtml(ct.name || '')}</strong></div>
             ${ct.company ? `<div>الشركة: ${escapeHtml(ct.company)}</div>` : ''}
+            ${ct.commercial_registration ? `<div>السجل التجاري: ${escapeHtml(ct.commercial_registration)}</div>` : ''}
             ${ct.specialization ? `<div>التخصص: ${escapeHtml(ct.specialization)}</div>` : ''}
             ${ct.phone ? `<div>الهاتف: ${escapeHtml(ct.phone)}</div>` : ''}
             ${ct.email ? `<div>البريد: ${escapeHtml(ct.email)}</div>` : ''}

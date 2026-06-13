@@ -463,6 +463,23 @@ const PurchasesPage = () => {
                         >
                           <Printer className="w-4 h-4" />
                         </Button>
+                        {order.status === 'معتمد' && (
+                          <PermissionButton
+                            pageName="invoices"
+                            requirePermission="create"
+                            size="sm"
+                            variant="outline"
+                            className="text-green-700 border-green-300 hover:bg-green-50"
+                            disabled={convertingId === order.id}
+                            title="تحويل إلى فاتورة"
+                            onClick={() => handleConvertToInvoice(order)}
+                          >
+                            <FileText className="w-4 h-4 ml-1" />
+                            {getLinkedInvoices(order.id).length > 0
+                              ? `فاتورة (${getLinkedInvoices(order.id).length})`
+                              : 'فاتورة'}
+                          </PermissionButton>
+                        )}
                         <PermissionButton
                           pageName="purchases"
                           requirePermission="delete"

@@ -7,14 +7,62 @@ import { PermissionButton } from "@/components/PermissionButton";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, ShoppingCart, CheckCircle, Clock, AlertCircle, Trash2, Edit, Printer } from 'lucide-react';
+import { Plus, Search, ShoppingCart, CheckCircle, Clock, AlertCircle, Trash2, Edit, Printer, FileText } from 'lucide-react';
 import { usePurchases } from '@/hooks/usePurchases';
+import { useInvoices } from '@/hooks/useInvoices';
+import { useToast } from '@/hooks/use-toast';
 
 const PurchasesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingPurchase, setEditingPurchase] = useState<any>(null);
+  const [convertingId, setConvertingId] = useState<string | null>(null);
   const { purchases, isLoading, deletePurchase } = usePurchases();
+  const { invoices, createInvoice } = useInvoices();
+  const { toast } = useToast();
+
+  const getLinkedInvoices = (purchaseId: string) =>
+    invoices.filter((inv: any) => inv.purchase_id === purchaseId);
+
+  const handleConvertToInvoice = async (order: any) => {
+    const linkedCount = getLinkedInvoices(order.id).length;
+
+    if (linkedCount > 0) {
+      const proceed = window.confirm(
+        `يوجد بالفعل ${linkedCount} فاتورة مرتبطة بهذا الطلب. هل تريد إنشاء فاتورة إضافية؟`
+      );
+      if (!proceed) return;
+    }
+
+    const invoiceNumber =
+      linkedCount === 0
+        ? `INV-${order.order_number}`
+        : `INV-${order.order_number}-${linkedCount + 1}`;
+
+    const today = new Date().toISOString().split('T')[0];
+
+    setConvertingId(order.id);
+    try {
+      await createInvoice.mutateAsync({
+        invoice_number: invoiceNumber,
+        supplier_name: order.supplier_name,
+        project_id: order.project_id || null,
+        amount: Number(order.total_amount) || 0,
+        description: `فاتورة محوّلة من طلب الشراء رقم ${order.order_number}${order.project_name ? ` - ${order.project_name}` : ''}`,
+        invoice_date: today,
+        due_date: today,
+        status: 'غير مدفوع',
+        purchase_id: order.id,
+        attached_file_url: order.attached_file_url || '',
+        attached_file_name: order.attached_file_name || '',
+      });
+    } catch (error) {
+      console.error('Error converting purchase to invoice:', error);
+      toast({ title: 'خطأ في تحويل الطلب إلى فاتورة', variant: 'destructive' });
+    } finally {
+      setConvertingId(null);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -415,6 +463,23 @@ const PurchasesPage = () => {
                         >
                           <Printer className="w-4 h-4" />
                         </Button>
+                        {order.status === 'معتمد' && (
+                          <PermissionButton
+                            pageName="invoices"
+                            requirePermission="create"
+                            size="sm"
+                            variant="outline"
+                            className="text-green-700 border-green-300 hover:bg-green-50"
+                            disabled={convertingId === order.id}
+                            title="تحويل إلى فاتورة"
+                            onClick={() => handleConvertToInvoice(order)}
+                          >
+                            <FileText className="w-4 h-4 ml-1" />
+                            {getLinkedInvoices(order.id).length > 0
+                              ? `فاتورة (${getLinkedInvoices(order.id).length})`
+                              : 'فاتورة'}
+                          </PermissionButton>
+                        )}
                         <PermissionButton
                           pageName="purchases"
                           requirePermission="delete"

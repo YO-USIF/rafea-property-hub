@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { FileUpload } from '@/components/ui/file-upload';
@@ -10,6 +11,7 @@ import { usePurchases } from '@/hooks/usePurchases';
 import { useProjects } from '@/hooks/useProjects';
 import { useUserRole } from '@/hooks/useUserRole';
 import { supabase } from '@/integrations/supabase/client';
+import { getUserSignature } from '@/lib/userSignatures';
 import { Plus, Trash2, Package } from 'lucide-react';
 
 interface PurchaseItem {

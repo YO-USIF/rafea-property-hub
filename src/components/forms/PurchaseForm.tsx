@@ -53,7 +53,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Purchase>({
     order_number: purchase?.order_number || `PO-${Date.now()}`,
-    supplier_name: purchase?.supplier_name || '',
+    supplier_name: purchase?.supplier_name || defaultSupplierName || '',
     project_name: purchase?.project_name || '',
     project_id: purchase?.project_id || "none",
     requested_by: purchase?.requested_by || '',

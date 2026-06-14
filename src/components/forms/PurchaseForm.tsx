@@ -61,7 +61,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
     status: p?.status || 'في انتظار الموافقة',
     delivery_status: p?.delivery_status || 'لم يتم التسليم',
     approved_by: p?.approved_by || '',
-    purchase_officer: p?.purchase_officer || '',
+    purchase_officer: p?.purchase_officer || (p?.id ? (currentUserName || '') : ''),
     notes: p?.notes || '',
     attached_file_url: p?.attached_file_url || '',
     attached_file_name: p?.attached_file_name || '',

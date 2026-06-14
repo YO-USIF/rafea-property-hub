@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { escapeHtml } from '@/lib/utils';
 import SupplierForm from '@/components/forms/SupplierForm';
 import InvoiceForm from '@/components/forms/InvoiceForm';
+import PurchaseForm from '@/components/forms/PurchaseForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

@@ -15,6 +15,7 @@ import { useInvoices } from '@/hooks/useInvoices';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { getDisplayName } from '@/lib/userDisplayNames';
+import { printPurchaseOrder } from '@/lib/purchasePrint';
 
 const PurchasesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -100,8 +101,9 @@ const PurchasesPage = () => {
         due_date: null,
         status: 'غير مدفوع',
         purchase_id: order.id,
-        attached_file_url: order.attached_file_url || '',
-        attached_file_name: order.attached_file_name || '',
+        // المرفق في المشتريات خاص بعروض الأسعار فقط ولا يُنقل للفاتورة
+        attached_file_url: '',
+        attached_file_name: '',
       });
 
       // تحديث حالة الطلب إلى "محوّل لفاتورة" للتعميد النهائي

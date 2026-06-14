@@ -627,6 +627,21 @@ const SuppliersPage = () => {
                           <Receipt className="w-4 h-4" />
                         </Button>
                         <PermissionButton
+                          pageName="purchases"
+                          requirePermission="create"
+                          size="sm"
+                          variant="outline"
+                          className="text-primary border-primary/40 hover:bg-primary/5"
+                          title="إنشاء طلب شراء"
+                          onClick={() => {
+                            setPurchaseSupplierName(supplier.name);
+                            setShowPurchaseForm(true);
+                          }}
+                        >
+                          <ShoppingCart className="w-4 h-4 ml-1" />
+                          طلب شراء
+                        </PermissionButton>
+                        <PermissionButton
                           pageName="suppliers"
                           requirePermission="edit"
                           size="sm" 

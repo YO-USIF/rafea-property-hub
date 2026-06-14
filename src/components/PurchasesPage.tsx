@@ -315,11 +315,13 @@ const PurchasesPage = () => {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           variant="outline"
-                          onClick={() => {
-                            const printWindow = window.open('', '_blank');
+                          onClick={() => printPurchaseOrder(order)}
+                        >
+                          <Printer className="w-4 h-4" />
+                        </Button>
                             if (printWindow) {
                               printWindow.document.write(`
                                 <html dir="rtl">

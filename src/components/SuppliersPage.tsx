@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Plus, Search, Truck, FileText, DollarSign, Calendar, Trash2, Edit, Printer, Receipt } from 'lucide-react';
+import { Plus, Search, Truck, FileText, DollarSign, Calendar, Trash2, Edit, Printer, Receipt, ShoppingCart } from 'lucide-react';
 import { useSuppliers } from '@/hooks/useSuppliers';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';

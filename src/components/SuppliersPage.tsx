@@ -22,6 +22,8 @@ const SuppliersPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<any>(null);
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
+  const [showPurchaseForm, setShowPurchaseForm] = useState(false);
+  const [purchaseSupplierName, setPurchaseSupplierName] = useState('');
   const [invoices, setInvoices] = useState<any[]>([]);
   const [supplierStats, setSupplierStats] = useState<any>({});
   const [showAccountStatement, setShowAccountStatement] = useState(false);

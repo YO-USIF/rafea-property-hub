@@ -33,7 +33,11 @@ const InvoicesPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   
   const { invoices, isLoading, deleteInvoice } = useInvoices();
+  const { purchases } = usePurchases();
   const { toast } = useToast();
+
+  const getOrderNumber = (purchaseId: string) =>
+    purchases.find((p: any) => p.id === purchaseId)?.order_number || '—';
 
   // تصفية الفواتير حسب البحث والحالة
   const filteredInvoices = invoices.filter(invoice => {

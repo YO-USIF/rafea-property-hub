@@ -42,9 +42,10 @@ interface PurchaseFormProps {
   onOpenChange: (open: boolean) => void;
   purchase?: Purchase;
   onSuccess: () => void;
+  defaultSupplierName?: string;
 }
 
-const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormProps) => {
+const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplierName }: PurchaseFormProps) => {
   const { createPurchase, updatePurchase } = usePurchases();
   const { toast } = useToast();
   const { projects } = useProjects();
@@ -52,7 +53,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Purchase>({
     order_number: purchase?.order_number || `PO-${Date.now()}`,
-    supplier_name: purchase?.supplier_name || '',
+    supplier_name: purchase?.supplier_name || defaultSupplierName || '',
     project_name: purchase?.project_name || '',
     project_id: purchase?.project_id || "none",
     requested_by: purchase?.requested_by || '',
@@ -106,7 +107,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
       // إعادة تعيين النموذج للإضافة الجديدة
       setFormData({
         order_number: `PO-${Date.now()}`,
-        supplier_name: '',
+        supplier_name: defaultSupplierName || '',
         project_name: '',
         project_id: "none",
         requested_by: '',
@@ -120,7 +121,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormP
         attached_file_name: ''
       });
     }
-  }, [purchase]);
+  }, [purchase, defaultSupplierName, open]);
 
   // تحميل أصناف الطلب عند التعديل
   useEffect(() => {

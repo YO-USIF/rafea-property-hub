@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useInvoices } from '@/hooks/useInvoices';
+import { usePurchases } from '@/hooks/usePurchases';
 import InvoiceForm from '@/components/forms/InvoiceForm';
 
 const InvoicesPage = () => {
@@ -32,7 +33,11 @@ const InvoicesPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   
   const { invoices, isLoading, deleteInvoice } = useInvoices();
+  const { purchases } = usePurchases();
   const { toast } = useToast();
+
+  const getOrderNumber = (purchaseId: string) =>
+    purchases.find((p: any) => p.id === purchaseId)?.order_number || '—';
 
   // تصفية الفواتير حسب البحث والحالة
   const filteredInvoices = invoices.filter(invoice => {
@@ -305,6 +310,7 @@ const InvoicesPage = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>رقم الفاتورة</TableHead>
+                <TableHead>رقم الطلب</TableHead>
                 <TableHead>المورد</TableHead>
                 <TableHead>الوصف</TableHead>
                 <TableHead>المبلغ</TableHead>
@@ -319,6 +325,15 @@ const InvoicesPage = () => {
                 filteredInvoices.map((invoice) => (
                   <TableRow key={invoice.id}>
                     <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
+                    <TableCell>
+                      {invoice.purchase_id ? (
+                        <Badge variant="outline" className="font-normal">
+                          {getOrderNumber(invoice.purchase_id)}
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
                     <TableCell>{invoice.supplier_name}</TableCell>
                     <TableCell className="max-w-[200px] truncate" title={invoice.description || '-'}>{invoice.description || '-'}</TableCell>
                     <TableCell>{formatCurrency(invoice.amount)}</TableCell>

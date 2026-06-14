@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { escapeHtml } from '@/lib/utils';
 import SupplierForm from '@/components/forms/SupplierForm';
 import InvoiceForm from '@/components/forms/InvoiceForm';
+import PurchaseForm from '@/components/forms/PurchaseForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Plus, Search, Truck, FileText, DollarSign, Calendar, Trash2, Edit, Printer, Receipt } from 'lucide-react';
+import { Plus, Search, Truck, FileText, DollarSign, Calendar, Trash2, Edit, Printer, Receipt, ShoppingCart } from 'lucide-react';
 import { useSuppliers } from '@/hooks/useSuppliers';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -21,6 +22,8 @@ const SuppliersPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<any>(null);
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
+  const [showPurchaseForm, setShowPurchaseForm] = useState(false);
+  const [purchaseSupplierName, setPurchaseSupplierName] = useState('');
   const [invoices, setInvoices] = useState<any[]>([]);
   const [supplierStats, setSupplierStats] = useState<any>({});
   const [showAccountStatement, setShowAccountStatement] = useState(false);
@@ -624,6 +627,21 @@ const SuppliersPage = () => {
                           <Receipt className="w-4 h-4" />
                         </Button>
                         <PermissionButton
+                          pageName="purchases"
+                          requirePermission="create"
+                          size="sm"
+                          variant="outline"
+                          className="text-primary border-primary/40 hover:bg-primary/5"
+                          title="إنشاء طلب شراء"
+                          onClick={() => {
+                            setPurchaseSupplierName(supplier.name);
+                            setShowPurchaseForm(true);
+                          }}
+                        >
+                          <ShoppingCart className="w-4 h-4 ml-1" />
+                          طلب شراء
+                        </PermissionButton>
+                        <PermissionButton
                           pageName="suppliers"
                           requirePermission="edit"
                           size="sm" 
@@ -965,6 +983,20 @@ const SuppliersPage = () => {
           // Refresh data if needed
         }}
       />
+
+      <PurchaseForm
+        open={showPurchaseForm}
+        onOpenChange={(open) => {
+          setShowPurchaseForm(open);
+          if (!open) setPurchaseSupplierName('');
+        }}
+        defaultSupplierName={purchaseSupplierName}
+        onSuccess={() => {
+          setShowPurchaseForm(false);
+          setPurchaseSupplierName('');
+        }}
+      />
+
 
       {/* Account Statement Dialog */}
       <Dialog open={showAccountStatement} onOpenChange={setShowAccountStatement}>

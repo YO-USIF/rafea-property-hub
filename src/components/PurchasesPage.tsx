@@ -7,22 +7,69 @@ import { PermissionButton } from "@/components/PermissionButton";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, ShoppingCart, CheckCircle, Clock, AlertCircle, Trash2, Edit, Printer, FileText } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { FileUpload } from "@/components/ui/file-upload";
+import { Plus, Search, ShoppingCart, CheckCircle, Clock, AlertCircle, Trash2, Edit, Printer, FileText, Paperclip, Stamp } from 'lucide-react';
 import { usePurchases } from '@/hooks/usePurchases';
 import { useInvoices } from '@/hooks/useInvoices';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { getDisplayName } from '@/lib/userDisplayNames';
 
 const PurchasesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingPurchase, setEditingPurchase] = useState<any>(null);
   const [convertingId, setConvertingId] = useState<string | null>(null);
-  const { purchases, isLoading, deletePurchase } = usePurchases();
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [attachingOrder, setAttachingOrder] = useState<any>(null);
+  const { purchases, isLoading, deletePurchase, updatePurchase } = usePurchases();
   const { invoices, createInvoice } = useInvoices();
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  const currentUserName = getDisplayName(user?.email);
 
   const getLinkedInvoices = (purchaseId: string) =>
     invoices.filter((inv: any) => inv.purchase_id === purchaseId);
+
+  // تعميد الطلب (المرحلة الأولى): تحويله إلى "معتمد" وتسجيل المعتمد
+  const handleApprove = async (order: any) => {
+    setApprovingId(order.id);
+    try {
+      await updatePurchase.mutateAsync({
+        id: order.id,
+        status: 'معتمد',
+        approved_by: currentUserName,
+      });
+      toast({ title: 'تم تعميد الطلب', description: `الطلب ${order.order_number} أصبح معتمداً` });
+    } catch (error) {
+      console.error('Error approving purchase:', error);
+      toast({ title: 'خطأ في تعميد الطلب', variant: 'destructive' });
+    } finally {
+      setApprovingId(null);
+    }
+  };
+
+  // حفظ مرفق للطلب
+  const handleSaveAttachment = async (fileUrl: string, fileName: string) => {
+    if (!attachingOrder) return;
+    try {
+      await updatePurchase.mutateAsync({
+        id: attachingOrder.id,
+        attached_file_url: fileUrl,
+        attached_file_name: fileName,
+      });
+      setAttachingOrder((prev: any) =>
+        prev ? { ...prev, attached_file_url: fileUrl, attached_file_name: fileName } : prev
+      );
+      toast({ title: 'تم إرفاق الملف بنجاح' });
+    } catch (error) {
+      console.error('Error attaching file:', error);
+      toast({ title: 'خطأ في إرفاق الملف', variant: 'destructive' });
+    }
+  };
+
 
   const handleConvertToInvoice = async (order: any) => {
     const linkedCount = getLinkedInvoices(order.id).length;
@@ -50,11 +97,17 @@ const PurchasesPage = () => {
         amount: Number(order.total_amount) || 0,
         description: `فاتورة محوّلة من طلب الشراء رقم ${order.order_number}${order.project_name ? ` - ${order.project_name}` : ''}`,
         invoice_date: today,
-        due_date: today,
+        due_date: null,
         status: 'غير مدفوع',
         purchase_id: order.id,
         attached_file_url: order.attached_file_url || '',
         attached_file_name: order.attached_file_name || '',
+      });
+
+      // تحديث حالة الطلب إلى "محوّل لفاتورة" للتعميد النهائي
+      await updatePurchase.mutateAsync({
+        id: order.id,
+        status: 'محوّل لفاتورة',
       });
     } catch (error) {
       console.error('Error converting purchase to invoice:', error);
@@ -76,6 +129,8 @@ const PurchasesPage = () => {
     switch (status) {
       case 'معتمد':
         return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">معتمد</Badge>;
+      case 'محوّل لفاتورة':
+        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">محوّل لفاتورة</Badge>;
       case 'في انتظار الموافقة':
         return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">في انتظار الموافقة</Badge>;
       case 'مرفوض':
@@ -463,7 +518,36 @@ const PurchasesPage = () => {
                         >
                           <Printer className="w-4 h-4" />
                         </Button>
-                        {order.status === 'معتمد' && (
+                        {order.status === 'في انتظار الموافقة' && (
+                          <PermissionButton
+                            pageName="purchases"
+                            requirePermission="edit"
+                            size="sm"
+                            variant="outline"
+                            className="text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                            disabled={approvingId === order.id}
+                            title="تعميد الطلب"
+                            onClick={() => handleApprove(order)}
+                          >
+                            <Stamp className="w-4 h-4 ml-1" />
+                            {approvingId === order.id ? 'جارٍ...' : 'تعميد'}
+                          </PermissionButton>
+                        )}
+                        {(order.status === 'معتمد' || order.status === 'محوّل لفاتورة') && (
+                          <PermissionButton
+                            pageName="purchases"
+                            requirePermission="edit"
+                            size="sm"
+                            variant="outline"
+                            className={order.attached_file_url ? 'text-blue-700 border-blue-300 hover:bg-blue-50' : ''}
+                            title="إرفاق ملفات"
+                            onClick={() => setAttachingOrder(order)}
+                          >
+                            <Paperclip className="w-4 h-4 ml-1" />
+                            {order.attached_file_url ? 'مرفق' : 'إرفاق'}
+                          </PermissionButton>
+                        )}
+                        {(order.status === 'معتمد' || order.status === 'محوّل لفاتورة') && (
                           <PermissionButton
                             pageName="invoices"
                             requirePermission="create"
@@ -537,7 +621,30 @@ const PurchasesPage = () => {
           setEditingPurchase(null);
         }}
       />
+
+      <Dialog
+        open={!!attachingOrder}
+        onOpenChange={(open) => {
+          if (!open) setAttachingOrder(null);
+        }}
+      >
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>إرفاق ملفات للطلب {attachingOrder?.order_number}</DialogTitle>
+            <DialogDescription>
+              ارفع فاتورة المورد أو أي مستندات داعمة لهذا الطلب المعتمد.
+            </DialogDescription>
+          </DialogHeader>
+          <FileUpload
+            currentFileUrl={attachingOrder?.attached_file_url}
+            currentFileName={attachingOrder?.attached_file_name}
+            onFileUploaded={handleSaveAttachment}
+            onFileRemoved={() => handleSaveAttachment('', '')}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 };
 

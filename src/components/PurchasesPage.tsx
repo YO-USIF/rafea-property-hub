@@ -30,6 +30,7 @@ const PurchasesPage = () => {
   const { user } = useAuth();
 
   const currentUserName = getDisplayName(user?.email);
+  const isAmmar = currentUserName === 'عمار نور الدين';
 
   const getLinkedInvoices = (purchaseId: string) =>
     invoices.filter((inv: any) => inv.purchase_id === purchaseId);
@@ -322,7 +323,7 @@ const PurchasesPage = () => {
                         >
                           <Printer className="w-4 h-4" />
                         </Button>
-                        {order.status === 'في انتظار الموافقة' && (
+                        {order.status === 'في انتظار الموافقة' && !isAmmar && (
                           <PermissionButton
                             pageName="purchases"
                             requirePermission="edit"
@@ -420,6 +421,7 @@ const PurchasesPage = () => {
           if (!open) setEditingPurchase(null);
         }}
         purchase={editingPurchase}
+        currentUserName={currentUserName}
         onSuccess={() => {
           setShowForm(false);
           setEditingPurchase(null);

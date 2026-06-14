@@ -7,10 +7,14 @@ import { PermissionButton } from "@/components/PermissionButton";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, ShoppingCart, CheckCircle, Clock, AlertCircle, Trash2, Edit, Printer, FileText } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { FileUpload } from "@/components/ui/file-upload";
+import { Plus, Search, ShoppingCart, CheckCircle, Clock, AlertCircle, Trash2, Edit, Printer, FileText, Paperclip, Stamp } from 'lucide-react';
 import { usePurchases } from '@/hooks/usePurchases';
 import { useInvoices } from '@/hooks/useInvoices';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { getDisplayName } from '@/lib/userDisplayNames';
 
 const PurchasesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');

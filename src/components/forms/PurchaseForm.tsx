@@ -39,9 +39,10 @@ interface PurchaseFormProps {
   onSuccess: () => void;
   defaultSupplierName?: string;
   simpleItemsMode?: boolean;
+  currentUserName?: string;
 }
 
-const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplierName }: PurchaseFormProps) => {
+const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplierName, currentUserName }: PurchaseFormProps) => {
   const { createPurchase, updatePurchase } = usePurchases();
   const { toast } = useToast();
   const { projects } = useProjects();

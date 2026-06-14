@@ -21,12 +21,55 @@ const PurchasesPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingPurchase, setEditingPurchase] = useState<any>(null);
   const [convertingId, setConvertingId] = useState<string | null>(null);
-  const { purchases, isLoading, deletePurchase } = usePurchases();
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [attachingOrder, setAttachingOrder] = useState<any>(null);
+  const { purchases, isLoading, deletePurchase, updatePurchase } = usePurchases();
   const { invoices, createInvoice } = useInvoices();
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  const currentUserName = getDisplayName(user?.email);
 
   const getLinkedInvoices = (purchaseId: string) =>
     invoices.filter((inv: any) => inv.purchase_id === purchaseId);
+
+  // تعميد الطلب (المرحلة الأولى): تحويله إلى "معتمد" وتسجيل المعتمد
+  const handleApprove = async (order: any) => {
+    setApprovingId(order.id);
+    try {
+      await updatePurchase.mutateAsync({
+        id: order.id,
+        status: 'معتمد',
+        approved_by: currentUserName,
+      });
+      toast({ title: 'تم تعميد الطلب', description: `الطلب ${order.order_number} أصبح معتمداً` });
+    } catch (error) {
+      console.error('Error approving purchase:', error);
+      toast({ title: 'خطأ في تعميد الطلب', variant: 'destructive' });
+    } finally {
+      setApprovingId(null);
+    }
+  };
+
+  // حفظ مرفق للطلب
+  const handleSaveAttachment = async (fileUrl: string, fileName: string) => {
+    if (!attachingOrder) return;
+    try {
+      await updatePurchase.mutateAsync({
+        id: attachingOrder.id,
+        attached_file_url: fileUrl,
+        attached_file_name: fileName,
+      });
+      setAttachingOrder((prev: any) =>
+        prev ? { ...prev, attached_file_url: fileUrl, attached_file_name: fileName } : prev
+      );
+      toast({ title: 'تم إرفاق الملف بنجاح' });
+    } catch (error) {
+      console.error('Error attaching file:', error);
+      toast({ title: 'خطأ في إرفاق الملف', variant: 'destructive' });
+    }
+  };
+
 
   const handleConvertToInvoice = async (order: any) => {
     const linkedCount = getLinkedInvoices(order.id).length;

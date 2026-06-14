@@ -663,7 +663,7 @@ export type Database = {
           attached_file_url: string | null
           created_at: string
           description: string | null
-          due_date: string
+          due_date: string | null
           id: string
           invoice_date: string
           invoice_number: string
@@ -680,7 +680,7 @@ export type Database = {
           attached_file_url?: string | null
           created_at?: string
           description?: string | null
-          due_date: string
+          due_date?: string | null
           id?: string
           invoice_date?: string
           invoice_number: string
@@ -697,7 +697,7 @@ export type Database = {
           attached_file_url?: string | null
           created_at?: string
           description?: string | null
-          due_date?: string
+          due_date?: string | null
           id?: string
           invoice_date?: string
           invoice_number?: string
@@ -1097,12 +1097,14 @@ export type Database = {
           attached_file_url: string | null
           created_at: string
           delivery_status: string
-          expected_delivery: string
+          expected_delivery: string | null
           id: string
+          notes: string | null
           order_date: string
           order_number: string
           project_id: string | null
           project_name: string
+          purchase_officer: string | null
           requested_by: string
           status: string
           supplier_name: string
@@ -1116,12 +1118,14 @@ export type Database = {
           attached_file_url?: string | null
           created_at?: string
           delivery_status?: string
-          expected_delivery: string
+          expected_delivery?: string | null
           id?: string
+          notes?: string | null
           order_date: string
           order_number: string
           project_id?: string | null
           project_name: string
+          purchase_officer?: string | null
           requested_by: string
           status?: string
           supplier_name: string
@@ -1135,12 +1139,14 @@ export type Database = {
           attached_file_url?: string | null
           created_at?: string
           delivery_status?: string
-          expected_delivery?: string
+          expected_delivery?: string | null
           id?: string
+          notes?: string | null
           order_date?: string
           order_number?: string
           project_id?: string | null
           project_name?: string
+          purchase_officer?: string | null
           requested_by?: string
           status?: string
           supplier_name?: string

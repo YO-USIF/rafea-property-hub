@@ -97,11 +97,17 @@ const PurchasesPage = () => {
         amount: Number(order.total_amount) || 0,
         description: `فاتورة محوّلة من طلب الشراء رقم ${order.order_number}${order.project_name ? ` - ${order.project_name}` : ''}`,
         invoice_date: today,
-        due_date: today,
+        due_date: null,
         status: 'غير مدفوع',
         purchase_id: order.id,
         attached_file_url: order.attached_file_url || '',
         attached_file_name: order.attached_file_name || '',
+      });
+
+      // تحديث حالة الطلب إلى "محوّل لفاتورة" للتعميد النهائي
+      await updatePurchase.mutateAsync({
+        id: order.id,
+        status: 'محوّل لفاتورة',
       });
     } catch (error) {
       console.error('Error converting purchase to invoice:', error);

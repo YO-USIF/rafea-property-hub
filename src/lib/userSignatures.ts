@@ -9,6 +9,9 @@ const SIGNATURE_MAP: { match: string; path: string; displayName?: string }[] = [
   // عمار نور الدين
   { match: 'عمار', path: '/signatures/ammar-signature.jpeg', displayName: 'عمار نور الدين' },
   { match: 'amarnory', path: '/signatures/ammar-signature.jpeg', displayName: 'عمار نور الدين' },
+  // م/ يوسف صلاح يوسف
+  { match: 'يوسف', path: '/signatures/yousef-signature.jpeg', displayName: 'م/ يوسف صلاح يوسف' },
+  { match: 'wwork', path: '/signatures/yousef-signature.jpeg', displayName: 'م/ يوسف صلاح يوسف' },
 ];
 
 function normalizeText(value: string): string {

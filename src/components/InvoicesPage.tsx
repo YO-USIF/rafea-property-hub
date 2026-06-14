@@ -320,6 +320,15 @@ const InvoicesPage = () => {
                 filteredInvoices.map((invoice) => (
                   <TableRow key={invoice.id}>
                     <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
+                    <TableCell>
+                      {invoice.purchase_id ? (
+                        <Badge variant="outline" className="font-normal">
+                          {getOrderNumber(invoice.purchase_id)}
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
                     <TableCell>{invoice.supplier_name}</TableCell>
                     <TableCell className="max-w-[200px] truncate" title={invoice.description || '-'}>{invoice.description || '-'}</TableCell>
                     <TableCell>{formatCurrency(invoice.amount)}</TableCell>

@@ -279,6 +279,16 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
                 onChange={(e) => setFormData(prev => ({ ...prev, requested_by: e.target.value }))}
                 required
               />
+              {requesterSignature && (
+                <div className="flex items-center gap-2 pt-1">
+                  <span className="text-xs text-muted-foreground">توقيع طالب الشراء:</span>
+                  <img
+                    src={requesterSignature}
+                    alt="توقيع طالب الشراء"
+                    className="h-12 object-contain"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -293,13 +303,13 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="expected_delivery">تاريخ التسليم المتوقع</Label>
+              <Label htmlFor="expected_delivery">تاريخ التسليم المتوقع{!simpleItemsMode ? '' : ' (اختياري)'}</Label>
               <Input
                 id="expected_delivery"
                 type="date"
                 value={formData.expected_delivery}
                 onChange={(e) => setFormData(prev => ({ ...prev, expected_delivery: e.target.value }))}
-                required
+                required={!simpleItemsMode}
               />
             </div>
 

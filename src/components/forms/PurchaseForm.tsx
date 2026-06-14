@@ -157,18 +157,35 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
     setLoading(true);
 
     try {
-      const validItems = items
-        .filter(item => item.name.trim() !== '')
-        .map(item => ({
-          name: item.name.trim(),
-          quantity: Number(item.quantity) || 0,
-          unit: item.unit?.trim() || 'قطعة',
-          unit_price: Number(item.unit_price) || 0,
-        }));
+      let validItems;
+      let computedTotal = formData.total_amount;
+
+      if (simpleItemsMode) {
+        validItems = itemsText
+          .split('\n')
+          .map((line) => line.trim())
+          .filter((line) => line !== '')
+          .map((line) => ({
+            name: line,
+            quantity: 1,
+            unit: 'قطعة',
+            unit_price: 0,
+          }));
+      } else {
+        validItems = items
+          .filter(item => item.name.trim() !== '')
+          .map(item => ({
+            name: item.name.trim(),
+            quantity: Number(item.quantity) || 0,
+            unit: item.unit?.trim() || 'قطعة',
+            unit_price: Number(item.unit_price) || 0,
+          }));
+        computedTotal = validItems.length > 0 ? itemsTotal : formData.total_amount;
+      }
 
       const purchasePayload = {
         ...formData,
-        total_amount: validItems.length > 0 ? itemsTotal : formData.total_amount,
+        total_amount: computedTotal,
         project_id: formData.project_id === "none" || formData.project_id === "multiple" ? null : formData.project_id,
         items: validItems,
       };

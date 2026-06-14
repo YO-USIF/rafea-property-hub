@@ -621,7 +621,30 @@ const PurchasesPage = () => {
           setEditingPurchase(null);
         }}
       />
+
+      <Dialog
+        open={!!attachingOrder}
+        onOpenChange={(open) => {
+          if (!open) setAttachingOrder(null);
+        }}
+      >
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>إرفاق ملفات للطلب {attachingOrder?.order_number}</DialogTitle>
+            <DialogDescription>
+              ارفع فاتورة المورد أو أي مستندات داعمة لهذا الطلب المعتمد.
+            </DialogDescription>
+          </DialogHeader>
+          <FileUpload
+            currentFileUrl={attachingOrder?.attached_file_url}
+            currentFileName={attachingOrder?.attached_file_name}
+            onFileUploaded={handleSaveAttachment}
+            onFileRemoved={() => handleSaveAttachment('', '')}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 };
 

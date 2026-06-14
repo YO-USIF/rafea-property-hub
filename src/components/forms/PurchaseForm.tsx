@@ -45,9 +45,10 @@ interface PurchaseFormProps {
   purchase?: Purchase;
   onSuccess: () => void;
   defaultSupplierName?: string;
+  simpleItemsMode?: boolean;
 }
 
-const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplierName }: PurchaseFormProps) => {
+const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplierName, simpleItemsMode = false }: PurchaseFormProps) => {
   const { createPurchase, updatePurchase } = usePurchases();
   const { toast } = useToast();
   const { projects } = useProjects();
@@ -69,6 +70,8 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
     attached_file_name: purchase?.attached_file_name || ''
   });
   const [items, setItems] = useState<PurchaseItem[]>([]);
+  const [itemsText, setItemsText] = useState('');
+  const requesterSignature = getUserSignature(formData.requested_by);
 
   const itemsTotal = items.reduce(
     (sum, item) => sum + (Number(item.quantity) || 0) * (Number(item.unit_price) || 0),

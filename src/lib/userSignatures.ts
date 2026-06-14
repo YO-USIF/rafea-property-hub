@@ -6,6 +6,9 @@ const SIGNATURE_MAP: { match: string; path: string; displayName?: string }[] = [
   // مطابقة أسماء المستخدمين الإنجليزية المخزّنة في الملف الشخصي
   { match: 'reyad', path: '/signatures/reyad-signature.jpeg', displayName: 'محمد رياض حمامي' },
   { match: 'rawah', path: '/signatures/rawah-signature.png', displayName: 'ريان راوه' },
+  // عمار نور الدين
+  { match: 'عمار', path: '/signatures/ammar-signature.jpeg', displayName: 'عمار نور الدين' },
+  { match: 'amarnory', path: '/signatures/ammar-signature.jpeg', displayName: 'عمار نور الدين' },
 ];
 
 function normalizeText(value: string): string {

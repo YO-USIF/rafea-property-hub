@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useInvoices } from '@/hooks/useInvoices';
+import { usePurchases } from '@/hooks/usePurchases';
 import InvoiceForm from '@/components/forms/InvoiceForm';
 
 const InvoicesPage = () => {

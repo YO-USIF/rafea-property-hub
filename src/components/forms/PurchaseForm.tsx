@@ -107,7 +107,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
       // إعادة تعيين النموذج للإضافة الجديدة
       setFormData({
         order_number: `PO-${Date.now()}`,
-        supplier_name: '',
+        supplier_name: defaultSupplierName || '',
         project_name: '',
         project_id: "none",
         requested_by: '',

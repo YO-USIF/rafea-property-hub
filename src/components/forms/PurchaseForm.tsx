@@ -136,16 +136,17 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
           .from('purchase_items')
           .select('name, quantity, unit, unit_price')
           .eq('purchase_id', purchase.id);
-        setItems(
-          (data || []).map((item: any) => ({
-            name: item.name || '',
-            quantity: item.quantity || 1,
-            unit: item.unit || 'قطعة',
-            unit_price: Number(item.unit_price) || 0,
-          }))
-        );
+        const loaded = (data || []).map((item: any) => ({
+          name: item.name || '',
+          quantity: item.quantity || 1,
+          unit: item.unit || 'قطعة',
+          unit_price: Number(item.unit_price) || 0,
+        }));
+        setItems(loaded);
+        setItemsText(loaded.map((i) => i.name).filter(Boolean).join('\n'));
       } else {
         setItems([]);
+        setItemsText('');
       }
     };
     loadItems();

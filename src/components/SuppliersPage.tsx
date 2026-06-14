@@ -984,6 +984,20 @@ const SuppliersPage = () => {
         }}
       />
 
+      <PurchaseForm
+        open={showPurchaseForm}
+        onOpenChange={(open) => {
+          setShowPurchaseForm(open);
+          if (!open) setPurchaseSupplierName('');
+        }}
+        defaultSupplierName={purchaseSupplierName}
+        onSuccess={() => {
+          setShowPurchaseForm(false);
+          setPurchaseSupplierName('');
+        }}
+      />
+
+
       {/* Account Statement Dialog */}
       <Dialog open={showAccountStatement} onOpenChange={setShowAccountStatement}>
         <DialogContent className="max-w-md">

@@ -518,7 +518,36 @@ const PurchasesPage = () => {
                         >
                           <Printer className="w-4 h-4" />
                         </Button>
-                        {order.status === 'معتمد' && (
+                        {order.status === 'في انتظار الموافقة' && (
+                          <PermissionButton
+                            pageName="purchases"
+                            requirePermission="edit"
+                            size="sm"
+                            variant="outline"
+                            className="text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                            disabled={approvingId === order.id}
+                            title="تعميد الطلب"
+                            onClick={() => handleApprove(order)}
+                          >
+                            <Stamp className="w-4 h-4 ml-1" />
+                            {approvingId === order.id ? 'جارٍ...' : 'تعميد'}
+                          </PermissionButton>
+                        )}
+                        {(order.status === 'معتمد' || order.status === 'محوّل لفاتورة') && (
+                          <PermissionButton
+                            pageName="purchases"
+                            requirePermission="edit"
+                            size="sm"
+                            variant="outline"
+                            className={order.attached_file_url ? 'text-blue-700 border-blue-300 hover:bg-blue-50' : ''}
+                            title="إرفاق ملفات"
+                            onClick={() => setAttachingOrder(order)}
+                          >
+                            <Paperclip className="w-4 h-4 ml-1" />
+                            {order.attached_file_url ? 'مرفق' : 'إرفاق'}
+                          </PermissionButton>
+                        )}
+                        {(order.status === 'معتمد' || order.status === 'محوّل لفاتورة') && (
                           <PermissionButton
                             pageName="invoices"
                             requirePermission="create"

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { FileUpload } from '@/components/ui/file-upload';
@@ -10,6 +11,7 @@ import { usePurchases } from '@/hooks/usePurchases';
 import { useProjects } from '@/hooks/useProjects';
 import { useUserRole } from '@/hooks/useUserRole';
 import { supabase } from '@/integrations/supabase/client';
+import { getUserSignature } from '@/lib/userSignatures';
 import { Plus, Trash2, Package } from 'lucide-react';
 
 interface PurchaseItem {
@@ -43,9 +45,10 @@ interface PurchaseFormProps {
   purchase?: Purchase;
   onSuccess: () => void;
   defaultSupplierName?: string;
+  simpleItemsMode?: boolean;
 }
 
-const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplierName }: PurchaseFormProps) => {
+const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplierName, simpleItemsMode = false }: PurchaseFormProps) => {
   const { createPurchase, updatePurchase } = usePurchases();
   const { toast } = useToast();
   const { projects } = useProjects();
@@ -67,6 +70,8 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
     attached_file_name: purchase?.attached_file_name || ''
   });
   const [items, setItems] = useState<PurchaseItem[]>([]);
+  const [itemsText, setItemsText] = useState('');
+  const requesterSignature = getUserSignature(formData.requested_by);
 
   const itemsTotal = items.reduce(
     (sum, item) => sum + (Number(item.quantity) || 0) * (Number(item.unit_price) || 0),
@@ -131,16 +136,17 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
           .from('purchase_items')
           .select('name, quantity, unit, unit_price')
           .eq('purchase_id', purchase.id);
-        setItems(
-          (data || []).map((item: any) => ({
-            name: item.name || '',
-            quantity: item.quantity || 1,
-            unit: item.unit || 'قطعة',
-            unit_price: Number(item.unit_price) || 0,
-          }))
-        );
+        const loaded = (data || []).map((item: any) => ({
+          name: item.name || '',
+          quantity: item.quantity || 1,
+          unit: item.unit || 'قطعة',
+          unit_price: Number(item.unit_price) || 0,
+        }));
+        setItems(loaded);
+        setItemsText(loaded.map((i) => i.name).filter(Boolean).join('\n'));
       } else {
         setItems([]);
+        setItemsText('');
       }
     };
     loadItems();
@@ -151,18 +157,35 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
     setLoading(true);
 
     try {
-      const validItems = items
-        .filter(item => item.name.trim() !== '')
-        .map(item => ({
-          name: item.name.trim(),
-          quantity: Number(item.quantity) || 0,
-          unit: item.unit?.trim() || 'قطعة',
-          unit_price: Number(item.unit_price) || 0,
-        }));
+      let validItems;
+      let computedTotal = formData.total_amount;
+
+      if (simpleItemsMode) {
+        validItems = itemsText
+          .split('\n')
+          .map((line) => line.trim())
+          .filter((line) => line !== '')
+          .map((line) => ({
+            name: line,
+            quantity: 1,
+            unit: 'قطعة',
+            unit_price: 0,
+          }));
+      } else {
+        validItems = items
+          .filter(item => item.name.trim() !== '')
+          .map(item => ({
+            name: item.name.trim(),
+            quantity: Number(item.quantity) || 0,
+            unit: item.unit?.trim() || 'قطعة',
+            unit_price: Number(item.unit_price) || 0,
+          }));
+        computedTotal = validItems.length > 0 ? itemsTotal : formData.total_amount;
+      }
 
       const purchasePayload = {
         ...formData,
-        total_amount: validItems.length > 0 ? itemsTotal : formData.total_amount,
+        total_amount: computedTotal,
         project_id: formData.project_id === "none" || formData.project_id === "multiple" ? null : formData.project_id,
         items: validItems,
       };
@@ -256,6 +279,16 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
                 onChange={(e) => setFormData(prev => ({ ...prev, requested_by: e.target.value }))}
                 required
               />
+              {requesterSignature && (
+                <div className="flex items-center gap-2 pt-1">
+                  <span className="text-xs text-muted-foreground">توقيع طالب الشراء:</span>
+                  <img
+                    src={requesterSignature}
+                    alt="توقيع طالب الشراء"
+                    className="h-12 object-contain"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -270,13 +303,13 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="expected_delivery">تاريخ التسليم المتوقع</Label>
+              <Label htmlFor="expected_delivery">تاريخ التسليم المتوقع{!simpleItemsMode ? '' : ' (اختياري)'}</Label>
               <Input
                 id="expected_delivery"
                 type="date"
                 value={formData.expected_delivery}
                 onChange={(e) => setFormData(prev => ({ ...prev, expected_delivery: e.target.value }))}
-                required
+                required={!simpleItemsMode}
               />
             </div>
 
@@ -344,83 +377,100 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
             </div>
           </div>
 
-          {/* أصناف وكميات الطلب */}
-          <div className="space-y-3 rounded-lg border p-4 bg-muted/20">
-            <div className="flex items-center justify-between">
+          {/* أصناف الطلب */}
+          {simpleItemsMode ? (
+            <div className="space-y-2 rounded-lg border p-4 bg-muted/20">
               <div className="flex items-center gap-2">
                 <Package className="w-4 h-4 text-primary" />
-                <Label className="text-base font-semibold">الأصناف والكميات</Label>
+                <Label htmlFor="items_text" className="text-base font-semibold">جميع الأصناف</Label>
               </div>
-              <Button type="button" size="sm" variant="outline" onClick={addItem}>
-                <Plus className="w-4 h-4 ml-1" />
-                إضافة صنف
-              </Button>
+              <Textarea
+                id="items_text"
+                value={itemsText}
+                onChange={(e) => setItemsText(e.target.value)}
+                placeholder="اكتب جميع الأصناف المطلوبة، كل صنف في سطر منفصل"
+                rows={6}
+              />
+              <p className="text-xs text-muted-foreground">اكتب كل صنف في سطر مستقل.</p>
             </div>
-
-            {items.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                لم تتم إضافة أصناف بعد. اضغط "إضافة صنف" لكتابة المواد والكميات المطلوبة.
-              </p>
-            ) : (
-              <div className="space-y-2">
-                <div className="hidden md:grid grid-cols-12 gap-2 px-1 text-xs font-medium text-muted-foreground">
-                  <div className="col-span-5">المادة / الصنف</div>
-                  <div className="col-span-2">الكمية</div>
-                  <div className="col-span-2">الوحدة</div>
-                  <div className="col-span-2">سعر الوحدة</div>
-                  <div className="col-span-1"></div>
+          ) : (
+            <div className="space-y-3 rounded-lg border p-4 bg-muted/20">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Package className="w-4 h-4 text-primary" />
+                  <Label className="text-base font-semibold">الأصناف والكميات</Label>
                 </div>
-                {items.map((item, index) => (
-                  <div key={index} className="grid grid-cols-12 gap-2 items-center">
-                    <Input
-                      className="col-span-12 md:col-span-5"
-                      placeholder="اسم المادة المطلوبة"
-                      value={item.name}
-                      onChange={(e) => updateItem(index, 'name', e.target.value)}
-                    />
-                    <Input
-                      className="col-span-4 md:col-span-2"
-                      type="number"
-                      min="0"
-                      placeholder="الكمية"
-                      value={item.quantity}
-                      onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                    />
-                    <Input
-                      className="col-span-4 md:col-span-2"
-                      placeholder="الوحدة"
-                      value={item.unit}
-                      onChange={(e) => updateItem(index, 'unit', e.target.value)}
-                    />
-                    <Input
-                      className="col-span-3 md:col-span-2"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      placeholder="السعر"
-                      value={item.unit_price}
-                      onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                    />
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="ghost"
-                      className="col-span-1 text-destructive"
-                      onClick={() => removeItem(index)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))}
-                <div className="flex justify-between items-center pt-2 border-t mt-2">
-                  <span className="text-sm font-medium">الإجمالي</span>
-                  <span className="text-base font-bold text-primary">
-                    {itemsTotal.toLocaleString()} ر.س
-                  </span>
-                </div>
+                <Button type="button" size="sm" variant="outline" onClick={addItem}>
+                  <Plus className="w-4 h-4 ml-1" />
+                  إضافة صنف
+                </Button>
               </div>
-            )}
-          </div>
+
+              {items.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  لم تتم إضافة أصناف بعد. اضغط "إضافة صنف" لكتابة المواد والكميات المطلوبة.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  <div className="hidden md:grid grid-cols-12 gap-2 px-1 text-xs font-medium text-muted-foreground">
+                    <div className="col-span-5">المادة / الصنف</div>
+                    <div className="col-span-2">الكمية</div>
+                    <div className="col-span-2">الوحدة</div>
+                    <div className="col-span-2">سعر الوحدة</div>
+                    <div className="col-span-1"></div>
+                  </div>
+                  {items.map((item, index) => (
+                    <div key={index} className="grid grid-cols-12 gap-2 items-center">
+                      <Input
+                        className="col-span-12 md:col-span-5"
+                        placeholder="اسم المادة المطلوبة"
+                        value={item.name}
+                        onChange={(e) => updateItem(index, 'name', e.target.value)}
+                      />
+                      <Input
+                        className="col-span-4 md:col-span-2"
+                        type="number"
+                        min="0"
+                        placeholder="الكمية"
+                        value={item.quantity}
+                        onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                      />
+                      <Input
+                        className="col-span-4 md:col-span-2"
+                        placeholder="الوحدة"
+                        value={item.unit}
+                        onChange={(e) => updateItem(index, 'unit', e.target.value)}
+                      />
+                      <Input
+                        className="col-span-3 md:col-span-2"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="السعر"
+                        value={item.unit_price}
+                        onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                      />
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        className="col-span-1 text-destructive"
+                        onClick={() => removeItem(index)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <div className="flex justify-between items-center pt-2 border-t mt-2">
+                    <span className="text-sm font-medium">الإجمالي</span>
+                    <span className="text-base font-bold text-primary">
+                      {itemsTotal.toLocaleString()} ر.س
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
 
           <FileUpload

@@ -991,6 +991,7 @@ const SuppliersPage = () => {
           if (!open) setPurchaseSupplierName('');
         }}
         defaultSupplierName={purchaseSupplierName}
+        simpleItemsMode
         onSuccess={() => {
           setShowPurchaseForm(false);
           setPurchaseSupplierName('');

@@ -42,9 +42,10 @@ interface PurchaseFormProps {
   onOpenChange: (open: boolean) => void;
   purchase?: Purchase;
   onSuccess: () => void;
+  defaultSupplierName?: string;
 }
 
-const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess }: PurchaseFormProps) => {
+const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplierName }: PurchaseFormProps) => {
   const { createPurchase, updatePurchase } = usePurchases();
   const { toast } = useToast();
   const { projects } = useProjects();

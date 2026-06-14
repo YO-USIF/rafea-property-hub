@@ -121,7 +121,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
         attached_file_name: ''
       });
     }
-  }, [purchase]);
+  }, [purchase, defaultSupplierName, open]);
 
   // تحميل أصناف الطلب عند التعديل
   useEffect(() => {

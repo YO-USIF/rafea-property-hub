@@ -5,6 +5,7 @@ import { Printer, X } from 'lucide-react';
 import { useCompanySettings } from '@/hooks/useCompanySettings';
 import suhailLogo from '@/assets/suhail-logo.jpeg';
 import { getUserSignature, getUserDisplayName } from '@/lib/userSignatures';
+import { printExtract } from '@/lib/extractPrint';
 interface ExtractPrintViewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -30,7 +31,7 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
   };
 
   const handlePrint = () => {
-    window.print();
+    printExtract(extract, selectedCompany);
   };
 
   const formatCurrency = (amount: number) => {

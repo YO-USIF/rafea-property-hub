@@ -51,9 +51,10 @@ interface ContractData {
   terms?: string;
   approved?: boolean;
   approved_at?: string | null;
+  user_id?: string | null;
 }
 
-export function printContract(
+export async function printContract(
   contract: ContractData,
   contractor: any,
   approverName?: string | null

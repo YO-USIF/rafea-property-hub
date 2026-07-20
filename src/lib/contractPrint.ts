@@ -266,6 +266,19 @@ export async function printContract(
           </div>
         </div>
 
+        <div class="signatures" style="margin-top:20px;">
+          <div class="sig">
+            <div class="role">المُعد (منشئ العقد)</div>
+            ${preparerSig ? `<img src="${preparerSig}" style="height:55px;object-fit:contain;margin:4px auto;display:block;mix-blend-mode:multiply;" />` : '<br/><br/>'}
+            <div style="font-weight:800;">${escapeHtml(preparerDisplay)}</div>
+          </div>
+          <div class="sig">
+            <div class="role">تاريخ الإعداد</div>
+            <br/><br/>
+            <div style="font-weight:800;">${todayStr}</div>
+          </div>
+        </div>
+
         <div class="footer">
           <span>حُرّر بتاريخ ${todayStr}</span>
           <span>عقد رقم ${escapeHtml(contract.contract_number)} — صفحة 2 من 2</span>

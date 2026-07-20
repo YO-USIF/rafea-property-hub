@@ -1,5 +1,6 @@
 import { escapeHtml } from '@/lib/utils';
 import { getUserSignature } from '@/lib/userSignatures';
+import { resolvePreparerName } from '@/lib/preparerName';
 
 const COMPANY_LOGO = '/lovable-uploads/c6fbcf40-7e64-42f0-b1da-d735b0b632c8.png';
 const COMPANY_NAME = 'شركة سهيل طيبة للتطوير العقاري';
@@ -70,7 +71,8 @@ const openAndPrint = (html: string) => {
   };
 };
 
-export const printPurchaseOrder = (order: any) => {
+export const printPurchaseOrder = async (order: any) => {
+  const preparerName = await resolvePreparerName(order.user_id || order.created_by);
   const statusColor =
     order.status === 'معتمد'
       ? 'background:#dcfce7;color:#166534;'
@@ -109,6 +111,7 @@ export const printPurchaseOrder = (order: any) => {
         <div class="amount"><div class="l">المبلغ الإجمالي</div><div class="v">${formatCurrency(order.total_amount)}</div></div>
         ${order.notes ? `<div class="notes"><div class="l">الأصناف / تفاصيل الطلب</div><div class="v">${escapeHtml(order.notes)}</div></div>` : ''}
         <div class="signs">
+          ${signatureBox('مُعد المستند', preparerName)}
           ${signatureBox('طالب الشراء', order.requested_by)}
           ${signatureBox('مسؤول المشتريات', order.purchase_officer)}
           ${signatureBox('المعتمد', order.approved_by)}
@@ -120,7 +123,8 @@ export const printPurchaseOrder = (order: any) => {
   openAndPrint(html);
 };
 
-export const printInvoice = (invoice: any, linkedPurchase?: any) => {
+export const printInvoice = async (invoice: any, linkedPurchase?: any) => {
+  const preparerName = await resolvePreparerName(invoice.user_id || invoice.created_by);
   const statusColor =
     invoice.status === 'مدفوع'
       ? 'background:#dcfce7;color:#166534;'
@@ -151,6 +155,7 @@ export const printInvoice = (invoice: any, linkedPurchase?: any) => {
         <div class="amount"><div class="l">المبلغ الإجمالي</div><div class="v">${formatCurrency(invoice.amount)}</div></div>
         ${invoice.description ? `<div class="notes"><div class="l">تفاصيل الفاتورة</div><div class="v">${escapeHtml(invoice.description)}</div></div>` : ''}
         <div class="signs">
+          ${signatureBox('مُعد الفاتورة', preparerName)}
           ${signatureBox('طالب الشراء', linkedPurchase?.requested_by)}
           ${signatureBox('مسؤول المشتريات', linkedPurchase?.purchase_officer)}
           ${signatureBox('المعتمد', linkedPurchase?.approved_by)}

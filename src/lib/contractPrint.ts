@@ -1,5 +1,6 @@
 import { escapeHtml } from '@/lib/utils';
 import { getUserSignature, getUserDisplayName } from '@/lib/userSignatures';
+import { resolvePreparerName } from '@/lib/preparerName';
 
 export const companyInfo: Record<string, { name: string; cr: string; vat: string; address: string }> = {
   suhail: {

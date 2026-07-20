@@ -12,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search, Home, Users, DollarSign, Calendar, Trash2, Edit, Printer, Clock, Building2, Filter } from 'lucide-react';
 import { useSales } from '@/hooks/useSales';
 import { useProjects } from '@/hooks/useProjects';
+import { resolvePreparerName } from '@/lib/preparerName';
+import { getUserSignature, getUserDisplayName } from '@/lib/userSignatures';
 
 const SalesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');

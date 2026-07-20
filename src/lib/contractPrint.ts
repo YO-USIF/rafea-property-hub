@@ -69,8 +69,13 @@ export async function printContract(
   const vatAmount = contract.vat_amount ?? (contract.vat_enabled ? subtotal * 0.15 : 0);
   const total = contract.total ?? subtotal + vatAmount;
 
+  const preparerName = await resolvePreparerName(contract.user_id);
+  const preparerDisplay = getUserDisplayName(preparerName) || preparerName;
+  const preparerSig = getUserSignature(preparerName);
+
   const printWindow = window.open('', '_blank');
   if (!printWindow) return;
+
 
   const itemsRows = items
     .filter((it: any) => (it.description || '').trim())

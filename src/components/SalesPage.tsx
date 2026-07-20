@@ -541,7 +541,10 @@ const SalesPage = () => {
                         <Button 
                           size="sm" 
                           variant="outline"
-                          onClick={() => {
+                          onClick={async () => {
+                            const preparerName = await resolvePreparerName((sale as any).user_id);
+                            const preparerDisplay = getUserDisplayName(preparerName) || preparerName;
+                            const preparerSig = getUserSignature(preparerName);
                             const printWindow = window.open('', '_blank');
                             if (printWindow) {
                               printWindow.document.write(`

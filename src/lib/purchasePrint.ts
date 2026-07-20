@@ -111,6 +111,7 @@ export const printPurchaseOrder = async (order: any) => {
         <div class="amount"><div class="l">المبلغ الإجمالي</div><div class="v">${formatCurrency(order.total_amount)}</div></div>
         ${order.notes ? `<div class="notes"><div class="l">الأصناف / تفاصيل الطلب</div><div class="v">${escapeHtml(order.notes)}</div></div>` : ''}
         <div class="signs">
+          ${signatureBox('مُعد المستند', preparerName)}
           ${signatureBox('طالب الشراء', order.requested_by)}
           ${signatureBox('مسؤول المشتريات', order.purchase_officer)}
           ${signatureBox('المعتمد', order.approved_by)}

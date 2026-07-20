@@ -1,5 +1,6 @@
 import { escapeHtml } from '@/lib/utils';
 import { getUserSignature } from '@/lib/userSignatures';
+import { resolvePreparerName } from '@/lib/preparerName';
 
 const COMPANY_LOGO = '/lovable-uploads/c6fbcf40-7e64-42f0-b1da-d735b0b632c8.png';
 const COMPANY_NAME = 'شركة سهيل طيبة للتطوير العقاري';

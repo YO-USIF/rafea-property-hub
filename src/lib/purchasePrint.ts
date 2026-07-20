@@ -123,7 +123,8 @@ export const printPurchaseOrder = async (order: any) => {
   openAndPrint(html);
 };
 
-export const printInvoice = (invoice: any, linkedPurchase?: any) => {
+export const printInvoice = async (invoice: any, linkedPurchase?: any) => {
+  const preparerName = await resolvePreparerName(invoice.user_id || invoice.created_by);
   const statusColor =
     invoice.status === 'مدفوع'
       ? 'background:#dcfce7;color:#166534;'

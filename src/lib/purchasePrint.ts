@@ -71,7 +71,8 @@ const openAndPrint = (html: string) => {
   };
 };
 
-export const printPurchaseOrder = (order: any) => {
+export const printPurchaseOrder = async (order: any) => {
+  const preparerName = await resolvePreparerName(order.user_id || order.created_by);
   const statusColor =
     order.status === 'معتمد'
       ? 'background:#dcfce7;color:#166534;'

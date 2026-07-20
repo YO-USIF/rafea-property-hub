@@ -65,7 +65,7 @@ const UnitHandoversTab = () => {
     }
   };
 
-  const printHandover = (h: any, company: 'suhail' | 'rafea') => {
+  const printHandover = async (h: any, company: 'suhail' | 'rafea') => {
     const escapeHtml = (str: string) => {
       if (!str) return '';
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -74,6 +74,9 @@ const UnitHandoversTab = () => {
     const isSuhail = company === 'suhail';
     const companyName = isSuhail ? 'شركة سهيل طيبة للتطوير العقاري' : 'شركة رافع للتطوير العقاري';
     const logoUrl = isSuhail ? '/logos/suhail-tayba-logo.png' : '/logos/rafea-logo.jpeg';
+    const preparerName = await resolvePreparerName(h.user_id);
+    const preparerDisplay = getUserDisplayName(preparerName) || preparerName;
+    const preparerSig = getUserSignature(preparerName);
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
     printWindow.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><title>إقرار تسليم وحدة سكنية</title>

@@ -155,6 +155,7 @@ export const printInvoice = async (invoice: any, linkedPurchase?: any) => {
         <div class="amount"><div class="l">المبلغ الإجمالي</div><div class="v">${formatCurrency(invoice.amount)}</div></div>
         ${invoice.description ? `<div class="notes"><div class="l">تفاصيل الفاتورة</div><div class="v">${escapeHtml(invoice.description)}</div></div>` : ''}
         <div class="signs">
+          ${signatureBox('مُعد الفاتورة', preparerName)}
           ${signatureBox('طالب الشراء', linkedPurchase?.requested_by)}
           ${signatureBox('مسؤول المشتريات', linkedPurchase?.purchase_officer)}
           ${signatureBox('المعتمد', linkedPurchase?.approved_by)}

@@ -12,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search, Home, Users, DollarSign, Calendar, Trash2, Edit, Printer, Clock, Building2, Filter } from 'lucide-react';
 import { useSales } from '@/hooks/useSales';
 import { useProjects } from '@/hooks/useProjects';
+import { resolvePreparerName } from '@/lib/preparerName';
+import { getUserSignature, getUserDisplayName } from '@/lib/userSignatures';
 
 const SalesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -539,7 +541,10 @@ const SalesPage = () => {
                         <Button 
                           size="sm" 
                           variant="outline"
-                          onClick={() => {
+                          onClick={async () => {
+                            const preparerName = await resolvePreparerName((sale as any).user_id);
+                            const preparerDisplay = getUserDisplayName(preparerName) || preparerName;
+                            const preparerSig = getUserSignature(preparerName);
                             const printWindow = window.open('', '_blank');
                             if (printWindow) {
                               printWindow.document.write(`
@@ -743,14 +748,23 @@ const SalesPage = () => {
                                       </div>
                                     </div>
                                     
-                                    <div class="footer">
-                                      <p>📅 تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')}</p>
-                                      <p>🏢 شركة سهيل طيبة للتطوير العقاري</p>
-                                      <p>📍 الرياض، المملكة العربية السعودية</p>
-                                    </div>
-                                  </body>
-                                </html>
-                              `);
+                                     </div>
+                                     
+                                     <div style="margin-top: 25px; padding: 20px; background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; text-align: center;">
+                                       <div style="font-size: 12px; color: #64748b; font-weight: 600; margin-bottom: 8px;">أُعدّ بواسطة</div>
+                                       ${preparerSig ? `<img src="${window.location.origin}${preparerSig}" style="height:55px;object-fit:contain;margin:0 auto 6px;display:block;mix-blend-mode:multiply;" alt="توقيع المُعد" />` : ''}
+                                       <div style="font-size: 16px; font-weight: bold; color: #1e293b;">${escapeHtml(preparerDisplay)}</div>
+                                       <div style="font-size: 12px; color: #64748b; margin-top: 4px;">المُنشئ (المُعد)</div>
+                                     </div>
+
+                                     <div class="footer">
+                                       <p>📅 تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')}</p>
+                                       <p>🏢 شركة سهيل طيبة للتطوير العقاري</p>
+                                       <p>📍 الرياض، المملكة العربية السعودية</p>
+                                     </div>
+                                   </body>
+                                 </html>
+                               `);
                               printWindow.document.close();
                               printWindow.print();
                             }

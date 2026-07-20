@@ -11,6 +11,8 @@ import { Plus, Search, Edit, Trash2, Printer, Home, CheckCircle, Clock, XCircle 
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { resolvePreparerName } from '@/lib/preparerName';
+import { getUserSignature, getUserDisplayName } from '@/lib/userSignatures';
 import UnitHandoverForm from './forms/UnitHandoverForm';
 
 const UnitHandoversTab = () => {
@@ -63,7 +65,7 @@ const UnitHandoversTab = () => {
     }
   };
 
-  const printHandover = (h: any, company: 'suhail' | 'rafea') => {
+  const printHandover = async (h: any, company: 'suhail' | 'rafea') => {
     const escapeHtml = (str: string) => {
       if (!str) return '';
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -72,6 +74,9 @@ const UnitHandoversTab = () => {
     const isSuhail = company === 'suhail';
     const companyName = isSuhail ? 'شركة سهيل طيبة للتطوير العقاري' : 'شركة رافع للتطوير العقاري';
     const logoUrl = isSuhail ? '/logos/suhail-tayba-logo.png' : '/logos/rafea-logo.jpeg';
+    const preparerName = await resolvePreparerName(h.user_id);
+    const preparerDisplay = getUserDisplayName(preparerName) || preparerName;
+    const preparerSig = getUserSignature(preparerName);
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
     printWindow.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><title>إقرار تسليم وحدة سكنية</title>
@@ -181,9 +186,14 @@ const UnitHandoversTab = () => {
     </div>
 
     <div style="margin-top:auto">
-    <div class="signature">
-    <div><p>توقيع المشتري (المستلم)</p><p>${escapeHtml(h.customer_name)}</p><p style="margin-top:25px">_______________</p></div>
-    <div><p>توقيع المالك (المسلّم)</p><p style="margin-top:25px">_______________</p></div>
+    <div class="signature" style="justify-content:space-around">
+    <div style="width:30%"><p>توقيع المشتري (المستلم)</p><p>${escapeHtml(h.customer_name)}</p><p style="margin-top:25px">_______________</p></div>
+    <div style="width:30%"><p>توقيع المالك (المسلّم)</p><p style="margin-top:25px">_______________</p></div>
+    <div style="width:30%">
+      <p>المُعد (منشئ الإقرار)</p>
+      ${preparerSig ? `<img src="${window.location.origin}${preparerSig}" style="height:50px;object-fit:contain;margin:4px auto;display:block;mix-blend-mode:multiply;" alt="توقيع المُعد" />` : '<p style="margin-top:25px">_______________</p>'}
+      <p style="font-weight:bold;margin-top:4px">${escapeHtml(preparerDisplay)}</p>
+    </div>
     </div>
     <div class="footer-date">تاريخ التوقيع: ${escapeHtml(h.handover_date)}</div>
     </div>

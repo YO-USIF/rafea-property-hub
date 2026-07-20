@@ -1,5 +1,6 @@
 import { escapeHtml } from '@/lib/utils';
 import { getUserSignature, getUserDisplayName } from '@/lib/userSignatures';
+import { resolvePreparerName } from '@/lib/preparerName';
 
 export const companyInfo: Record<string, { name: string; cr: string; vat: string; address: string }> = {
   suhail: {
@@ -50,9 +51,10 @@ interface ContractData {
   terms?: string;
   approved?: boolean;
   approved_at?: string | null;
+  user_id?: string | null;
 }
 
-export function printContract(
+export async function printContract(
   contract: ContractData,
   contractor: any,
   approverName?: string | null
@@ -67,8 +69,13 @@ export function printContract(
   const vatAmount = contract.vat_amount ?? (contract.vat_enabled ? subtotal * 0.15 : 0);
   const total = contract.total ?? subtotal + vatAmount;
 
+  const preparerName = await resolvePreparerName(contract.user_id);
+  const preparerDisplay = getUserDisplayName(preparerName) || preparerName;
+  const preparerSig = getUserSignature(preparerName);
+
   const printWindow = window.open('', '_blank');
   if (!printWindow) return;
+
 
   const itemsRows = items
     .filter((it: any) => (it.description || '').trim())
@@ -256,6 +263,19 @@ export function printContract(
             <div class="role">الطرف الثاني (المقاول)</div>
             <br/><br/>
             ${escapeHtml(ct.name || '')}<br/>الاسم والتوقيع
+          </div>
+        </div>
+
+        <div class="signatures" style="margin-top:20px;">
+          <div class="sig">
+            <div class="role">المُعد (منشئ العقد)</div>
+            ${preparerSig ? `<img src="${preparerSig}" style="height:55px;object-fit:contain;margin:4px auto;display:block;mix-blend-mode:multiply;" />` : '<br/><br/>'}
+            <div style="font-weight:800;">${escapeHtml(preparerDisplay)}</div>
+          </div>
+          <div class="sig">
+            <div class="role">تاريخ الإعداد</div>
+            <br/><br/>
+            <div style="font-weight:800;">${todayStr}</div>
           </div>
         </div>
 

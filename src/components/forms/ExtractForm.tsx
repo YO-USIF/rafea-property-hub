@@ -249,8 +249,8 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
             <div className="space-y-2">
               <Label htmlFor="contractor_name">اسم المقاول</Label>
               <Select
-                value={formData.contractor_name}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, contractor_name: value }))}
+                value={formData.contractor_name || undefined}
+                onValueChange={(value) => { if (value) setFormData(prev => ({ ...prev, contractor_name: value })); }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر المقاول" />

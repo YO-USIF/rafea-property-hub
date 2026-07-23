@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { Eye, EyeOff } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Profile } from '@/hooks/useProfiles';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const userSchema = z.object({
   full_name: z.string().min(1, 'الاسم مطلوب'),
@@ -33,6 +36,10 @@ const userSchema = z.object({
   phone: z.string().optional(),
   department: z.string().min(1, 'القسم مطلوب'),
   status: z.string().min(1, 'الحالة مطلوبة'),
+  password: z.string().optional().refine(
+    (v) => !v || v.length >= 6,
+    { message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' }
+  ),
 });
 
 type UserFormData = z.infer<typeof userSchema>;
@@ -41,7 +48,7 @@ interface UserFormProps {
   user?: Profile;
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: UserFormData) => void;
+  onSubmit: (data: Omit<UserFormData, 'password'>) => void;
 }
 
 const UserForm: React.FC<UserFormProps> = ({
@@ -50,6 +57,10 @@ const UserForm: React.FC<UserFormProps> = ({
   onClose,
   onSubmit,
 }) => {
+  const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
   const form = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
     defaultValues: {
@@ -58,6 +69,7 @@ const UserForm: React.FC<UserFormProps> = ({
       phone: user?.phone || '',
       department: user?.department || '',
       status: user?.status || 'نشط',
+      password: '',
     },
   });
 
@@ -69,14 +81,37 @@ const UserForm: React.FC<UserFormProps> = ({
         phone: user?.phone || '',
         department: user?.department || '',
         status: user?.status || 'نشط',
+        password: '',
       });
+      setShowPassword(false);
     }
   }, [user, isOpen]);
 
-  const handleSubmit = (data: UserFormData) => {
-    onSubmit(data);
-    onClose();
-    form.reset();
+  const handleSubmit = async (data: UserFormData) => {
+    setSubmitting(true);
+    try {
+      const { password, ...profileData } = data;
+      onSubmit(profileData);
+
+      if (user && password && password.length > 0) {
+        const { error } = await supabase.functions.invoke('admin-update-user', {
+          body: { userId: user.user_id, password },
+        });
+        if (error) throw error;
+        toast({ title: 'تم تحديث كلمة المرور بنجاح' });
+      }
+
+      onClose();
+      form.reset();
+    } catch (e: any) {
+      toast({
+        title: 'خطأ في تحديث كلمة المرور',
+        description: e.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -179,9 +214,40 @@ const UserForm: React.FC<UserFormProps> = ({
               )}
             />
 
+            {user && (
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>كلمة المرور (اتركها فارغة للاحتفاظ بالحالية)</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="••••••"
+                          autoComplete="new-password"
+                          {...field}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((v) => !v)}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                          tabIndex={-1}
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <div className="flex gap-2 pt-4">
-              <Button type="submit" className="flex-1">
-                {user ? 'تحديث' : 'إضافة'}
+              <Button type="submit" className="flex-1" disabled={submitting}>
+                {submitting ? 'جارٍ الحفظ...' : user ? 'تحديث' : 'إضافة'}
               </Button>
               <Button type="button" variant="outline" onClick={onClose} className="flex-1">
                 إلغاء

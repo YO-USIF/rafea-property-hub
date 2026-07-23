@@ -20,6 +20,7 @@ interface Project {
   start_date: string;
   expected_completion: string;
   status: string;
+  zone?: string | null;
 }
 
 interface ProjectFormProps {

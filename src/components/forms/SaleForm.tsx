@@ -267,6 +267,32 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="zone">Zone (النطاق)</Label>
+              <Select
+                value={selectedZone || 'all'}
+                onValueChange={(value) => {
+                  const z = value === 'all' ? '' : value;
+                  setSelectedZone(z);
+                  // إعادة تعيين المشروع إذا لم يعد يطابق الـ Zone الجديد
+                  const current = projects.find(p => p.id === formData.project_id);
+                  if (z && current && !projectMatchesZone(current.name, z)) {
+                    setFormData(prev => ({ ...prev, project_id: '', project_name: '', unit_number: '' }));
+                  }
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر النطاق" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50">
+                  <SelectItem value="all">كل النطاقات</SelectItem>
+                  {ZONES.map((z) => (
+                    <SelectItem key={z} value={z}>Zone {z}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="project_id">المشروع</Label>
               <Select
                 value={formData.project_id}
@@ -276,11 +302,13 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
                   <SelectValue placeholder="اختر المشروع" />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50">
-                  {projects.map((project) => (
-                    <SelectItem key={project.id} value={project.id}>
-                      {project.name}
-                    </SelectItem>
-                  ))}
+                  {projects
+                    .filter((project) => !selectedZone || projectMatchesZone(project.name, selectedZone))
+                    .map((project) => (
+                      <SelectItem key={project.id} value={project.id}>
+                        {project.name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>

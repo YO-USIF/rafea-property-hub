@@ -32,7 +32,7 @@ interface Project {
 const ProjectsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [projects, setProjects] = useState<Project[]>([]);
-  const [zoneTotals, setZoneTotals] = useState<{ ZONE1: number; ZONE2: number }>({ ZONE1: 0, ZONE2: 0 });
+  const [zoneTotals, setZoneTotals] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | undefined>();
@@ -137,11 +137,12 @@ const ProjectsPage = () => {
       // حساب إجمالي تكلفة كل نطاق (Zone)
       const projectZoneMap: Record<string, string | null> = {};
       (projectsData || []).forEach((p: any) => { projectZoneMap[p.id] = p.zone; });
-      const zoneTotalsCalc = { ZONE1: 0, ZONE2: 0 };
+      const zoneTotalsCalc: Record<string, number> = {};
       const addZone = (zone: string | null | undefined, amount: number) => {
         const n = Number(amount) || 0;
-        if (zone === 'ZONE1') zoneTotalsCalc.ZONE1 += n;
-        else if (zone === 'ZONE2') zoneTotalsCalc.ZONE2 += n;
+        const key = (zone || '').trim();
+        if (!key) return;
+        zoneTotalsCalc[key] = (zoneTotalsCalc[key] || 0) + n;
       };
       (extractsData || []).forEach((e: any) => addZone(e.zone || (e.project_id ? projectZoneMap[e.project_id] : null), e.amount));
       (invoicesData || []).forEach((i: any) => addZone(i.zone || (i.project_id ? projectZoneMap[i.project_id] : null), i.amount));
@@ -297,30 +298,25 @@ const ProjectsPage = () => {
         </Card>
       </div>
 
-      {/* Zone Costs Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border-r-4 border-r-blue-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">تكلفة ZONE 1</CardTitle>
-            <TrendingUp className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{zoneTotals.ZONE1.toLocaleString()} ر.س</div>
-            <p className="text-xs text-muted-foreground">إجمالي المستخلصات والفواتير وأوامر التكليف للنطاق الأول</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-r-4 border-r-purple-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">تكلفة ZONE 2</CardTitle>
-            <TrendingUp className="h-4 w-4 text-purple-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-600">{zoneTotals.ZONE2.toLocaleString()} ر.س</div>
-            <p className="text-xs text-muted-foreground">إجمالي المستخلصات والفواتير وأوامر التكليف للنطاق الثاني</p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Zone Costs Cards - dynamic per zone */}
+      {Object.keys(zoneTotals).length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Object.entries(zoneTotals)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([zone, total]) => (
+              <Card key={zone} className="border-r-4 border-r-blue-500">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">تكلفة {zone}</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-blue-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-blue-600">{total.toLocaleString()} ر.س</div>
+                  <p className="text-xs text-muted-foreground">إجمالي المستخلصات والفواتير وأوامر التكليف لهذا النطاق</p>
+                </CardContent>
+              </Card>
+            ))}
+        </div>
+      )}
 
       {/* Projects Table */}
       <Card>

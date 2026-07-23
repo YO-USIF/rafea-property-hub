@@ -44,7 +44,8 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
     progress: 0,
     start_date: '',
     expected_completion: '',
-    status: 'قيد التنفيذ'
+    status: 'قيد التنفيذ',
+    zone: ''
   });
 
   useEffect(() => {

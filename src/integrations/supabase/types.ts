@@ -442,6 +442,7 @@ export type Database = {
           tax_included: boolean | null
           updated_at: string
           user_id: string
+          zone: string | null
         }
         Insert: {
           amount?: number
@@ -471,6 +472,7 @@ export type Database = {
           tax_included?: boolean | null
           updated_at?: string
           user_id: string
+          zone?: string | null
         }
         Update: {
           amount?: number
@@ -500,6 +502,7 @@ export type Database = {
           tax_included?: boolean | null
           updated_at?: string
           user_id?: string
+          zone?: string | null
         }
         Relationships: [
           {
@@ -673,6 +676,7 @@ export type Database = {
           supplier_name: string
           updated_at: string
           user_id: string
+          zone: string | null
         }
         Insert: {
           amount?: number
@@ -690,6 +694,7 @@ export type Database = {
           supplier_name: string
           updated_at?: string
           user_id: string
+          zone?: string | null
         }
         Update: {
           amount?: number
@@ -707,6 +712,7 @@ export type Database = {
           supplier_name?: string
           updated_at?: string
           user_id?: string
+          zone?: string | null
         }
         Relationships: [
           {

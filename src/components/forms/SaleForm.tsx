@@ -92,10 +92,6 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
           attached_file_url: sale.attached_file_url || '',
           attached_file_name: sale.attached_file_name || ''
         });
-        // استنتاج الـ Zone من اسم المشروع الحالي
-        const currentName = sale.project_name || projects.find(p => p.id === sale.project_id)?.name || '';
-        const inferred = ZONES.find(z => projectMatchesZone(currentName, z)) || '';
-        setSelectedZone(inferred);
       } else {
         // وضع الإضافة - إعادة تعيين النموذج
         setFormData({

@@ -60,7 +60,8 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
         progress: project.progress || 0,
         start_date: project.start_date || '',
         expected_completion: project.expected_completion || '',
-        status: project.status || 'قيد التنفيذ'
+        status: project.status || 'قيد التنفيذ',
+        zone: project.zone || ''
       });
     } else {
       setFormData({
@@ -73,7 +74,8 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
         progress: 0,
         start_date: '',
         expected_completion: '',
-        status: 'قيد التنفيذ'
+        status: 'قيد التنفيذ',
+        zone: ''
       });
     }
   }, [project, open]);

@@ -177,7 +177,8 @@ const ProjectsPage = () => {
 
   const filteredProjects = projects.filter(project =>
     project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    project.location.toLowerCase().includes(searchTerm.toLowerCase())
+    project.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (project.zone?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   );
 
   const getStatusBadge = (status: string) => {

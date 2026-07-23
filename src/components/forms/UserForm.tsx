@@ -61,6 +61,18 @@ const UserForm: React.FC<UserFormProps> = ({
     },
   });
 
+  useEffect(() => {
+    if (isOpen) {
+      form.reset({
+        full_name: user?.full_name || '',
+        email: user?.email || '',
+        phone: user?.phone || '',
+        department: user?.department || '',
+        status: user?.status || 'نشط',
+      });
+    }
+  }, [user, isOpen]);
+
   const handleSubmit = (data: UserFormData) => {
     onSubmit(data);
     onClose();

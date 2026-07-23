@@ -214,9 +214,40 @@ const UserForm: React.FC<UserFormProps> = ({
               )}
             />
 
+            {user && (
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>كلمة المرور (اتركها فارغة للاحتفاظ بالحالية)</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="••••••"
+                          autoComplete="new-password"
+                          {...field}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((v) => !v)}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                          tabIndex={-1}
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <div className="flex gap-2 pt-4">
-              <Button type="submit" className="flex-1">
-                {user ? 'تحديث' : 'إضافة'}
+              <Button type="submit" className="flex-1" disabled={submitting}>
+                {submitting ? 'جارٍ الحفظ...' : user ? 'تحديث' : 'إضافة'}
               </Button>
               <Button type="button" variant="outline" onClick={onClose} className="flex-1">
                 إلغاء

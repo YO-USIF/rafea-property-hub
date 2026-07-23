@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -60,6 +60,18 @@ const UserForm: React.FC<UserFormProps> = ({
       status: user?.status || 'نشط',
     },
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      form.reset({
+        full_name: user?.full_name || '',
+        email: user?.email || '',
+        phone: user?.phone || '',
+        department: user?.department || '',
+        status: user?.status || 'نشط',
+      });
+    }
+  }, [user, isOpen]);
 
   const handleSubmit = (data: UserFormData) => {
     onSubmit(data);

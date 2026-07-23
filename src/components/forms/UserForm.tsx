@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { Eye, EyeOff } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Profile } from '@/hooks/useProfiles';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const userSchema = z.object({
   full_name: z.string().min(1, 'الاسم مطلوب'),
@@ -33,6 +36,10 @@ const userSchema = z.object({
   phone: z.string().optional(),
   department: z.string().min(1, 'القسم مطلوب'),
   status: z.string().min(1, 'الحالة مطلوبة'),
+  password: z.string().optional().refine(
+    (v) => !v || v.length >= 6,
+    { message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' }
+  ),
 });
 
 type UserFormData = z.infer<typeof userSchema>;
@@ -41,7 +48,7 @@ interface UserFormProps {
   user?: Profile;
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: UserFormData) => void;
+  onSubmit: (data: Omit<UserFormData, 'password'>) => void;
 }
 
 const UserForm: React.FC<UserFormProps> = ({

@@ -42,11 +42,18 @@ interface SaleFormProps {
   description?: string;
 }
 
+const ZONES = ['A', 'B', 'C', 'D'] as const;
+const projectMatchesZone = (name: string, zone: string) => {
+  const re = new RegExp(`(^|[\\s\\-\\(\\/])${zone}(?=[\\s\\-\\)\\/]|$)`, 'i');
+  return re.test(name || '');
+};
+
 const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, description }: SaleFormProps) => {
   const { createSale, updateSale, sales } = useSales();
   const { projects } = useProjects();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [selectedZone, setSelectedZone] = useState<string>('');
   const [formData, setFormData] = useState<Sale>({
     customer_name: '',
     customer_phone: '',

@@ -31,6 +31,9 @@ interface Project {
 
 const ProjectsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [zoneFilter, setZoneFilter] = useState<string>('all');
+  const [minCost, setMinCost] = useState<string>('');
+  const [maxCost, setMaxCost] = useState<string>('');
   const [projects, setProjects] = useState<Project[]>([]);
   const [zoneTotals, setZoneTotals] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
@@ -191,11 +194,22 @@ const ProjectsPage = () => {
     setEditingProject(undefined);
   };
 
-  const filteredProjects = projects.filter(project =>
-    project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    project.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (project.zone?.toLowerCase() || '').includes(searchTerm.toLowerCase())
-  );
+  const availableZones = Array.from(new Set(projects.map(p => p.zone).filter(Boolean) as string[])).sort();
+
+  const filteredProjects = projects.filter(project => {
+    const term = searchTerm.trim().toLowerCase();
+    const matchesText = !term ||
+      project.name.toLowerCase().includes(term) ||
+      project.location.toLowerCase().includes(term) ||
+      (project.zone?.toLowerCase() || '').includes(term) ||
+      project.total_expenses.toString().includes(term) ||
+      project.total_sales.toString().includes(term);
+    const matchesZone = zoneFilter === 'all' || (project.zone || '') === zoneFilter;
+    const min = minCost === '' ? -Infinity : Number(minCost);
+    const max = maxCost === '' ? Infinity : Number(maxCost);
+    const matchesCost = project.total_expenses >= min && project.total_expenses <= max;
+    return matchesText && matchesZone && matchesCost;
+  });
 
   const getStatusBadge = (status: string) => {
     switch (status) {

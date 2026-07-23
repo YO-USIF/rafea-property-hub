@@ -238,6 +238,22 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="zone">النطاق (Zone)</Label>
+              <Select
+                value={formData.zone || ''}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, zone: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر النطاق" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ZONE1">ZONE1</SelectItem>
+                  <SelectItem value="ZONE2">ZONE2</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="start_date">تاريخ البداية</Label>
               <Input
                 id="start_date"

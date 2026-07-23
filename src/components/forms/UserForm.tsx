@@ -57,6 +57,10 @@ const UserForm: React.FC<UserFormProps> = ({
   onClose,
   onSubmit,
 }) => {
+  const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
   const form = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
     defaultValues: {
@@ -65,6 +69,7 @@ const UserForm: React.FC<UserFormProps> = ({
       phone: user?.phone || '',
       department: user?.department || '',
       status: user?.status || 'نشط',
+      password: '',
     },
   });
 
@@ -76,14 +81,37 @@ const UserForm: React.FC<UserFormProps> = ({
         phone: user?.phone || '',
         department: user?.department || '',
         status: user?.status || 'نشط',
+        password: '',
       });
+      setShowPassword(false);
     }
   }, [user, isOpen]);
 
-  const handleSubmit = (data: UserFormData) => {
-    onSubmit(data);
-    onClose();
-    form.reset();
+  const handleSubmit = async (data: UserFormData) => {
+    setSubmitting(true);
+    try {
+      const { password, ...profileData } = data;
+      onSubmit(profileData);
+
+      if (user && password && password.length > 0) {
+        const { error } = await supabase.functions.invoke('admin-update-user', {
+          body: { userId: user.user_id, password },
+        });
+        if (error) throw error;
+        toast({ title: 'تم تحديث كلمة المرور بنجاح' });
+      }
+
+      onClose();
+      form.reset();
+    } catch (e: any) {
+      toast({
+        title: 'خطأ في تحديث كلمة المرور',
+        description: e.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

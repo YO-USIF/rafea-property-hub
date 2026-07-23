@@ -36,6 +36,7 @@ interface Extract {
   payment_type?: string;
   installments_count?: number;
   installment_amount?: number;
+  zone?: string | null;
 }
 
 interface ExtractFormProps {
@@ -74,6 +75,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
     payment_type: extract?.payment_type || 'كامل',
     installments_count: extract?.installments_count || 1,
     installment_amount: extract?.installment_amount || 0,
+    zone: extract?.zone ?? null,
   });
 
   // تحديث البيانات عند تغيير العنصر المرسل للتعديل
@@ -101,6 +103,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         payment_type: extract.payment_type || 'كامل',
         installments_count: extract.installments_count || 1,
         installment_amount: extract.installment_amount || 0,
+        zone: extract.zone ?? null,
       });
     } else {
       setFormData({
@@ -124,6 +127,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         payment_type: 'كامل',
         installments_count: 1,
         installment_amount: 0,
+        zone: null,
       });
     }
   }, [extract]);
@@ -185,6 +189,7 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         payment_type: formData.payment_type || 'كامل',
         installments_count: formData.payment_type === 'دفعات' ? Number(formData.installments_count || 2) : 1,
         installment_amount: formData.payment_type === 'دفعات' ? Number(formData.installment_amount || 0) : 0,
+        zone: formData.zone || null,
       };
 
       // التحقق من صحة البيانات باستخدام Zod
@@ -276,12 +281,13 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
               <Select
                 value={formData.project_id}
                 onValueChange={(value) => {
-                  const selectedProject = projects.find((p: any) => p.id === value);
+                  const selectedProject: any = projects.find((p: any) => p.id === value);
                   setFormData(prev => ({ 
                     ...prev, 
                     project_id: value === "none" ? "" : value,
                     project_name: value === "none" ? "" : value === "multiple" ? "المشروعين مع بعض" : value === "external" ? prev.project_name : (selectedProject ? selectedProject.name : ""),
-                    is_external_project: value === "external"
+                    is_external_project: value === "external",
+                    zone: selectedProject?.zone ?? (value === "none" || value === "external" ? prev.zone : prev.zone) ?? null,
                   }));
                 }}
               >

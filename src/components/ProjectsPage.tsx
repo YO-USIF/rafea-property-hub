@@ -297,6 +297,31 @@ const ProjectsPage = () => {
         </Card>
       </div>
 
+      {/* Zone Costs Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="border-r-4 border-r-blue-500">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">تكلفة ZONE 1</CardTitle>
+            <TrendingUp className="h-4 w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">{zoneTotals.ZONE1.toLocaleString()} ر.س</div>
+            <p className="text-xs text-muted-foreground">إجمالي المستخلصات والفواتير وأوامر التكليف للنطاق الأول</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-r-4 border-r-purple-500">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">تكلفة ZONE 2</CardTitle>
+            <TrendingUp className="h-4 w-4 text-purple-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-600">{zoneTotals.ZONE2.toLocaleString()} ر.س</div>
+            <p className="text-xs text-muted-foreground">إجمالي المستخلصات والفواتير وأوامر التكليف للنطاق الثاني</p>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Projects Table */}
       <Card>
         <CardHeader>

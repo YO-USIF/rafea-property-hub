@@ -341,6 +341,7 @@ const ProjectsPage = () => {
                 {filteredProjects.map((project) => (
                   <TableRow key={project.id}>
                     <TableCell className="font-medium">{project.name}</TableCell>
+                    <TableCell>{project.zone || '-'}</TableCell>
                     <TableCell>{project.type}</TableCell>
                     <TableCell>{project.location}</TableCell>
                     <TableCell>{project.sold_units}/{project.total_units}</TableCell>

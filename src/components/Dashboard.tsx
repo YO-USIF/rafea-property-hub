@@ -11,7 +11,10 @@ import {
   CheckCircle,
   Plus,
   FileText,
-  Wrench
+  Wrench,
+  Bell,
+  Info,
+  AlertTriangle
 } from 'lucide-react';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useAuth } from '@/hooks/useAuth';
@@ -20,8 +23,9 @@ import { getDisplayName } from '@/lib/userDisplayNames';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { isLoading, stats, recentActivities, upcomingTasks } = useDashboardData();
-  const { createNotification } = useNotifications();
+  const { isLoading, stats, recentActivities } = useDashboardData();
+  const { notifications, markAsRead } = useNotifications();
+  const userNotifications = (notifications || []).slice(0, 6);
   const isSystemAdmin = user?.email === 'wwork9575@gmail.com';
 
   const formatCurrency = (value: number) => {
@@ -147,35 +151,43 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Upcoming Tasks */}
+        {/* Notifications */}
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">المهام القادمة</h2>
-            <button className="text-primary hover:text-primary/80 text-sm font-medium">
-              إضافة مهمة
-            </button>
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <Bell className="w-5 h-5 text-primary" />
+              الإشعارات
+            </h2>
           </div>
-          <div className="space-y-4">
-            {upcomingTasks.length > 0 ? (
-              upcomingTasks.map((task) => (
-                <div key={task.id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors">
-                  <div className="flex items-center space-x-3 space-x-reverse">
-                    <div className={`w-3 h-3 rounded-full ${
-                      task.priority === 'high' ? 'bg-red-500' :
-                      task.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
-                    }`}></div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{task.title}</p>
-                      <p className="text-xs text-gray-500">{task.due}</p>
+          <div className="space-y-3">
+            {userNotifications.length > 0 ? (
+              userNotifications.map((n) => {
+                const Icon = n.type === 'warning' ? AlertTriangle : n.type === 'success' ? CheckCircle : Info;
+                const color = n.type === 'warning' ? 'text-yellow-500' : n.type === 'success' ? 'text-green-500' : 'text-blue-500';
+                return (
+                  <div
+                    key={n.id}
+                    onClick={() => !n.read && markAsRead(n.id)}
+                    className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                      n.read ? 'hover:bg-gray-50' : 'bg-blue-50 hover:bg-blue-100'
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 mt-0.5 flex-shrink-0 ${color}`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900">{n.title}</p>
+                      <p className="text-xs text-gray-600 mt-1 line-clamp-2">{n.message}</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {new Date(n.created_at).toLocaleDateString('en-GB')}
+                      </p>
                     </div>
+                    {!n.read && <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>}
                   </div>
-                  <CheckCircle className="w-4 h-4 text-gray-400 hover:text-green-500 cursor-pointer transition-colors" />
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="text-center py-8 text-gray-500">
-                <p>لا توجد مهام عاجلة</p>
-                <p className="text-xs mt-1">المهام العاجلة ستظهر هنا</p>
+                <p>لا توجد إشعارات</p>
+                <p className="text-xs mt-1">ستظهر إشعاراتك هنا</p>
               </div>
             )}
           </div>

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Search, Building, MapPin, Calendar, TrendingUp, Edit, Trash2, Printer } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -339,16 +340,48 @@ const ProjectsPage = () => {
           <CardDescription>جميع المشاريع العقارية وحالة تطويرها</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4 mb-6">
-            <div className="relative flex-1">
+          <div className="flex flex-wrap gap-3 mb-6 items-end">
+            <div className="relative flex-1 min-w-[220px]">
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
-                placeholder="البحث في المشاريع..."
+                placeholder="البحث بالاسم / الموقع / النطاق / المبلغ..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pr-10"
               />
             </div>
+            <div className="w-[160px]">
+              <Select value={zoneFilter} onValueChange={setZoneFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="النطاق" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">كل النطاقات</SelectItem>
+                  {availableZones.map(z => (
+                    <SelectItem key={z} value={z}>{z}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Input
+              type="number"
+              placeholder="أدنى تكلفة"
+              value={minCost}
+              onChange={(e) => setMinCost(e.target.value)}
+              className="w-[140px]"
+            />
+            <Input
+              type="number"
+              placeholder="أعلى تكلفة"
+              value={maxCost}
+              onChange={(e) => setMaxCost(e.target.value)}
+              className="w-[140px]"
+            />
+            {(searchTerm || zoneFilter !== 'all' || minCost || maxCost) && (
+              <Button variant="ghost" onClick={() => { setSearchTerm(''); setZoneFilter('all'); setMinCost(''); setMaxCost(''); }}>
+                مسح الفلاتر
+              </Button>
+            )}
             <Button variant="outline" onClick={() => {
               const headers = "اسم المشروع,النطاق,النوع,الموقع,الوحدات المباعة,إجمالي الوحدات,نسبة الإنجاز,إجمالي المبيعات,التكلفة الإجمالية,الحالة,تاريخ الانتهاء المتوقع\n";
               const csvContent = headers + 

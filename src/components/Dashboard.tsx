@@ -11,7 +11,10 @@ import {
   CheckCircle,
   Plus,
   FileText,
-  Wrench
+  Wrench,
+  Bell,
+  Info,
+  AlertTriangle
 } from 'lucide-react';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useAuth } from '@/hooks/useAuth';
@@ -20,8 +23,9 @@ import { getDisplayName } from '@/lib/userDisplayNames';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { isLoading, stats, recentActivities, upcomingTasks } = useDashboardData();
-  const { createNotification } = useNotifications();
+  const { isLoading, stats, recentActivities } = useDashboardData();
+  const { notifications, markAsRead } = useNotifications();
+  const userNotifications = (notifications || []).slice(0, 6);
   const isSystemAdmin = user?.email === 'wwork9575@gmail.com';
 
   const formatCurrency = (value: number) => {

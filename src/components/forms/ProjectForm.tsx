@@ -20,6 +20,7 @@ interface Project {
   start_date: string;
   expected_completion: string;
   status: string;
+  zone?: string | null;
 }
 
 interface ProjectFormProps {
@@ -43,7 +44,8 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
     progress: 0,
     start_date: '',
     expected_completion: '',
-    status: 'قيد التنفيذ'
+    status: 'قيد التنفيذ',
+    zone: ''
   });
 
   useEffect(() => {
@@ -58,7 +60,8 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
         progress: project.progress || 0,
         start_date: project.start_date || '',
         expected_completion: project.expected_completion || '',
-        status: project.status || 'قيد التنفيذ'
+        status: project.status || 'قيد التنفيذ',
+        zone: project.zone || ''
       });
     } else {
       setFormData({
@@ -71,7 +74,8 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
         progress: 0,
         start_date: '',
         expected_completion: '',
-        status: 'قيد التنفيذ'
+        status: 'قيد التنفيذ',
+        zone: ''
       });
     }
   }, [project, open]);
@@ -229,6 +233,22 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
                   <SelectItem value="قيد التنفيذ">قيد التنفيذ</SelectItem>
                   <SelectItem value="مكتمل">مكتمل</SelectItem>
                   <SelectItem value="متوقف">متوقف</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="zone">النطاق (Zone)</Label>
+              <Select
+                value={formData.zone || ''}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, zone: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر النطاق" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ZONE1">ZONE1</SelectItem>
+                  <SelectItem value="ZONE2">ZONE2</SelectItem>
                 </SelectContent>
               </Select>
             </div>

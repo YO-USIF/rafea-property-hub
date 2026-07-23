@@ -325,6 +325,7 @@ const ProjectsPage = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-right">اسم المشروع</TableHead>
+                  <TableHead className="text-right">النطاق</TableHead>
                   <TableHead className="text-right">النوع</TableHead>
                   <TableHead className="text-right">الموقع</TableHead>
                   <TableHead className="text-right">الوحدات</TableHead>

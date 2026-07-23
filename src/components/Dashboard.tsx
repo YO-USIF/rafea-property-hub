@@ -16,14 +16,12 @@ import {
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
-import { useZoneCosts } from '@/hooks/useZoneCosts';
 import { getDisplayName } from '@/lib/userDisplayNames';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { isLoading, stats, recentActivities, upcomingTasks } = useDashboardData();
   const { createNotification } = useNotifications();
-  const { data: zoneCosts } = useZoneCosts();
 
   const formatCurrency = (value: number) => {
     if (value >= 1000000) {
@@ -117,25 +115,6 @@ const Dashboard = () => {
         })}
       </div>
 
-      {/* Zone Costs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-r-blue-500 animate-slide-up">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-600">تكلفة ZONE 1</h3>
-            <span className="text-xs px-2 py-1 rounded bg-blue-50 text-blue-700">النطاق الأول</span>
-          </div>
-          <p className="text-2xl font-bold text-blue-600">{formatCurrency(zoneCosts?.ZONE1 || 0)}</p>
-          <p className="text-xs text-gray-500 mt-1">مستخلصات + فواتير + أوامر تكليف</p>
-        </div>
-        <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-r-purple-500 animate-slide-up">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-600">تكلفة ZONE 2</h3>
-            <span className="text-xs px-2 py-1 rounded bg-purple-50 text-purple-700">النطاق الثاني</span>
-          </div>
-          <p className="text-2xl font-bold text-purple-600">{formatCurrency(zoneCosts?.ZONE2 || 0)}</p>
-          <p className="text-xs text-gray-500 mt-1">مستخلصات + فواتير + أوامر تكليف</p>
-        </div>
-      </div>
 
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

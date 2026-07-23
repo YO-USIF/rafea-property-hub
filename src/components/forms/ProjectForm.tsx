@@ -239,18 +239,18 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
 
             <div className="space-y-2">
               <Label htmlFor="zone">النطاق (Zone)</Label>
-              <Select
+              <Input
+                id="zone"
                 value={formData.zone || ''}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, zone: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر النطاق" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ZONE1">ZONE1</SelectItem>
-                  <SelectItem value="ZONE2">ZONE2</SelectItem>
-                </SelectContent>
-              </Select>
+                onChange={(e) => setFormData(prev => ({ ...prev, zone: e.target.value }))}
+                placeholder="مثال: ZONE1، ZONE2، ZONE3 ..."
+                list="zones-list"
+              />
+              <datalist id="zones-list">
+                <option value="ZONE1" />
+                <option value="ZONE2" />
+              </datalist>
+              <p className="text-xs text-muted-foreground">يمكن إدخال أي نطاق جديد للمشاريع القادمة</p>
             </div>
 
             <div className="space-y-2">

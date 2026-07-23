@@ -320,6 +320,24 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
               </div>
             )}
 
+            <div className="space-y-2">
+              <Label htmlFor="zone">النطاق (Zone)</Label>
+              <Select
+                value={formData.zone || "none"}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, zone: value === "none" ? null : value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر النطاق" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">بدون نطاق</SelectItem>
+                  <SelectItem value="ZONE1">ZONE1</SelectItem>
+                  <SelectItem value="ZONE2">ZONE2</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">يُستمد تلقائياً من المشروع، ويمكن تعديله يدوياً</p>
+            </div>
+
             <div className="space-y-2 md:col-span-2">
               <div className="flex items-center space-x-2 space-x-reverse">
                 <Checkbox

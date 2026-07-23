@@ -300,10 +300,10 @@ const ProjectsPage = () => {
               />
             </div>
             <Button variant="outline" onClick={() => {
-              const headers = "اسم المشروع,النوع,الموقع,الوحدات المباعة,إجمالي الوحدات,نسبة الإنجاز,إجمالي المبيعات,التكلفة الإجمالية,الحالة,تاريخ الانتهاء المتوقع\n";
+              const headers = "اسم المشروع,النطاق,النوع,الموقع,الوحدات المباعة,إجمالي الوحدات,نسبة الإنجاز,إجمالي المبيعات,التكلفة الإجمالية,الحالة,تاريخ الانتهاء المتوقع\n";
               const csvContent = headers + 
                 filteredProjects.map(project => 
-                  `${project.name},${project.type},${project.location},${project.sold_units},${project.total_units},${project.progress}%,${project.total_sales},${project.total_expenses},${project.status},${project.expected_completion}`
+                  `${project.name},${project.zone || ''},${project.type},${project.location},${project.sold_units},${project.total_units},${project.progress}%,${project.total_sales},${project.total_expenses},${project.status},${project.expected_completion}`
                 ).join("\n");
               
               // إضافة BOM للتعامل مع الترميز العربي بشكل صحيح

@@ -50,14 +50,14 @@ const Dashboard = () => {
       gradient: 'gradient-gold',
       changePositive: true
     },
-    {
+    ...(isSystemAdmin ? [{
       title: 'إجمالي الإيرادات',
       value: formatCurrency(stats.totalRevenue),
       change: stats.totalRevenue > 0 ? 'إيرادات متوقعة' : 'لا توجد إيرادات',
       icon: DollarSign,
       gradient: 'gradient-navy',
       changePositive: true
-    },
+    }] : []),
     {
       title: 'المتعاونون النشطون',
       value: stats.activeContractors.toString(),

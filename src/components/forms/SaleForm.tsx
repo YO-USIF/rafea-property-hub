@@ -42,18 +42,12 @@ interface SaleFormProps {
   description?: string;
 }
 
-const ZONES = ['A', 'B', 'C', 'D'] as const;
-const projectMatchesZone = (name: string, zone: string) => {
-  const re = new RegExp(`(^|[\\s\\-\\(\\/])${zone}(?=[\\s\\-\\)\\/]|$)`, 'i');
-  return re.test(name || '');
-};
 
 const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, description }: SaleFormProps) => {
   const { createSale, updateSale, sales } = useSales();
   const { projects } = useProjects();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [selectedZone, setSelectedZone] = useState<string>('');
   const [formData, setFormData] = useState<Sale>({
     customer_name: '',
     customer_phone: '',
@@ -98,10 +92,6 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
           attached_file_url: sale.attached_file_url || '',
           attached_file_name: sale.attached_file_name || ''
         });
-        // استنتاج الـ Zone من اسم المشروع الحالي
-        const currentName = sale.project_name || projects.find(p => p.id === sale.project_id)?.name || '';
-        const inferred = ZONES.find(z => projectMatchesZone(currentName, z)) || '';
-        setSelectedZone(inferred);
       } else {
         // وضع الإضافة - إعادة تعيين النموذج
         setFormData({
@@ -123,7 +113,7 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
           attached_file_url: '',
           attached_file_name: ''
         });
-        setSelectedZone('');
+        
       }
     }
   }, [open, sale]);
@@ -267,32 +257,6 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="zone">Zone (النطاق)</Label>
-              <Select
-                value={selectedZone || 'all'}
-                onValueChange={(value) => {
-                  const z = value === 'all' ? '' : value;
-                  setSelectedZone(z);
-                  // إعادة تعيين المشروع إذا لم يعد يطابق الـ Zone الجديد
-                  const current = projects.find(p => p.id === formData.project_id);
-                  if (z && current && !projectMatchesZone(current.name, z)) {
-                    setFormData(prev => ({ ...prev, project_id: '', project_name: '', unit_number: '' }));
-                  }
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر النطاق" />
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50">
-                  <SelectItem value="all">كل النطاقات</SelectItem>
-                  {ZONES.map((z) => (
-                    <SelectItem key={z} value={z}>Zone {z}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="project_id">المشروع</Label>
               <Select
                 value={formData.project_id}
@@ -302,16 +266,15 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
                   <SelectValue placeholder="اختر المشروع" />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50">
-                  {projects
-                    .filter((project) => !selectedZone || projectMatchesZone(project.name, selectedZone))
-                    .map((project) => (
-                      <SelectItem key={project.id} value={project.id}>
-                        {project.name}
-                      </SelectItem>
-                    ))}
+                  {projects.map((project) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
+
 
             <div className="space-y-2">
               <Label htmlFor="unit_number">رقم الوحدة</Label>

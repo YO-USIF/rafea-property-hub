@@ -113,7 +113,7 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
           attached_file_url: '',
           attached_file_name: ''
         });
-        setSelectedZone('');
+        
       }
     }
   }, [open, sale]);

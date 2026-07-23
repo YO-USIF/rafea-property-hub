@@ -322,20 +322,18 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
 
             <div className="space-y-2">
               <Label htmlFor="zone">النطاق (Zone)</Label>
-              <Select
-                value={formData.zone || "none"}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, zone: value === "none" ? null : value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر النطاق" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">بدون نطاق</SelectItem>
-                  <SelectItem value="ZONE1">ZONE1</SelectItem>
-                  <SelectItem value="ZONE2">ZONE2</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">يُستمد تلقائياً من المشروع، ويمكن تعديله يدوياً</p>
+              <Input
+                id="zone"
+                value={formData.zone || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, zone: e.target.value || null }))}
+                placeholder="يُستمد من المشروع أو أدخل نطاقاً"
+                list="extract-zones-list"
+              />
+              <datalist id="extract-zones-list">
+                <option value="ZONE1" />
+                <option value="ZONE2" />
+              </datalist>
+              <p className="text-xs text-muted-foreground">يدعم أي نطاق للمشاريع الحالية والقادمة</p>
             </div>
 
             <div className="space-y-2 md:col-span-2">

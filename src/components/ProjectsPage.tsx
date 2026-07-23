@@ -32,6 +32,7 @@ interface Project {
 const ProjectsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [projects, setProjects] = useState<Project[]>([]);
+  const [zoneTotals, setZoneTotals] = useState<{ ZONE1: number; ZONE2: number }>({ ZONE1: 0, ZONE2: 0 });
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | undefined>();
@@ -64,14 +65,14 @@ const ProjectsPage = () => {
       // جلب بيانات المستخلصات
       const { data: extractsData, error: extractsError } = await supabase
         .from('extracts')
-        .select('project_id, amount');
+        .select('project_id, amount, zone');
 
       if (extractsError) throw extractsError;
 
       // جلب بيانات الفواتير
       const { data: invoicesData, error: invoicesError } = await supabase
         .from('invoices')
-        .select('project_id, amount');
+        .select('project_id, amount, zone');
 
       if (invoicesError) throw invoicesError;
 
@@ -132,6 +133,20 @@ const ProjectsPage = () => {
         total_sales: salesByProject?.[project.id] || 0,
         total_expenses: expensesByProject?.[project.id] || 0
       }));
+
+      // حساب إجمالي تكلفة كل نطاق (Zone)
+      const projectZoneMap: Record<string, string | null> = {};
+      (projectsData || []).forEach((p: any) => { projectZoneMap[p.id] = p.zone; });
+      const zoneTotalsCalc = { ZONE1: 0, ZONE2: 0 };
+      const addZone = (zone: string | null | undefined, amount: number) => {
+        const n = Number(amount) || 0;
+        if (zone === 'ZONE1') zoneTotalsCalc.ZONE1 += n;
+        else if (zone === 'ZONE2') zoneTotalsCalc.ZONE2 += n;
+      };
+      (extractsData || []).forEach((e: any) => addZone(e.zone || (e.project_id ? projectZoneMap[e.project_id] : null), e.amount));
+      (invoicesData || []).forEach((i: any) => addZone(i.zone || (i.project_id ? projectZoneMap[i.project_id] : null), i.amount));
+      (assignmentOrdersData || []).forEach((a: any) => addZone(a.project_id ? projectZoneMap[a.project_id] : null, a.amount));
+      setZoneTotals(zoneTotalsCalc);
 
       setProjects(updatedProjects || []);
     } catch (error: any) {

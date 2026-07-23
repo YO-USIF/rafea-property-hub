@@ -22,6 +22,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   const { isLoading, stats, recentActivities, upcomingTasks } = useDashboardData();
   const { createNotification } = useNotifications();
+  const isSystemAdmin = user?.email === 'wwork9575@gmail.com';
 
   const formatCurrency = (value: number) => {
     if (value >= 1000000) {

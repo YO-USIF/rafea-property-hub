@@ -48,7 +48,6 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
   const { projects } = useProjects();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [selectedZone, setSelectedZone] = useState<string>('');
   const [formData, setFormData] = useState<Sale>({
     customer_name: '',
     customer_phone: '',

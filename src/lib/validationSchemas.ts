@@ -120,6 +120,7 @@ export const invoiceFormSchema = z.object({
   
   attached_file_url: z.string().optional(),
   attached_file_name: z.string().optional(),
+  zone: z.string().nullable().optional(),
 }).refine((data) => {
   // التحقق من أن تاريخ الاستحقاق بعد أو يساوي تاريخ الفاتورة
   if (data.invoice_date && data.due_date) {
@@ -196,6 +197,7 @@ export const extractFormSchema = z.object({
   payment_type: z.string().optional(),
   installments_count: z.number().min(1).max(24).optional(),
   installment_amount: z.number().min(0).optional(),
+  zone: z.string().nullable().optional(),
 }).refine((data) => {
   // التحقق من أن المبلغ قبل الضريبة + الضريبة = المبلغ الإجمالي (إذا كانت الضريبة مفعلة)
   if (data.tax_included && data.amount_before_tax !== undefined && data.tax_amount !== undefined) {

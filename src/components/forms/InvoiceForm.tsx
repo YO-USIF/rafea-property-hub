@@ -26,6 +26,7 @@ interface Invoice {
   status: string;
   attached_file_url?: string;
   attached_file_name?: string;
+  zone?: string | null;
 }
 
 interface InvoiceFormProps {
@@ -52,7 +53,8 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
     due_date: invoice?.due_date || '',
     status: invoice?.status || 'غير مدفوع',
     attached_file_url: invoice?.attached_file_url || '',
-    attached_file_name: invoice?.attached_file_name || ''
+    attached_file_name: invoice?.attached_file_name || '',
+    zone: invoice?.zone ?? null,
   });
 
   // تحديث البيانات عند تغيير العنصر المرسل للتعديل
@@ -68,7 +70,8 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
         due_date: invoice.due_date || '',
         status: invoice.status || 'غير مدفوع',
         attached_file_url: invoice.attached_file_url || '',
-        attached_file_name: invoice.attached_file_name || ''
+        attached_file_name: invoice.attached_file_name || '',
+        zone: invoice.zone ?? null,
       });
     } else {
       // إعادة تعيين النموذج للإضافة الجديدة
@@ -82,7 +85,8 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
         due_date: '',
         status: 'غير مدفوع',
         attached_file_url: '',
-        attached_file_name: ''
+        attached_file_name: '',
+        zone: null,
       });
     }
   }, [invoice]);
@@ -102,7 +106,8 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
         due_date: formData.due_date,
         status: formData.status,
         attached_file_url: formData.attached_file_url,
-        attached_file_name: formData.attached_file_name
+        attached_file_name: formData.attached_file_name,
+        zone: formData.zone || null,
       };
 
       // التحقق من صحة البيانات باستخدام Zod
@@ -188,7 +193,14 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
               <Label htmlFor="project">المشروع</Label>
               <Select
                 value={formData.project_id || "none"}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, project_id: value === "none" ? null : value }))}
+                onValueChange={(value) => {
+                  const selected: any = projects.find((p: any) => p.id === value);
+                  setFormData(prev => ({
+                    ...prev,
+                    project_id: value === "none" ? null : value,
+                    zone: selected?.zone ?? prev.zone ?? null,
+                  }));
+                }}
                 disabled={!isManager && !isAdmin && !!invoice}
               >
                 <SelectTrigger>
@@ -204,6 +216,24 @@ const InvoiceForm = ({ open, onOpenChange, invoice, onSuccess }: InvoiceFormProp
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="zone">النطاق (Zone)</Label>
+              <Select
+                value={formData.zone || "none"}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, zone: value === "none" ? null : value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر النطاق" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">بدون نطاق</SelectItem>
+                  <SelectItem value="ZONE1">ZONE1</SelectItem>
+                  <SelectItem value="ZONE2">ZONE2</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">يُستمد تلقائياً من المشروع، ويمكن تعديله يدوياً</p>
             </div>
 
             <div className="space-y-2">

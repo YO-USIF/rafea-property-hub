@@ -91,7 +91,7 @@ const ReportsPage = () => {
     return query;
   };
 
-  const { data: salesData = [] } = useQuery({
+  const { data: salesDataRaw = [] } = useQuery({
     queryKey: ['sales-report', startDate, endDate],
     queryFn: async () => {
       let query = supabase.from('sales').select('*');
@@ -103,7 +103,7 @@ const ReportsPage = () => {
     enabled: !!user?.id,
   });
 
-  const { data: invoicesData = [] } = useQuery({
+  const { data: invoicesDataRaw = [] } = useQuery({
     queryKey: ['invoices-report', startDate, endDate],
     queryFn: async () => {
       let query = supabase.from('invoices').select('*');
@@ -115,7 +115,7 @@ const ReportsPage = () => {
     enabled: !!user?.id,
   });
 
-  const { data: purchasesData = [] } = useQuery({
+  const { data: purchasesDataRaw = [] } = useQuery({
     queryKey: ['purchases-report', startDate, endDate],
     queryFn: async () => {
       let query = supabase.from('purchases').select('*');
@@ -127,7 +127,7 @@ const ReportsPage = () => {
     enabled: !!user?.id,
   });
 
-  const { data: extractsData = [] } = useQuery({
+  const { data: extractsDataRaw = [] } = useQuery({
     queryKey: ['extracts-report', startDate, endDate],
     queryFn: async () => {
       let query = supabase.from('extracts').select('*');
@@ -173,7 +173,7 @@ const ReportsPage = () => {
     enabled: !!user?.id,
   });
 
-  const { data: assignmentOrdersData = [] } = useQuery({
+  const { data: assignmentOrdersDataRaw = [] } = useQuery({
     queryKey: ['assignment-orders-report', startDate, endDate],
     queryFn: async () => {
       let query = supabase.from('assignment_orders').select('*');

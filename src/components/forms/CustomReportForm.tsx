@@ -24,11 +24,20 @@ interface CustomReportFormProps {
 const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormProps) => {
   const { toast } = useToast();
   const { projects } = useProjects();
+  const [selectedZone, setSelectedZone] = useState<string>('all');
   const [selectedProjectId, setSelectedProjectId] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [showReport, setShowReport] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
+
+  const availableZones = Array.from(
+    new Set((projects || []).map((p: any) => p.zone).filter(Boolean))
+  ) as string[];
+
+  const filteredProjects = selectedZone === 'all'
+    ? projects
+    : (projects || []).filter((p: any) => p.zone === selectedZone);
 
   // جلب بيانات المبيعات
   const { data: salesData = [] } = useQuery({

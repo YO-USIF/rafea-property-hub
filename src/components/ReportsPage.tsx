@@ -226,7 +226,7 @@ const ReportsPage = () => {
 
   // Generate project detailed report
   const generateProjectDetailedReport = () => {
-    return projectsData.map(project => {
+    return projectsDataFiltered.map(project => {
       const pSales = salesData.filter(s => s.project_id === project.id);
       const pInvoices = invoicesData.filter(i => i.project_id === project.id);
       const pExtracts = extractsData.filter(e => e.project_id === project.id);
@@ -245,7 +245,7 @@ const ReportsPage = () => {
   };
 
   const generateProjectCostCenterReport = () => {
-    return projectsData.map(project => {
+    return projectsDataFiltered.map(project => {
       const pInvoices = invoicesData.filter(i => i.project_id === project.id);
       const pExtracts = extractsData.filter(e => e.project_id === project.id);
       const invoiceCosts = pInvoices.reduce((sum, i) => sum + (i.amount || 0), 0);
@@ -279,7 +279,7 @@ const ReportsPage = () => {
         };
         break;
       case 'project-progress': reportData = projectsData; break;
-      case 'delayed-projects': reportData = projectsData.filter(p => p.status === 'متأخر' || (p.progress < 50 && new Date(p.expected_completion) < new Date())); break;
+      case 'delayed-projects': reportData = projectsDataFiltered.filter(p => p.status === 'متأخر' || (p.progress < 50 && new Date(p.expected_completion) < new Date())); break;
       case 'tasks': reportData = tasksData; break;
       case 'completed-tasks': reportData = tasksData.filter(t => t.status === 'مكتملة'); break;
       case 'maintenance': reportData = maintenanceData; break;

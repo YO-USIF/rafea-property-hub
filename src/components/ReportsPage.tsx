@@ -586,7 +586,7 @@ const ReportsPage = () => {
       <Card>
         <CardHeader>
           <CardTitle>إعدادات التقارير</CardTitle>
-          <CardDescription>اختر الفترة الزمنية</CardDescription>
+          <CardDescription>اختر الفترة الزمنية والنطاق</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4 items-center flex-wrap">
@@ -597,12 +597,31 @@ const ReportsPage = () => {
                 </Button>
               ))}
             </div>
+            {availableZones.length > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">النطاق:</span>
+                <Select value={selectedZone} onValueChange={setSelectedZone}>
+                  <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">جميع النطاقات</SelectItem>
+                    {availableZones.map(z => (
+                      <SelectItem key={z} value={z}>{z}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="flex gap-2 mr-auto">
               <Input type="date" className="w-40" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
               <span className="flex items-center text-muted-foreground">إلى</span>
               <Input type="date" className="w-40" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
             </div>
           </div>
+          {selectedZone !== 'all' && (
+            <div className="mt-3 text-sm text-primary">
+              التقارير مفلترة على مشاريع النطاق: <strong>{selectedZone}</strong>
+            </div>
+          )}
         </CardContent>
       </Card>
 

@@ -224,15 +224,34 @@ const ReportsPage = () => {
     { title: 'صافي الربح', value: formatCurrency(totalRevenue - totalExpenses), description: 'ريال سعودي', icon: TrendingUp, color: 'text-orange-600' }
   ];
 
+  // Helpers: group project IDs by zone for shared-cost distribution
+  const projectsInZone = (zoneKey: string) =>
+    (projectsData || []).filter((p: any) => (p.zone || '').trim() === zoneKey);
+  const zoneRowsFilter = (rows: any[], zoneKey: string, ids: Set<string>) =>
+    rows.filter((r: any) => ((r.zone || '').trim() === zoneKey) || (r.project_id && ids.has(r.project_id)));
+
   // Generate project detailed report
   const generateProjectDetailedReport = () => {
     return projectsDataFiltered.map(project => {
+      const zoneKey = (project.zone || '').trim();
       const pSales = salesData.filter(s => s.project_id === project.id);
-      const pInvoices = invoicesData.filter(i => i.project_id === project.id);
-      const pExtracts = extractsData.filter(e => e.project_id === project.id);
       const totalS = pSales.reduce((sum, s) => sum + (s.price || 0), 0);
-      const totalI = pInvoices.reduce((sum, i) => sum + (i.amount || 0), 0);
-      const totalE = pExtracts.reduce((sum, e) => sum + (e.amount || 0), 0);
+
+      let pInvoices: any[], pExtracts: any[], totalI: number, totalE: number, share = 1;
+      if (zoneKey) {
+        const zProjects = projectsInZone(zoneKey);
+        const zIds = new Set(zProjects.map((p: any) => p.id));
+        share = Math.max(zProjects.length, 1);
+        pInvoices = zoneRowsFilter(invoicesData, zoneKey, zIds);
+        pExtracts = zoneRowsFilter(extractsData, zoneKey, zIds);
+        totalI = pInvoices.reduce((sum, i) => sum + (i.amount || 0), 0) / share;
+        totalE = pExtracts.reduce((sum, e) => sum + (e.amount || 0), 0) / share;
+      } else {
+        pInvoices = invoicesData.filter(i => i.project_id === project.id);
+        pExtracts = extractsData.filter(e => e.project_id === project.id);
+        totalI = pInvoices.reduce((sum, i) => sum + (i.amount || 0), 0);
+        totalE = pExtracts.reduce((sum, e) => sum + (e.amount || 0), 0);
+      }
       return {
         id: project.id, name: project.name,
         totalSales: totalS, salesCount: pSales.length,
@@ -246,10 +265,22 @@ const ReportsPage = () => {
 
   const generateProjectCostCenterReport = () => {
     return projectsDataFiltered.map(project => {
-      const pInvoices = invoicesData.filter(i => i.project_id === project.id);
-      const pExtracts = extractsData.filter(e => e.project_id === project.id);
-      const invoiceCosts = pInvoices.reduce((sum, i) => sum + (i.amount || 0), 0);
-      const extractCosts = pExtracts.reduce((sum, e) => sum + (e.amount || 0), 0);
+      const zoneKey = (project.zone || '').trim();
+      let pInvoices: any[], pExtracts: any[], invoiceCosts: number, extractCosts: number;
+      if (zoneKey) {
+        const zProjects = projectsInZone(zoneKey);
+        const zIds = new Set(zProjects.map((p: any) => p.id));
+        const share = Math.max(zProjects.length, 1);
+        pInvoices = zoneRowsFilter(invoicesData, zoneKey, zIds);
+        pExtracts = zoneRowsFilter(extractsData, zoneKey, zIds);
+        invoiceCosts = pInvoices.reduce((sum, i) => sum + (i.amount || 0), 0) / share;
+        extractCosts = pExtracts.reduce((sum, e) => sum + (e.amount || 0), 0) / share;
+      } else {
+        pInvoices = invoicesData.filter(i => i.project_id === project.id);
+        pExtracts = extractsData.filter(e => e.project_id === project.id);
+        invoiceCosts = pInvoices.reduce((sum, i) => sum + (i.amount || 0), 0);
+        extractCosts = pExtracts.reduce((sum, e) => sum + (e.amount || 0), 0);
+      }
       return {
         ...project,
         invoiceDetails: pInvoices, extractDetails: pExtracts,

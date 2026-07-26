@@ -146,13 +146,20 @@ const ProjectsPage = () => {
       (assignmentOrdersData || []).forEach((a: any) => addZone(a.project_id ? projectZoneMap[a.project_id] : null, a.amount));
       setZoneTotals(zoneTotalsCalc);
 
+      // حساب عدد المشاريع في كل نطاق لتقسيم التكلفة بالتساوي
+      const zoneProjectCount: Record<string, number> = {};
+      (projectsData || []).forEach((p: any) => {
+        const zk = (p.zone || '').trim();
+        if (zk) zoneProjectCount[zk] = (zoneProjectCount[zk] || 0) + 1;
+      });
+
       // تحديث بيانات كل مشروع:
-      // - المشاريع التي لها نطاق (Zone) تعرض التكلفة الإجمالية للنطاق (مشتركة)
+      // - المشاريع التي لها نطاق (Zone) تُقسَّم تكلفة النطاق بالتساوي بين مشاريعه
       // - المشاريع بدون نطاق تعرض تكلفتها الخاصة فقط
       const updatedProjects = projectsData?.map((project: any) => {
         const zoneKey = (project.zone || '').trim();
         const totalExpenses = zoneKey
-          ? (zoneTotalsCalc[zoneKey] || 0)
+          ? ((zoneTotalsCalc[zoneKey] || 0) / (zoneProjectCount[zoneKey] || 1))
           : (expensesByProject?.[project.id] || 0);
         return {
           ...project,
@@ -237,17 +244,8 @@ const ProjectsPage = () => {
   const activeProjects = projects.filter(p => p.status === 'قيد التنفيذ').length;
   const completedProjects = projects.filter(p => p.status === 'مكتمل').length;
   const totalSales = projects.reduce((sum, p) => sum + p.total_sales, 0);
-  // تجنّب ازدواج التكلفة: المشاريع ذات النطاق تُحسب مرة واحدة لكل نطاق، والباقي لكل مشروع
-  const countedZones = new Set<string>();
-  const totalExpenses = projects.reduce((sum, p) => {
-    const zoneKey = (p.zone || '').trim();
-    if (zoneKey) {
-      if (countedZones.has(zoneKey)) return sum;
-      countedZones.add(zoneKey);
-      return sum + (zoneTotals[zoneKey] || 0);
-    }
-    return sum + p.total_expenses;
-  }, 0);
+  // تكلفة كل مشروع مستقلة الآن (حصة من النطاق أو تكلفته الفردية)، فقط اجمعها
+  const totalExpenses = projects.reduce((sum, p) => sum + p.total_expenses, 0);
 
   if (loading) {
     return (

@@ -185,6 +185,29 @@ const ReportsPage = () => {
     enabled: !!user?.id,
   });
 
+  // Zones available (from projects that have a zone)
+  const availableZones = Array.from(
+    new Set((projectsData || []).map((p: any) => p.zone).filter(Boolean))
+  ) as string[];
+
+  // Filter helper: when a zone is selected, keep only rows tied to projects in that zone
+  const zoneProjectIds = new Set(
+    (projectsData || [])
+      .filter((p: any) => selectedZone === 'all' || p.zone === selectedZone)
+      .map((p: any) => p.id)
+  );
+  const inZone = <T extends { project_id?: string | null }>(rows: T[]) =>
+    selectedZone === 'all' ? rows : rows.filter(r => r.project_id && zoneProjectIds.has(r.project_id));
+
+  const salesData = inZone(salesDataRaw);
+  const invoicesData = inZone(invoicesDataRaw);
+  const purchasesData = inZone(purchasesDataRaw);
+  const extractsData = inZone(extractsDataRaw);
+  const assignmentOrdersData = inZone(assignmentOrdersDataRaw);
+  const projectsDataFiltered = selectedZone === 'all'
+    ? projectsData
+    : (projectsData || []).filter((p: any) => p.zone === selectedZone);
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
   };

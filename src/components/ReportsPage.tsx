@@ -29,6 +29,7 @@ const ReportsPage = () => {
   const [selectedReport, setSelectedReport] = useState<any>(null);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [selectedZone, setSelectedZone] = useState<string>('all');
   const { toast } = useToast();
   const { user } = useAuth();
 

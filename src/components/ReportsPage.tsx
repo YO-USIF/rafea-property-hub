@@ -278,7 +278,7 @@ const ReportsPage = () => {
           assignmentOrders: assignmentOrdersData
         };
         break;
-      case 'project-progress': reportData = projectsData; break;
+      case 'project-progress': reportData = projectsDataFiltered; break;
       case 'delayed-projects': reportData = projectsDataFiltered.filter(p => p.status === 'متأخر' || (p.progress < 50 && new Date(p.expected_completion) < new Date())); break;
       case 'tasks': reportData = tasksData; break;
       case 'completed-tasks': reportData = tasksData.filter(t => t.status === 'مكتملة'); break;

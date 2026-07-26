@@ -131,13 +131,6 @@ const ProjectsPage = () => {
         }
       });
 
-      // تحديث بيانات كل مشروع
-      const updatedProjects = projectsData?.map((project: any) => ({
-        ...project,
-        total_sales: salesByProject?.[project.id] || 0,
-        total_expenses: expensesByProject?.[project.id] || 0
-      }));
-
       // حساب إجمالي تكلفة كل نطاق (Zone)
       const projectZoneMap: Record<string, string | null> = {};
       (projectsData || []).forEach((p: any) => { projectZoneMap[p.id] = p.zone; });
@@ -152,6 +145,21 @@ const ProjectsPage = () => {
       (invoicesData || []).forEach((i: any) => addZone(i.zone || (i.project_id ? projectZoneMap[i.project_id] : null), i.amount));
       (assignmentOrdersData || []).forEach((a: any) => addZone(a.project_id ? projectZoneMap[a.project_id] : null, a.amount));
       setZoneTotals(zoneTotalsCalc);
+
+      // تحديث بيانات كل مشروع:
+      // - المشاريع التي لها نطاق (Zone) تعرض التكلفة الإجمالية للنطاق (مشتركة)
+      // - المشاريع بدون نطاق تعرض تكلفتها الخاصة فقط
+      const updatedProjects = projectsData?.map((project: any) => {
+        const zoneKey = (project.zone || '').trim();
+        const totalExpenses = zoneKey
+          ? (zoneTotalsCalc[zoneKey] || 0)
+          : (expensesByProject?.[project.id] || 0);
+        return {
+          ...project,
+          total_sales: salesByProject?.[project.id] || 0,
+          total_expenses: totalExpenses,
+        };
+      });
 
       setProjects(updatedProjects || []);
     } catch (error: any) {
@@ -229,7 +237,17 @@ const ProjectsPage = () => {
   const activeProjects = projects.filter(p => p.status === 'قيد التنفيذ').length;
   const completedProjects = projects.filter(p => p.status === 'مكتمل').length;
   const totalSales = projects.reduce((sum, p) => sum + p.total_sales, 0);
-  const totalExpenses = projects.reduce((sum, p) => sum + p.total_expenses, 0);
+  // تجنّب ازدواج التكلفة: المشاريع ذات النطاق تُحسب مرة واحدة لكل نطاق، والباقي لكل مشروع
+  const countedZones = new Set<string>();
+  const totalExpenses = projects.reduce((sum, p) => {
+    const zoneKey = (p.zone || '').trim();
+    if (zoneKey) {
+      if (countedZones.has(zoneKey)) return sum;
+      countedZones.add(zoneKey);
+      return sum + (zoneTotals[zoneKey] || 0);
+    }
+    return sum + p.total_expenses;
+  }, 0);
 
   if (loading) {
     return (
@@ -440,7 +458,12 @@ const ProjectsPage = () => {
                       </div>
                     </TableCell>
                     <TableCell className="text-green-600 font-medium">{project.total_sales.toLocaleString()} ر.س</TableCell>
-                    <TableCell className="text-red-600 font-medium">{project.total_expenses.toLocaleString()} ر.س</TableCell>
+                    <TableCell className="text-red-600 font-medium">
+                      {project.total_expenses.toLocaleString()} ر.س
+                      {project.zone ? (
+                        <div className="text-[10px] text-muted-foreground font-normal">مشتركة لنطاق {project.zone}</div>
+                      ) : null}
+                    </TableCell>
                     <TableCell>{getStatusBadge(project.status)}</TableCell>
                     <TableCell>{project.expected_completion}</TableCell>
                     <TableCell>

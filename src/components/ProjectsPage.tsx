@@ -458,7 +458,12 @@ const ProjectsPage = () => {
                       </div>
                     </TableCell>
                     <TableCell className="text-green-600 font-medium">{project.total_sales.toLocaleString()} ر.س</TableCell>
-                    <TableCell className="text-red-600 font-medium">{project.total_expenses.toLocaleString()} ر.س</TableCell>
+                    <TableCell className="text-red-600 font-medium">
+                      {project.total_expenses.toLocaleString()} ر.س
+                      {project.zone ? (
+                        <div className="text-[10px] text-muted-foreground font-normal">مشتركة لنطاق {project.zone}</div>
+                      ) : null}
+                    </TableCell>
                     <TableCell>{getStatusBadge(project.status)}</TableCell>
                     <TableCell>{project.expected_completion}</TableCell>
                     <TableCell>

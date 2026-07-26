@@ -10,8 +10,9 @@ import { useProjects } from '@/hooks/useProjects';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { ProjectDetailedReport } from '@/components/reports/ProjectDetailedReport';
-import { Printer, Eye, Calendar } from 'lucide-react';
+import { Printer, Eye, Calendar, FileText, MapPin, Building2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import suhailLogo from '@/assets/suhail-logo.jpeg';
 
 interface CustomReportFormProps {
@@ -23,11 +24,20 @@ interface CustomReportFormProps {
 const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormProps) => {
   const { toast } = useToast();
   const { projects } = useProjects();
+  const [selectedZone, setSelectedZone] = useState<string>('all');
   const [selectedProjectId, setSelectedProjectId] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [showReport, setShowReport] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
+
+  const availableZones = Array.from(
+    new Set((projects || []).map((p: any) => p.zone).filter(Boolean))
+  ) as string[];
+
+  const filteredProjects = selectedZone === 'all'
+    ? projects
+    : (projects || []).filter((p: any) => p.zone === selectedZone);
 
   // جلب بيانات المبيعات
   const { data: salesData = [] } = useQuery({
@@ -188,34 +198,66 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>إنشاء تقرير مخصص للمشروع</DialogTitle>
+        <DialogHeader className="border-b pb-4">
+          <DialogTitle className="text-2xl flex items-center gap-2">
+            <FileText className="w-6 h-6 text-primary" />
+            إنشاء تقرير مخصص للمشروع
+          </DialogTitle>
           <DialogDescription>
-            اختر المشروع والفترة الزمنية لإنشاء تقرير تفصيلي
+            حدّد النطاق والمشروع والفترة الزمنية لإنشاء تقرير احترافي جاهز للطباعة
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* نموذج اختيار المشروع والفترة */}
-          <Card className="no-print">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                إعدادات التقرير
+          <Card className="no-print border-primary/20 shadow-sm">
+            <CardHeader className="bg-primary/5 border-b">
+              <CardTitle className="flex items-center justify-between text-base">
+                <span className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-primary" />
+                  إعدادات التقرير
+                </span>
+                {selectedProject?.zone && (
+                  <Badge variant="secondary" className="gap-1">
+                    <MapPin className="w-3 h-3" /> {selectedProject.zone}
+                  </Badge>
+                )}
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {availableZones.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" /> النطاق
+                    </Label>
+                    <Select
+                      value={selectedZone}
+                      onValueChange={(v) => { setSelectedZone(v); setSelectedProjectId(''); setShowReport(false); }}
+                    >
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع النطاقات</SelectItem>
+                        {availableZones.map(z => (
+                          <SelectItem key={z} value={z}>{z}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
                 <div className="space-y-2">
-                  <Label htmlFor="project">المشروع *</Label>
+                  <Label htmlFor="project" className="flex items-center gap-1">
+                    <Building2 className="w-4 h-4" /> المشروع *
+                  </Label>
                   <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
                     <SelectTrigger>
                       <SelectValue placeholder="اختر المشروع" />
                     </SelectTrigger>
                     <SelectContent>
-                      {projects.map((project) => (
+                      {filteredProjects.map((project: any) => (
                         <SelectItem key={project.id} value={project.id}>
-                          {project.name}
+                          {project.name}{project.zone ? ` — ${project.zone}` : ''}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -229,7 +271,6 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    placeholder="اختياري"
                   />
                 </div>
 
@@ -240,39 +281,41 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    placeholder="اختياري"
                   />
-                </div>
-
-                <div className="flex items-end gap-2">
-                  <Button
-                    type="button"
-                    onClick={handleGenerateReport}
-                    className="flex-1"
-                    disabled={!selectedProjectId}
-                  >
-                    <Eye className="w-4 h-4 ml-2" />
-                    عرض التقرير
-                  </Button>
-                  
-                  {showReport && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handlePrint}
-                    >
-                      <Printer className="w-4 h-4 ml-2" />
-                      طباعة
-                    </Button>
-                  )}
                 </div>
               </div>
 
-              {startDate && endDate && (
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-700">
-                  <strong>فترة التقرير:</strong> من {new Date(startDate).toLocaleDateString('en-GB')} إلى {new Date(endDate).toLocaleDateString('en-GB')}
-                </div>
-              )}
+              <div className="flex flex-wrap items-center gap-2 mt-6 pt-4 border-t">
+                <Button
+                  type="button"
+                  onClick={handleGenerateReport}
+                  disabled={!selectedProjectId}
+                >
+                  <Eye className="w-4 h-4 ml-2" />
+                  عرض التقرير
+                </Button>
+                {showReport && (
+                  <Button type="button" variant="outline" onClick={handlePrint}>
+                    <Printer className="w-4 h-4 ml-2" />
+                    طباعة التقرير
+                  </Button>
+                )}
+                {(startDate || endDate || selectedZone !== 'all') && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => { setStartDate(''); setEndDate(''); setSelectedZone('all'); }}
+                  >
+                    مسح الفلاتر
+                  </Button>
+                )}
+                {startDate && endDate && (
+                  <div className="mr-auto text-xs text-muted-foreground">
+                    <strong>الفترة:</strong> {new Date(startDate).toLocaleDateString('en-GB')} — {new Date(endDate).toLocaleDateString('en-GB')}
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 

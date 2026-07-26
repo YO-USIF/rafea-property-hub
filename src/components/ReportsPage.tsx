@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart3, FileText, Download, Filter, Calendar, TrendingUp, DollarSign, Users, Building2, Eye, FileSpreadsheet, Printer } from 'lucide-react';
 import CustomReportForm from '@/components/forms/CustomReportForm';
 import SalesReport from '@/components/reports/SalesReport';
@@ -29,6 +30,7 @@ const ReportsPage = () => {
   const [selectedReport, setSelectedReport] = useState<any>(null);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [selectedZone, setSelectedZone] = useState<string>('all');
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -89,7 +91,7 @@ const ReportsPage = () => {
     return query;
   };
 
-  const { data: salesData = [] } = useQuery({
+  const { data: salesDataRaw = [] } = useQuery({
     queryKey: ['sales-report', startDate, endDate],
     queryFn: async () => {
       let query = supabase.from('sales').select('*');
@@ -101,7 +103,7 @@ const ReportsPage = () => {
     enabled: !!user?.id,
   });
 
-  const { data: invoicesData = [] } = useQuery({
+  const { data: invoicesDataRaw = [] } = useQuery({
     queryKey: ['invoices-report', startDate, endDate],
     queryFn: async () => {
       let query = supabase.from('invoices').select('*');
@@ -113,7 +115,7 @@ const ReportsPage = () => {
     enabled: !!user?.id,
   });
 
-  const { data: purchasesData = [] } = useQuery({
+  const { data: purchasesDataRaw = [] } = useQuery({
     queryKey: ['purchases-report', startDate, endDate],
     queryFn: async () => {
       let query = supabase.from('purchases').select('*');
@@ -125,7 +127,7 @@ const ReportsPage = () => {
     enabled: !!user?.id,
   });
 
-  const { data: extractsData = [] } = useQuery({
+  const { data: extractsDataRaw = [] } = useQuery({
     queryKey: ['extracts-report', startDate, endDate],
     queryFn: async () => {
       let query = supabase.from('extracts').select('*');
@@ -171,7 +173,7 @@ const ReportsPage = () => {
     enabled: !!user?.id,
   });
 
-  const { data: assignmentOrdersData = [] } = useQuery({
+  const { data: assignmentOrdersDataRaw = [] } = useQuery({
     queryKey: ['assignment-orders-report', startDate, endDate],
     queryFn: async () => {
       let query = supabase.from('assignment_orders').select('*');
@@ -182,6 +184,29 @@ const ReportsPage = () => {
     },
     enabled: !!user?.id,
   });
+
+  // Zones available (from projects that have a zone)
+  const availableZones = Array.from(
+    new Set((projectsData || []).map((p: any) => p.zone).filter(Boolean))
+  ) as string[];
+
+  // Filter helper: when a zone is selected, keep only rows tied to projects in that zone
+  const zoneProjectIds = new Set(
+    (projectsData || [])
+      .filter((p: any) => selectedZone === 'all' || p.zone === selectedZone)
+      .map((p: any) => p.id)
+  );
+  const inZone = <T extends { project_id?: string | null }>(rows: T[]) =>
+    selectedZone === 'all' ? rows : rows.filter(r => r.project_id && zoneProjectIds.has(r.project_id));
+
+  const salesData = inZone(salesDataRaw);
+  const invoicesData = inZone(invoicesDataRaw);
+  const purchasesData = inZone(purchasesDataRaw);
+  const extractsData = inZone(extractsDataRaw);
+  const assignmentOrdersData = inZone(assignmentOrdersDataRaw);
+  const projectsDataFiltered = selectedZone === 'all'
+    ? projectsData
+    : (projectsData || []).filter((p: any) => p.zone === selectedZone);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
@@ -201,7 +226,7 @@ const ReportsPage = () => {
 
   // Generate project detailed report
   const generateProjectDetailedReport = () => {
-    return projectsData.map(project => {
+    return projectsDataFiltered.map(project => {
       const pSales = salesData.filter(s => s.project_id === project.id);
       const pInvoices = invoicesData.filter(i => i.project_id === project.id);
       const pExtracts = extractsData.filter(e => e.project_id === project.id);
@@ -220,7 +245,7 @@ const ReportsPage = () => {
   };
 
   const generateProjectCostCenterReport = () => {
-    return projectsData.map(project => {
+    return projectsDataFiltered.map(project => {
       const pInvoices = invoicesData.filter(i => i.project_id === project.id);
       const pExtracts = extractsData.filter(e => e.project_id === project.id);
       const invoiceCosts = pInvoices.reduce((sum, i) => sum + (i.amount || 0), 0);
@@ -253,8 +278,8 @@ const ReportsPage = () => {
           assignmentOrders: assignmentOrdersData
         };
         break;
-      case 'project-progress': reportData = projectsData; break;
-      case 'delayed-projects': reportData = projectsData.filter(p => p.status === 'متأخر' || (p.progress < 50 && new Date(p.expected_completion) < new Date())); break;
+      case 'project-progress': reportData = projectsDataFiltered; break;
+      case 'delayed-projects': reportData = projectsDataFiltered.filter(p => p.status === 'متأخر' || (p.progress < 50 && new Date(p.expected_completion) < new Date())); break;
       case 'tasks': reportData = tasksData; break;
       case 'completed-tasks': reportData = tasksData.filter(t => t.status === 'مكتملة'); break;
       case 'maintenance': reportData = maintenanceData; break;
@@ -561,7 +586,7 @@ const ReportsPage = () => {
       <Card>
         <CardHeader>
           <CardTitle>إعدادات التقارير</CardTitle>
-          <CardDescription>اختر الفترة الزمنية</CardDescription>
+          <CardDescription>اختر الفترة الزمنية والنطاق</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4 items-center flex-wrap">
@@ -572,12 +597,31 @@ const ReportsPage = () => {
                 </Button>
               ))}
             </div>
+            {availableZones.length > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">النطاق:</span>
+                <Select value={selectedZone} onValueChange={setSelectedZone}>
+                  <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">جميع النطاقات</SelectItem>
+                    {availableZones.map(z => (
+                      <SelectItem key={z} value={z}>{z}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="flex gap-2 mr-auto">
               <Input type="date" className="w-40" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
               <span className="flex items-center text-muted-foreground">إلى</span>
               <Input type="date" className="w-40" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
             </div>
           </div>
+          {selectedZone !== 'all' && (
+            <div className="mt-3 text-sm text-primary">
+              التقارير مفلترة على مشاريع النطاق: <strong>{selectedZone}</strong>
+            </div>
+          )}
         </CardContent>
       </Card>
 

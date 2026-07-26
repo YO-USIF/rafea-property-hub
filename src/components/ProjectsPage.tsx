@@ -244,17 +244,8 @@ const ProjectsPage = () => {
   const activeProjects = projects.filter(p => p.status === 'قيد التنفيذ').length;
   const completedProjects = projects.filter(p => p.status === 'مكتمل').length;
   const totalSales = projects.reduce((sum, p) => sum + p.total_sales, 0);
-  // تجنّب ازدواج التكلفة: المشاريع ذات النطاق تُحسب مرة واحدة لكل نطاق، والباقي لكل مشروع
-  const countedZones = new Set<string>();
-  const totalExpenses = projects.reduce((sum, p) => {
-    const zoneKey = (p.zone || '').trim();
-    if (zoneKey) {
-      if (countedZones.has(zoneKey)) return sum;
-      countedZones.add(zoneKey);
-      return sum + (zoneTotals[zoneKey] || 0);
-    }
-    return sum + p.total_expenses;
-  }, 0);
+  // تكلفة كل مشروع مستقلة الآن (حصة من النطاق أو تكلفته الفردية)، فقط اجمعها
+  const totalExpenses = projects.reduce((sum, p) => sum + p.total_expenses, 0);
 
   if (loading) {
     return (

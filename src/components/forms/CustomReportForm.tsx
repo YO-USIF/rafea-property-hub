@@ -10,8 +10,9 @@ import { useProjects } from '@/hooks/useProjects';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { ProjectDetailedReport } from '@/components/reports/ProjectDetailedReport';
-import { Printer, Eye, Calendar } from 'lucide-react';
+import { Printer, Eye, Calendar, FileText, MapPin, Building2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import suhailLogo from '@/assets/suhail-logo.jpeg';
 
 interface CustomReportFormProps {

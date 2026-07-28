@@ -176,7 +176,9 @@ export const useAssignmentOrders = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['assignment_orders'], refetchType: 'all' });
-      toast({ title: "تم تعميد أمر التكليف بنجاح" });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['journal_entries'] });
+      toast({ title: "تم تعميد أمر التكليف وإنشاء القيد المحاسبي" });
     },
     onError: (error) => {
       console.error('Error approving assignment order:', error);

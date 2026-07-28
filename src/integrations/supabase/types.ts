@@ -827,6 +827,8 @@ export type Database = {
           approved_at: string | null
           approved_by: string | null
           assigned_to: string | null
+          attached_file_name: string | null
+          attached_file_url: string | null
           building_name: string
           created_at: string
           description: string | null
@@ -845,6 +847,8 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           assigned_to?: string | null
+          attached_file_name?: string | null
+          attached_file_url?: string | null
           building_name: string
           created_at?: string
           description?: string | null
@@ -863,6 +867,8 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           assigned_to?: string | null
+          attached_file_name?: string | null
+          attached_file_url?: string | null
           building_name?: string
           created_at?: string
           description?: string | null

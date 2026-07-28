@@ -255,6 +255,18 @@ const MaintenanceForm = ({ open, onOpenChange, request, onSuccess }: Maintenance
             />
           </div>
 
+          <div className="space-y-2">
+            <Label>مرفق طلب الصيانة (اختياري)</Label>
+            <FileUpload
+              onFileUploaded={(url, name) => setFormData(prev => ({ ...prev, attached_file_url: url, attached_file_name: name }))}
+              currentFileUrl={formData.attached_file_url}
+              currentFileName={formData.attached_file_name}
+              onFileRemoved={() => setFormData(prev => ({ ...prev, attached_file_url: '', attached_file_name: '' }))}
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx"
+              maxSizeMB={10}
+            />
+          </div>
+
           <div className="flex justify-end space-x-2 space-x-reverse pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               إلغاء

@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, User, Shield, Bell, Database, Key, Users, Mail, Edit, Trash2, Download, Loader2 } from 'lucide-react';
+import { Settings, User, Shield, Bell, Database, Key, Users, Mail, Edit, Trash2, Download, Loader2, FileArchive, Cloud } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useCompanySettings } from '@/hooks/useCompanySettings';
@@ -30,7 +30,23 @@ const SettingsPage = () => {
   const { profiles, loading: profilesLoading, updateProfile, updateUserRole, deleteProfile } = useProfiles();
   const { settings, loading: settingsLoading, updateSettings } = useCompanySettings();
   const { settings: notificationSettings, updateSettings: updateNotificationSettings } = useNotificationSettings();
-  const { logs: backupLogs, createBackup, downloadBackup, downloading } = useBackupLogs();
+  const { logs: backupLogs, createBackup, downloadBackup, downloading, downloadAttachments, downloadingAttachments, backupToGoogleDrive, uploadingToDrive } = useBackupLogs();
+
+  // Auto-run monthly backup to Google Drive if last successful run is > 30 days
+  React.useEffect(() => {
+    if (!backupLogs || backupLogs.length === 0) return;
+    const lastDrive = backupLogs.find(l => l.backup_type === 'Google Drive' && l.status === 'مكتمل');
+    const daysSince = lastDrive
+      ? (Date.now() - new Date(lastDrive.completed_at || lastDrive.created_at).getTime()) / 86400000
+      : Infinity;
+    const flagKey = 'auto_gdrive_backup_last_check';
+    const lastCheck = Number(localStorage.getItem(flagKey) || 0);
+    const hoursSinceCheck = (Date.now() - lastCheck) / 3600000;
+    if (daysSince >= 30 && hoursSinceCheck >= 24) {
+      localStorage.setItem(flagKey, String(Date.now()));
+      backupToGoogleDrive(true);
+    }
+  }, [backupLogs, backupToGoogleDrive]);
   const { settings: securitySettings, updateSettings: updateSecuritySettings } = useSecuritySettings();
 
   const settingsTabs = [
@@ -397,17 +413,24 @@ const SettingsPage = () => {
               <CardTitle>النسخ الاحتياطي</CardTitle>
               <CardDescription>إدارة النسخ الاحتياطية للنظام</CardDescription>
             </div>
-            <div className="flex gap-2">
-              <Button onClick={downloadBackup} disabled={downloading}>
-                {downloading ? (
-                  <Loader2 className="w-4 h-4 ml-2 animate-spin" />
-                ) : (
-                  <Download className="w-4 h-4 ml-2" />
-                )}
-                {downloading ? 'جارٍ التحميل...' : 'تحميل نسخة احتياطية'}
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={downloadBackup} disabled={downloading} variant="outline">
+                {downloading ? <Loader2 className="w-4 h-4 ml-2 animate-spin" /> : <Database className="w-4 h-4 ml-2" />}
+                {downloading ? 'جارٍ التحميل...' : 'نسخة قاعدة البيانات'}
+              </Button>
+              <Button onClick={downloadAttachments} disabled={downloadingAttachments} variant="outline">
+                {downloadingAttachments ? <Loader2 className="w-4 h-4 ml-2 animate-spin" /> : <FileArchive className="w-4 h-4 ml-2" />}
+                {downloadingAttachments ? 'جارٍ التجهيز...' : 'نسخة المرفقات (ZIP)'}
+              </Button>
+              <Button onClick={() => backupToGoogleDrive(false)} disabled={uploadingToDrive}>
+                {uploadingToDrive ? <Loader2 className="w-4 h-4 ml-2 animate-spin" /> : <Cloud className="w-4 h-4 ml-2" />}
+                {uploadingToDrive ? 'جارٍ الرفع...' : 'رفع إلى Google Drive الآن'}
               </Button>
             </div>
           </div>
+          <p className="text-sm text-muted-foreground mt-2">
+            يتم الرفع التلقائي شهرياً إلى مجلد <strong>Rafea Property Hub Backups</strong> في Google Drive المتصل (<code>fafof661@gmail.com</code>) عند دخول مدير النظام إذا مضى أكثر من 30 يوماً على آخر نسخة.
+          </p>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">

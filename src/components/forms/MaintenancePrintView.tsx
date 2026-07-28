@@ -515,7 +515,16 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
               <div className="text-xs text-muted-foreground">Maintenance Technician</div>
             </div>
             <div className="text-center">
-              <div className="h-28" />
+              {request.approved && approverSignature ? (
+                <div className="flex items-end justify-center h-28 mb-1">
+                  <img src={approverSignature} alt="توقيع المُعتمد" className="h-24 max-w-full object-contain" style={{ mixBlendMode: 'multiply' }} />
+                </div>
+              ) : (
+                <div className="h-28" />
+              )}
+              {request.approved && approverName && (
+                <p className="text-sm font-bold text-gray-800 mb-1">{getUserDisplayName(approverName) || approverName}</p>
+              )}
               <div className="border-t mt-2 pt-2 text-sm font-semibold">المُعتمد</div>
               <div className="text-xs text-muted-foreground">Approver</div>
             </div>

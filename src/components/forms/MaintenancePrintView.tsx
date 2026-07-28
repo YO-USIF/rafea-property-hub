@@ -356,7 +356,8 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
             </div>
             <div class="signature-box">
               <div class="signature-line">
-                ${request.approved ? `<div class="signature-slot"><img src="${window.location.origin}/signatures/yousef-signature.jpeg" alt="توقيع المُعتمد" /></div><div style="font-size: 11px; font-weight: bold; color: #1e3a5f; margin-bottom: 4px;">م. يوسف صلاح يوسف</div>` : '<div class="signature-slot empty"></div>'}
+                ${request.approved && approverSignature ? `<div class="signature-slot"><img src="${window.location.origin}${approverSignature}" alt="توقيع المُعتمد" /></div>` : '<div class="signature-slot empty"></div>'}
+                ${request.approved && approverName ? `<div style="font-size: 12px; font-weight: bold; color: #1f2937; margin-bottom: 4px;">${escapeHtml(getUserDisplayName(approverName) || approverName)}</div>` : ''}
                 <div class="signature-title">المُعتمد</div>
                 <div class="signature-title-en">Approver</div>
                 ${request.approved && request.approved_at ? `<div style="font-size: 10px; color: #16a34a; margin-top: 4px;">تاريخ التعميد: ${formatDate(request.approved_at)}</div>` : ''}

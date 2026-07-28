@@ -1731,6 +1731,15 @@ export type Database = {
         Args: { _page_name: string; _permission_type: string; _user_id: string }
         Returns: boolean
       }
+      create_assignment_order_journal_entry: {
+        Args: {
+          contractor_name: string
+          order_amount: number
+          order_id: string
+          project_id?: string
+        }
+        Returns: string
+      }
       create_extract_journal_entry: {
         Args: {
           contractor_name: string

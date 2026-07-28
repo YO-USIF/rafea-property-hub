@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { FileUpload } from '@/components/ui/file-upload';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -20,6 +21,8 @@ interface MaintenanceRequest {
   reported_date: string;
   assigned_to: string;
   estimated_cost: number;
+  attached_file_url?: string;
+  attached_file_name?: string;
 }
 
 interface MaintenanceFormProps {
@@ -42,7 +45,9 @@ const MaintenanceForm = ({ open, onOpenChange, request, onSuccess }: Maintenance
     status: 'جديد',
     reported_date: new Date().toISOString().split('T')[0],
     assigned_to: '',
-    estimated_cost: 0
+    estimated_cost: 0,
+    attached_file_url: '',
+    attached_file_name: ''
   });
 
   useEffect(() => {
@@ -56,7 +61,9 @@ const MaintenanceForm = ({ open, onOpenChange, request, onSuccess }: Maintenance
         status: request.status || 'جديد',
         reported_date: request.reported_date || new Date().toISOString().split('T')[0],
         assigned_to: request.assigned_to || '',
-        estimated_cost: request.estimated_cost || 0
+        estimated_cost: request.estimated_cost || 0,
+        attached_file_url: request.attached_file_url || '',
+        attached_file_name: request.attached_file_name || ''
       });
     } else {
       setFormData({
@@ -68,7 +75,9 @@ const MaintenanceForm = ({ open, onOpenChange, request, onSuccess }: Maintenance
         status: 'جديد',
         reported_date: new Date().toISOString().split('T')[0],
         assigned_to: '',
-        estimated_cost: 0
+        estimated_cost: 0,
+        attached_file_url: '',
+        attached_file_name: ''
       });
     }
   }, [request]);
@@ -243,6 +252,18 @@ const MaintenanceForm = ({ open, onOpenChange, request, onSuccess }: Maintenance
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="وصف مفصل للعطل..."
               rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>مرفق طلب الصيانة (اختياري)</Label>
+            <FileUpload
+              onFileUploaded={(url, name) => setFormData(prev => ({ ...prev, attached_file_url: url, attached_file_name: name }))}
+              currentFileUrl={formData.attached_file_url}
+              currentFileName={formData.attached_file_name}
+              onFileRemoved={() => setFormData(prev => ({ ...prev, attached_file_url: '', attached_file_name: '' }))}
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx"
+              maxSizeMB={10}
             />
           </div>
 

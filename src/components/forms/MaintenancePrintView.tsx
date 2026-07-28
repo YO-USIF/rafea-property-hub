@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { escapeHtml } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Printer } from 'lucide-react';
 import { getUserSignature, getUserDisplayName } from '@/lib/userSignatures';
+import { resolvePreparerName } from '@/lib/preparerName';
 import { useAuth } from '@/hooks/useAuth';
 
 interface MaintenancePrintViewProps {
@@ -18,8 +19,23 @@ interface MaintenancePrintViewProps {
 const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintViewProps) => {
   const [selectedCompany, setSelectedCompany] = useState<'suhail' | 'tamlik'>('suhail');
   const { user } = useAuth();
-  const preparerName = request?.created_by_name || (user?.user_metadata as any)?.full_name || user?.email || 'غير معروف';
+  const [preparerName, setPreparerName] = useState<string>('غير معروف');
+  const [approverName, setApproverName] = useState<string>('');
+
+  useEffect(() => {
+    if (!request) return;
+    resolvePreparerName(request.user_id).then((n) =>
+      setPreparerName(n || (user?.user_metadata as any)?.full_name || user?.email || 'غير معروف')
+    );
+    if (request.approved && request.approved_by) {
+      resolvePreparerName(request.approved_by).then((n) => setApproverName(n || ''));
+    } else {
+      setApproverName('');
+    }
+  }, [request, user]);
+
   const preparerSignature = getUserSignature(preparerName);
+  const approverSignature = getUserSignature(approverName);
 
   const companyInfo = {
     suhail: {
@@ -340,7 +356,8 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
             </div>
             <div class="signature-box">
               <div class="signature-line">
-                ${request.approved ? `<div class="signature-slot"><img src="${window.location.origin}/signatures/yousef-signature.jpeg" alt="توقيع المُعتمد" /></div><div style="font-size: 11px; font-weight: bold; color: #1e3a5f; margin-bottom: 4px;">م. يوسف صلاح يوسف</div>` : '<div class="signature-slot empty"></div>'}
+                ${request.approved && approverSignature ? `<div class="signature-slot"><img src="${window.location.origin}${approverSignature}" alt="توقيع المُعتمد" /></div>` : '<div class="signature-slot empty"></div>'}
+                ${request.approved && approverName ? `<div style="font-size: 12px; font-weight: bold; color: #1f2937; margin-bottom: 4px;">${escapeHtml(getUserDisplayName(approverName) || approverName)}</div>` : ''}
                 <div class="signature-title">المُعتمد</div>
                 <div class="signature-title-en">Approver</div>
                 ${request.approved && request.approved_at ? `<div style="font-size: 10px; color: #16a34a; margin-top: 4px;">تاريخ التعميد: ${formatDate(request.approved_at)}</div>` : ''}
@@ -498,7 +515,16 @@ const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintV
               <div className="text-xs text-muted-foreground">Maintenance Technician</div>
             </div>
             <div className="text-center">
-              <div className="h-28" />
+              {request.approved && approverSignature ? (
+                <div className="flex items-end justify-center h-28 mb-1">
+                  <img src={approverSignature} alt="توقيع المُعتمد" className="h-24 max-w-full object-contain" style={{ mixBlendMode: 'multiply' }} />
+                </div>
+              ) : (
+                <div className="h-28" />
+              )}
+              {request.approved && approverName && (
+                <p className="text-sm font-bold text-gray-800 mb-1">{getUserDisplayName(approverName) || approverName}</p>
+              )}
               <div className="border-t mt-2 pt-2 text-sm font-semibold">المُعتمد</div>
               <div className="text-xs text-muted-foreground">Approver</div>
             </div>

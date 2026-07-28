@@ -133,6 +133,21 @@ export const useAssignmentOrders = () => {
       
       if (error) throw error;
 
+      // إنشاء قيد محاسبي تلقائي وتحديث تكلفة المشروع
+      try {
+        const { error: jeError } = await supabase.rpc('create_assignment_order_journal_entry', {
+          order_id: data.id,
+          order_amount: Number(data.amount),
+          contractor_name: data.contractor_name || 'مقاول غير محدد',
+          project_id: data.project_id ?? null,
+        });
+        if (jeError) console.warn('Journal entry creation failed:', jeError);
+      } catch (e) {
+        console.warn('Journal entry RPC error:', e);
+      }
+
+
+
       // إرسال إشعار لجميع المستخدمين
       try {
         const { data: allProfiles } = await supabase

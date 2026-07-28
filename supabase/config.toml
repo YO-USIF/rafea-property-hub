@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.admin-update-user]
 verify_jwt = true
+
+[functions.backup-attachments]
+verify_jwt = false
+
+[functions.backup-to-gdrive]
+verify_jwt = false

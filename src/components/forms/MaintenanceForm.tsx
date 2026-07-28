@@ -45,7 +45,9 @@ const MaintenanceForm = ({ open, onOpenChange, request, onSuccess }: Maintenance
     status: 'جديد',
     reported_date: new Date().toISOString().split('T')[0],
     assigned_to: '',
-    estimated_cost: 0
+    estimated_cost: 0,
+    attached_file_url: '',
+    attached_file_name: ''
   });
 
   useEffect(() => {
@@ -59,7 +61,9 @@ const MaintenanceForm = ({ open, onOpenChange, request, onSuccess }: Maintenance
         status: request.status || 'جديد',
         reported_date: request.reported_date || new Date().toISOString().split('T')[0],
         assigned_to: request.assigned_to || '',
-        estimated_cost: request.estimated_cost || 0
+        estimated_cost: request.estimated_cost || 0,
+        attached_file_url: request.attached_file_url || '',
+        attached_file_name: request.attached_file_name || ''
       });
     } else {
       setFormData({
@@ -71,7 +75,9 @@ const MaintenanceForm = ({ open, onOpenChange, request, onSuccess }: Maintenance
         status: 'جديد',
         reported_date: new Date().toISOString().split('T')[0],
         assigned_to: '',
-        estimated_cost: 0
+        estimated_cost: 0,
+        attached_file_url: '',
+        attached_file_name: ''
       });
     }
   }, [request]);

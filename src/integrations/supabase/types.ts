@@ -1775,6 +1775,7 @@ export type Database = {
           unit: string
         }[]
       }
+      get_user_display_name: { Args: { _user_id: string }; Returns: string }
       is_admin: { Args: never; Returns: boolean }
       is_manager_or_admin: { Args: never; Returns: boolean }
       log_customer_access: {

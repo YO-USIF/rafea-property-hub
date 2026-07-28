@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { escapeHtml } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Printer } from 'lucide-react';
 import { getUserSignature, getUserDisplayName } from '@/lib/userSignatures';
+import { resolvePreparerName } from '@/lib/preparerName';
 import { useAuth } from '@/hooks/useAuth';
 
 interface MaintenancePrintViewProps {
@@ -18,8 +19,23 @@ interface MaintenancePrintViewProps {
 const MaintenancePrintView = ({ open, onOpenChange, request }: MaintenancePrintViewProps) => {
   const [selectedCompany, setSelectedCompany] = useState<'suhail' | 'tamlik'>('suhail');
   const { user } = useAuth();
-  const preparerName = request?.created_by_name || (user?.user_metadata as any)?.full_name || user?.email || 'غير معروف';
+  const [preparerName, setPreparerName] = useState<string>('غير معروف');
+  const [approverName, setApproverName] = useState<string>('');
+
+  useEffect(() => {
+    if (!request) return;
+    resolvePreparerName(request.user_id).then((n) =>
+      setPreparerName(n || (user?.user_metadata as any)?.full_name || user?.email || 'غير معروف')
+    );
+    if (request.approved && request.approved_by) {
+      resolvePreparerName(request.approved_by).then((n) => setApproverName(n || ''));
+    } else {
+      setApproverName('');
+    }
+  }, [request, user]);
+
   const preparerSignature = getUserSignature(preparerName);
+  const approverSignature = getUserSignature(approverName);
 
   const companyInfo = {
     suhail: {

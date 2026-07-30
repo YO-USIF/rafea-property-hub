@@ -29,6 +29,8 @@ interface Extract {
   previous_amount?: number;
   attached_file_url?: string;
   attached_file_name?: string;
+  attached_file_url_2?: string;
+  attached_file_name_2?: string;
   tax_included?: boolean;
   tax_amount?: number;
   amount_before_tax?: number;
@@ -68,6 +70,8 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
     previous_amount: extract?.previous_amount || 0,
     attached_file_url: extract?.attached_file_url || '',
     attached_file_name: extract?.attached_file_name || '',
+    attached_file_url_2: extract?.attached_file_url_2 || '',
+    attached_file_name_2: extract?.attached_file_name_2 || '',
     tax_included: extract?.tax_included || false,
     tax_amount: extract?.tax_amount || 0,
     amount_before_tax: extract?.amount_before_tax || 0,
@@ -96,6 +100,8 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         previous_amount: extract.previous_amount || 0,
         attached_file_url: extract.attached_file_url || '',
         attached_file_name: extract.attached_file_name || '',
+        attached_file_url_2: extract.attached_file_url_2 || '',
+        attached_file_name_2: extract.attached_file_name_2 || '',
         tax_included: extract.tax_included || false,
         tax_amount: extract.tax_amount || 0,
         amount_before_tax: extract.amount_before_tax || 0,
@@ -120,6 +126,8 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         previous_amount: 0,
         attached_file_url: '',
         attached_file_name: '',
+        attached_file_url_2: '',
+        attached_file_name_2: '',
         tax_included: false,
         tax_amount: 0,
         amount_before_tax: 0,
@@ -186,6 +194,8 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
         previous_amount: formData.previous_amount !== undefined ? Number(formData.previous_amount) : 0,
         attached_file_url: formData.attached_file_url || '',
         attached_file_name: formData.attached_file_name || '',
+        attached_file_url_2: formData.attached_file_url_2 || '',
+        attached_file_name_2: formData.attached_file_name_2 || '',
         payment_type: formData.payment_type || 'كامل',
         installments_count: formData.payment_type === 'دفعات' ? Number(formData.installments_count || 2) : 1,
         installment_amount: formData.payment_type === 'دفعات' ? Number(formData.installment_amount || 0) : 0,
@@ -563,24 +573,51 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
             />
           </div>
 
-          <FileUpload
-            onFileUploaded={(fileUrl, fileName) => {
-              setFormData(prev => ({
-                ...prev,
-                attached_file_url: fileUrl,
-                attached_file_name: fileName
-              }));
-            }}
-            currentFileUrl={formData.attached_file_url}
-            currentFileName={formData.attached_file_name}
-            onFileRemoved={() => {
-              setFormData(prev => ({
-                ...prev,
-                attached_file_url: '',
-                attached_file_name: ''
-              }));
-            }}
-          />
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>المرفق الأول</Label>
+              <FileUpload
+                onFileUploaded={(fileUrl, fileName) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    attached_file_url: fileUrl,
+                    attached_file_name: fileName
+                  }));
+                }}
+                currentFileUrl={formData.attached_file_url}
+                currentFileName={formData.attached_file_name}
+                onFileRemoved={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    attached_file_url: '',
+                    attached_file_name: ''
+                  }));
+                }}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>المرفق الثاني (اختياري)</Label>
+              <FileUpload
+                onFileUploaded={(fileUrl, fileName) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    attached_file_url_2: fileUrl,
+                    attached_file_name_2: fileName
+                  }));
+                }}
+                currentFileUrl={formData.attached_file_url_2}
+                currentFileName={formData.attached_file_name_2}
+                onFileRemoved={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    attached_file_url_2: '',
+                    attached_file_name_2: ''
+                  }));
+                }}
+              />
+            </div>
+          </div>
+
 
           <div className="flex justify-end space-x-2 space-x-reverse pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

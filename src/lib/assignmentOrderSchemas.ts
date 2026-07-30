@@ -66,6 +66,8 @@ export const assignmentOrderSchema = z.object({
   
   attached_file_url: z.string().optional(),
   attached_file_name: z.string().optional(),
+  attached_file_url_2: z.string().optional(),
+  attached_file_name_2: z.string().optional(),
 }).refine((data) => {
   if (data.tax_included && data.amount_before_tax !== undefined && data.tax_amount !== undefined) {
     const calculatedTotal = data.amount_before_tax + data.tax_amount;

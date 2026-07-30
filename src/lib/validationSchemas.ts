@@ -82,6 +82,8 @@ export const saleFormSchema = z.object({
   
   attached_file_url: z.string().optional(),
   attached_file_name: z.string().optional(),
+  attached_file_url_2: z.string().optional(),
+  attached_file_name_2: z.string().optional(),
 });
 
 // نظام التحقق من صحة نموذج الفواتير
@@ -120,6 +122,8 @@ export const invoiceFormSchema = z.object({
   
   attached_file_url: z.string().optional(),
   attached_file_name: z.string().optional(),
+  attached_file_url_2: z.string().optional(),
+  attached_file_name_2: z.string().optional(),
   zone: z.string().nullable().optional(),
 }).refine((data) => {
   // التحقق من أن تاريخ الاستحقاق بعد أو يساوي تاريخ الفاتورة
@@ -194,6 +198,8 @@ export const extractFormSchema = z.object({
   
   attached_file_url: z.string().optional(),
   attached_file_name: z.string().optional(),
+  attached_file_url_2: z.string().optional(),
+  attached_file_name_2: z.string().optional(),
   payment_type: z.string().optional(),
   installments_count: z.number().min(1).max(24).optional(),
   installment_amount: z.number().min(0).optional(),

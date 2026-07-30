@@ -339,14 +339,24 @@ const ExtractsPage = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      {extract.attached_file_url && (
-                        <Button variant="outline" size="sm" asChild>
-                          <a href={extract.attached_file_url} target="_blank" rel="noopener noreferrer">
-                            <FileText className="w-4 h-4" />
-                          </a>
-                        </Button>
-                      )}
+                      <div className="flex gap-1">
+                        {extract.attached_file_url && (
+                          <Button variant="outline" size="sm" asChild title="المرفق الأول">
+                            <a href={extract.attached_file_url} target="_blank" rel="noopener noreferrer">
+                              <FileText className="w-4 h-4" />
+                            </a>
+                          </Button>
+                        )}
+                        {extract.attached_file_url_2 && (
+                          <Button variant="outline" size="sm" asChild title="المرفق الثاني">
+                            <a href={extract.attached_file_url_2} target="_blank" rel="noopener noreferrer">
+                              <FileText className="w-4 h-4" />
+                            </a>
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
+
                     <TableCell>
                       <div className="flex gap-2">
                         <Button

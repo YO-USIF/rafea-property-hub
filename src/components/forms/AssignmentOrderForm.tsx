@@ -27,6 +27,8 @@ interface AssignmentOrder {
   duration_days?: number;
   attached_file_url?: string;
   attached_file_name?: string;
+  attached_file_url_2?: string;
+  attached_file_name_2?: string;
   tax_included?: boolean;
   tax_amount?: number;
   amount_before_tax?: number;
@@ -58,6 +60,8 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
     duration_days: order?.duration_days || 0,
     attached_file_url: order?.attached_file_url || '',
     attached_file_name: order?.attached_file_name || '',
+    attached_file_url_2: order?.attached_file_url_2 || '',
+    attached_file_name_2: order?.attached_file_name_2 || '',
     tax_included: order?.tax_included || false,
     tax_amount: order?.tax_amount || 0,
     amount_before_tax: order?.amount_before_tax || 0
@@ -78,6 +82,8 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
         duration_days: order.duration_days || 0,
         attached_file_url: order.attached_file_url || '',
         attached_file_name: order.attached_file_name || '',
+        attached_file_url_2: order.attached_file_url_2 || '',
+        attached_file_name_2: order.attached_file_name_2 || '',
         tax_included: order.tax_included || false,
         tax_amount: order.tax_amount || 0,
         amount_before_tax: order.amount_before_tax || 0
@@ -96,6 +102,8 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
         duration_days: 0,
         attached_file_url: '',
         attached_file_name: '',
+        attached_file_url_2: '',
+        attached_file_name_2: '',
         tax_included: false,
         tax_amount: 0,
         amount_before_tax: 0
@@ -142,6 +150,8 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
         duration_days: formData.duration_days ? Number(formData.duration_days) : undefined,
         attached_file_url: formData.attached_file_url,
         attached_file_name: formData.attached_file_name,
+        attached_file_url_2: formData.attached_file_url_2,
+        attached_file_name_2: formData.attached_file_name_2,
       };
 
       const validatedData = assignmentOrderSchema.parse(orderPayload);
@@ -372,24 +382,51 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
             />
           </div>
 
-          <FileUpload
-            onFileUploaded={(fileUrl, fileName) => {
-              setFormData(prev => ({
-                ...prev,
-                attached_file_url: fileUrl,
-                attached_file_name: fileName
-              }));
-            }}
-            currentFileUrl={formData.attached_file_url}
-            currentFileName={formData.attached_file_name}
-            onFileRemoved={() => {
-              setFormData(prev => ({
-                ...prev,
-                attached_file_url: '',
-                attached_file_name: ''
-              }));
-            }}
-          />
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>المرفق الأول</Label>
+              <FileUpload
+                onFileUploaded={(fileUrl, fileName) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    attached_file_url: fileUrl,
+                    attached_file_name: fileName
+                  }));
+                }}
+                currentFileUrl={formData.attached_file_url}
+                currentFileName={formData.attached_file_name}
+                onFileRemoved={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    attached_file_url: '',
+                    attached_file_name: ''
+                  }));
+                }}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>المرفق الثاني (اختياري)</Label>
+              <FileUpload
+                onFileUploaded={(fileUrl, fileName) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    attached_file_url_2: fileUrl,
+                    attached_file_name_2: fileName
+                  }));
+                }}
+                currentFileUrl={formData.attached_file_url_2}
+                currentFileName={formData.attached_file_name_2}
+                onFileRemoved={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    attached_file_url_2: '',
+                    attached_file_name_2: ''
+                  }));
+                }}
+              />
+            </div>
+          </div>
+
 
           <div className="flex justify-end space-x-2 space-x-reverse pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

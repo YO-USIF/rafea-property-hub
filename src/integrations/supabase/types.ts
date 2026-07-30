@@ -22,7 +22,9 @@ export type Database = {
           approved_at: string | null
           approved_by: string | null
           attached_file_name: string | null
+          attached_file_name_2: string | null
           attached_file_url: string | null
+          attached_file_url_2: string | null
           contractor_name: string
           created_at: string
           description: string | null
@@ -46,7 +48,9 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           attached_file_name?: string | null
+          attached_file_name_2?: string | null
           attached_file_url?: string | null
+          attached_file_url_2?: string | null
           contractor_name: string
           created_at?: string
           description?: string | null
@@ -70,7 +74,9 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           attached_file_name?: string | null
+          attached_file_name_2?: string | null
           attached_file_url?: string | null
+          attached_file_url_2?: string | null
           contractor_name?: string
           created_at?: string
           description?: string | null
@@ -421,7 +427,9 @@ export type Database = {
           approved_at: string | null
           approved_by: string | null
           attached_file_name: string | null
+          attached_file_name_2: string | null
           attached_file_url: string | null
+          attached_file_url_2: string | null
           contractor_name: string
           created_at: string
           current_amount: number | null
@@ -451,7 +459,9 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           attached_file_name?: string | null
+          attached_file_name_2?: string | null
           attached_file_url?: string | null
+          attached_file_url_2?: string | null
           contractor_name: string
           created_at?: string
           current_amount?: number | null
@@ -481,7 +491,9 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           attached_file_name?: string | null
+          attached_file_name_2?: string | null
           attached_file_url?: string | null
+          attached_file_url_2?: string | null
           contractor_name?: string
           created_at?: string
           current_amount?: number | null

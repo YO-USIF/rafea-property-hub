@@ -27,6 +27,8 @@ interface AssignmentOrder {
   duration_days?: number;
   attached_file_url?: string;
   attached_file_name?: string;
+  attached_file_url_2?: string;
+  attached_file_name_2?: string;
   tax_included?: boolean;
   tax_amount?: number;
   amount_before_tax?: number;
@@ -58,6 +60,8 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
     duration_days: order?.duration_days || 0,
     attached_file_url: order?.attached_file_url || '',
     attached_file_name: order?.attached_file_name || '',
+    attached_file_url_2: order?.attached_file_url_2 || '',
+    attached_file_name_2: order?.attached_file_name_2 || '',
     tax_included: order?.tax_included || false,
     tax_amount: order?.tax_amount || 0,
     amount_before_tax: order?.amount_before_tax || 0
@@ -78,6 +82,8 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
         duration_days: order.duration_days || 0,
         attached_file_url: order.attached_file_url || '',
         attached_file_name: order.attached_file_name || '',
+        attached_file_url_2: order.attached_file_url_2 || '',
+        attached_file_name_2: order.attached_file_name_2 || '',
         tax_included: order.tax_included || false,
         tax_amount: order.tax_amount || 0,
         amount_before_tax: order.amount_before_tax || 0
@@ -96,6 +102,8 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
         duration_days: 0,
         attached_file_url: '',
         attached_file_name: '',
+        attached_file_url_2: '',
+        attached_file_name_2: '',
         tax_included: false,
         tax_amount: 0,
         amount_before_tax: 0
@@ -142,6 +150,8 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
         duration_days: formData.duration_days ? Number(formData.duration_days) : undefined,
         attached_file_url: formData.attached_file_url,
         attached_file_name: formData.attached_file_name,
+        attached_file_url_2: formData.attached_file_url_2,
+        attached_file_name_2: formData.attached_file_name_2,
       };
 
       const validatedData = assignmentOrderSchema.parse(orderPayload);

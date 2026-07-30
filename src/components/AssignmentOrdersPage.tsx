@@ -296,12 +296,20 @@ const AssignmentOrdersPage = () => {
                           <Printer className="w-4 h-4" />
                         </Button>
                         {order.attached_file_url && (
-                          <Button variant="outline" size="sm" asChild>
+                          <Button variant="outline" size="sm" asChild title="المرفق الأول">
                             <a href={order.attached_file_url} target="_blank" rel="noopener noreferrer">
                               <FileText className="w-4 h-4" />
                             </a>
                           </Button>
                         )}
+                        {order.attached_file_url_2 && (
+                          <Button variant="outline" size="sm" asChild title="المرفق الثاني">
+                            <a href={order.attached_file_url_2} target="_blank" rel="noopener noreferrer">
+                              <FileText className="w-4 h-4" />
+                            </a>
+                          </Button>
+                        )}
+
                         <Button
                           variant="outline"
                           size="sm"

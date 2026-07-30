@@ -563,24 +563,51 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
             />
           </div>
 
-          <FileUpload
-            onFileUploaded={(fileUrl, fileName) => {
-              setFormData(prev => ({
-                ...prev,
-                attached_file_url: fileUrl,
-                attached_file_name: fileName
-              }));
-            }}
-            currentFileUrl={formData.attached_file_url}
-            currentFileName={formData.attached_file_name}
-            onFileRemoved={() => {
-              setFormData(prev => ({
-                ...prev,
-                attached_file_url: '',
-                attached_file_name: ''
-              }));
-            }}
-          />
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>المرفق الأول</Label>
+              <FileUpload
+                onFileUploaded={(fileUrl, fileName) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    attached_file_url: fileUrl,
+                    attached_file_name: fileName
+                  }));
+                }}
+                currentFileUrl={formData.attached_file_url}
+                currentFileName={formData.attached_file_name}
+                onFileRemoved={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    attached_file_url: '',
+                    attached_file_name: ''
+                  }));
+                }}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>المرفق الثاني (اختياري)</Label>
+              <FileUpload
+                onFileUploaded={(fileUrl, fileName) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    attached_file_url_2: fileUrl,
+                    attached_file_name_2: fileName
+                  }));
+                }}
+                currentFileUrl={formData.attached_file_url_2}
+                currentFileName={formData.attached_file_name_2}
+                onFileRemoved={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    attached_file_url_2: '',
+                    attached_file_name_2: ''
+                  }));
+                }}
+              />
+            </div>
+          </div>
+
 
           <div className="flex justify-end space-x-2 space-x-reverse pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

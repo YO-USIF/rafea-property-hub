@@ -348,7 +348,7 @@ const SalesPage = () => {
                           <TableCell className="font-medium">{sale.unit_number}</TableCell>
                           <TableCell>{sale.unit_type}</TableCell>
                           <TableCell>{sale.area} م²</TableCell>
-                          <TableCell>{sale.price.toLocaleString()} ر.س</TableCell>
+                          <TableCell>{sale.price.toLocaleString()} ⃁</TableCell>
                           <TableCell>
                             <div>
                               <div className="font-medium">{sale.customer_name}</div>
@@ -484,7 +484,7 @@ const SalesPage = () => {
                     <TableCell>{sale.unit_number}</TableCell>
                     <TableCell>{sale.unit_type}</TableCell>
                     <TableCell>{sale.area} م²</TableCell>
-                    <TableCell>{sale.price.toLocaleString()} ر.س</TableCell>
+                    <TableCell>{sale.price.toLocaleString()} ⃁</TableCell>
                     <TableCell>
                       <div>
                         <div className="font-medium">{sale.customer_name}</div>
@@ -521,7 +521,7 @@ const SalesPage = () => {
                       })()}
                     </TableCell>
                     <TableCell>
-                      {sale.remaining_amount > 0 ? `${sale.remaining_amount.toLocaleString()} ر.س` : 'مسدد بالكامل'}
+                      {sale.remaining_amount > 0 ? `${sale.remaining_amount.toLocaleString()} ⃁` : 'مسدد بالكامل'}
                     </TableCell>
                     <TableCell>{sale.sale_date || 'غير محدد'}</TableCell>
                     <TableCell>
@@ -551,10 +551,10 @@ const SalesPage = () => {
                                 <html dir="rtl">
                                   <head>
                                     <title>عقد بيع - ${escapeHtml(sale.project_name)} - وحدة ${escapeHtml(sale.unit_number)}</title>
-                                    <style>
+                                    <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}
                                       * { margin: 0; padding: 0; box-sizing: border-box; }
                                       body { 
-                                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'saudi_riyal'; 
                                         direction: rtl; 
                                         text-align: right; 
                                         margin: 20px;
@@ -734,7 +734,7 @@ const SalesPage = () => {
                                           </div>
                                           <div class="info-item">
                                             <div class="info-label">المبلغ المتبقي</div>
-                                            <div class="info-value">${sale.remaining_amount > 0 ? `${sale.remaining_amount.toLocaleString()} ر.س` : 'مسدد بالكامل'}</div>
+                                            <div class="info-value">${sale.remaining_amount > 0 ? `${sale.remaining_amount.toLocaleString()} ⃁` : 'مسدد بالكامل'}</div>
                                           </div>
                                           <div class="info-item">
                                             <div class="info-label">تاريخ البيع</div>

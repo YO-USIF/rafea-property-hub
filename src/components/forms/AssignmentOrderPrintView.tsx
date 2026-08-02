@@ -50,14 +50,14 @@ const AssignmentOrderPrintView = ({ open, onOpenChange, order }: AssignmentOrder
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>أمر تكليف - ${escapeHtml(order.order_number)}</title>
-        <style>
+        <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}
           * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
           }
           body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'saudi_riyal';
             direction: rtl;
             padding: 15px;
             background: white;

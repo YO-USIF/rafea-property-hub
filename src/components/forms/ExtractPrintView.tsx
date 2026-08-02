@@ -344,7 +344,7 @@ const ExtractPrintView = ({ open, onOpenChange, extract }: ExtractPrintViewProps
         </div>
 
         {/* Print Styles */}
-        <style>{`
+        <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}{`
           @media print {
             body {
               print-color-adjust: exact;

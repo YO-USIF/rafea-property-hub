@@ -351,7 +351,7 @@ const ProjectsPage = () => {
                   <TrendingUp className="h-4 w-4 text-blue-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-blue-600">{total.toLocaleString()} ر.س</div>
+                  <div className="text-2xl font-bold text-blue-600">{total.toLocaleString()} ⃁</div>
                   <p className="text-xs text-muted-foreground">إجمالي المستخلصات والفواتير وأوامر التكليف لهذا النطاق</p>
                 </CardContent>
               </Card>
@@ -466,10 +466,10 @@ const ProjectsPage = () => {
                         <span className="text-sm">{project.progress}%</span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-green-600 font-medium">{project.total_sales.toLocaleString()} ر.س</TableCell>
-                    <TableCell className="font-medium">{(Number((project as any).land_value) || 0).toLocaleString()} ر.س</TableCell>
+                    <TableCell className="text-green-600 font-medium">{project.total_sales.toLocaleString()} ⃁</TableCell>
+                    <TableCell className="font-medium">{(Number((project as any).land_value) || 0).toLocaleString()} ⃁</TableCell>
                     <TableCell className="text-red-600 font-medium">
-                      {project.total_expenses.toLocaleString()} ر.س
+                      {project.total_expenses.toLocaleString()} ⃁
                       {project.zone ? (
                         <div className="text-[10px] text-muted-foreground font-normal">مشتركة لنطاق {project.zone}</div>
                       ) : null}

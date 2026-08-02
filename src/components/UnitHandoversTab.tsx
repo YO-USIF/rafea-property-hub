@@ -80,9 +80,9 @@ const UnitHandoversTab = () => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
     printWindow.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><title>إقرار تسليم وحدة سكنية</title>
-    <style>
+    <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}
     @page{size:A4;margin:15mm 15mm 15mm 15mm}
-    body{font-family:Arial,sans-serif;padding:0;margin:0;direction:rtl;font-size:12px;color:#333}
+    body{font-family: Arial,sans-serif, 'saudi_riyal';padding:0;margin:0;direction:rtl;font-size:12px;color:#333}
     .page{padding:15mm;box-sizing:border-box}
     .header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1a365d;padding-bottom:10px;margin-bottom:12px}
     .header-logo img{width:90px;height:90px;object-fit:contain;border-radius:8px}

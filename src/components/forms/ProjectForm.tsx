@@ -213,7 +213,7 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="land_value">قيمة الأرض (ر.س)</Label>
+              <Label htmlFor="land_value">قيمة الأرض (⃁)</Label>
               <Input
                 id="land_value"
                 type="number"

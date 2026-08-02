@@ -222,7 +222,7 @@ const PurchaseForm = ({ open, onOpenChange, purchase, onSuccess, defaultSupplier
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="total_amount">المبلغ الإجمالي (ر.س)</Label>
+              <Label htmlFor="total_amount">المبلغ الإجمالي (⃁)</Label>
               <Input
                 id="total_amount"
                 type="number"

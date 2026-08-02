@@ -157,13 +157,13 @@ const ContractorsPage = () => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>كشف حساب المقاول - ${escapeHtml(contractor.name)}</title>
-        <style>
+        <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}
           @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
           
           * { margin: 0; padding: 0; box-sizing: border-box; }
           
           body { 
-            font-family: 'Tajawal', Arial, sans-serif; 
+            font-family: 'Tajawal', Arial, sans-serif, 'saudi_riyal'; 
             line-height: 1.6; 
             color: #2c3e50; 
             direction: rtl;
@@ -396,15 +396,15 @@ const ContractorsPage = () => {
             <div class="summary-cards">
               <div class="summary-card total">
                 <h3>إجمالي المستخلصات</h3>
-                <div class="amount">${totalAmount.toLocaleString()} ر.س</div>
+                <div class="amount">${totalAmount.toLocaleString()} ⃁</div>
               </div>
               <div class="summary-card paid">
                 <h3>المبلغ المدفوع</h3>
-                <div class="amount">${paidAmount.toLocaleString()} ر.س</div>
+                <div class="amount">${paidAmount.toLocaleString()} ⃁</div>
               </div>
               <div class="summary-card remaining">
                 <h3>الرصيد المتبقي</h3>
-                <div class="amount">${remainingAmount.toLocaleString()} ر.س</div>
+                <div class="amount">${remainingAmount.toLocaleString()} ⃁</div>
               </div>
             </div>
             
@@ -426,7 +426,7 @@ const ContractorsPage = () => {
                     <td>${escapeHtml(extract.extract_number) || 'غير محدد'}</td>
                     <td>${new Date(extract.extract_date).toLocaleDateString('en-GB')}</td>
                     <td>${escapeHtml(extract.project_name) || 'غير محدد'}</td>
-                    <td>${Number(extract.amount).toLocaleString()} ر.س</td>
+                    <td>${Number(extract.amount).toLocaleString()} ⃁</td>
                     <td>${extract.percentage_completed || 0}%</td>
                     <td>
                       <span class="status-badge ${extract.status === 'مدفوع' || extract.status === 'مكتمل' ? 'status-paid' : extract.status === 'قيد المراجعة' ? 'status-review' : 'status-unpaid'}">
@@ -619,8 +619,8 @@ const ContractorsPage = () => {
                     <TableCell>{contractor.email}</TableCell>
                     <TableCell>{contractor.phone}</TableCell>
                     <TableCell>{contractorStats[contractor.id]?.projects || 0} مشروع</TableCell>
-                    <TableCell>{(contractorStats[contractor.id]?.totalContracts || 0).toLocaleString()} ر.س</TableCell>
-                    <TableCell className="text-red-600">{(contractorStats[contractor.id]?.pendingPayments || 0).toLocaleString()} ر.س</TableCell>
+                    <TableCell>{(contractorStats[contractor.id]?.totalContracts || 0).toLocaleString()} ⃁</TableCell>
+                    <TableCell className="text-red-600">{(contractorStats[contractor.id]?.pendingPayments || 0).toLocaleString()} ⃁</TableCell>
                     <TableCell>
                       <Badge variant="outline">ممتاز</Badge>
                     </TableCell>
@@ -703,7 +703,7 @@ const ContractorsPage = () => {
                       <TableCell className="font-medium">{extract.extract_number}</TableCell>
                       <TableCell>{extract.contractor_name}</TableCell>
                       <TableCell>{extract.project_name}</TableCell>
-                      <TableCell>{Number(extract.amount).toLocaleString()} ر.س</TableCell>
+                      <TableCell>{Number(extract.amount).toLocaleString()} ⃁</TableCell>
                       <TableCell>{extract.extract_date}</TableCell>
                       <TableCell>{getExtractStatusBadge(extract.status)}</TableCell>
                     </TableRow>

@@ -40,10 +40,10 @@ export const exportToPDF = (elementId: string, title: string) => {
     <head>
       <meta charset="UTF-8">
       <title>${title}</title>
-      <style>
+      <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Tajawal', sans-serif; direction: rtl; padding: 20px; color: #333; }
+        body { font-family: 'Tajawal', sans-serif, 'saudi_riyal'; direction: rtl; padding: 20px; color: #333; }
         h1, h2, h3 { margin-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; margin: 15px 0; }
         th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: right; font-size: 12px; }

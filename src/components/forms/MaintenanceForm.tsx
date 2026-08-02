@@ -233,7 +233,7 @@ const MaintenanceForm = ({ open, onOpenChange, request, onSuccess }: Maintenance
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="estimated_cost">التكلفة المقدرة (ر.س)</Label>
+              <Label htmlFor="estimated_cost">التكلفة المقدرة (⃁)</Label>
               <Input
                 id="estimated_cost"
                 type="number"

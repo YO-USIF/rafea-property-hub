@@ -301,7 +301,7 @@ const PurchasesPage = () => {
                     <TableCell>{order.requested_by}</TableCell>
                     <TableCell>{order.order_date}</TableCell>
                     <TableCell>{order.expected_delivery}</TableCell>
-                    <TableCell>{order.total_amount.toLocaleString()} ر.س</TableCell>
+                    <TableCell>{order.total_amount.toLocaleString()} ⃁</TableCell>
                     <TableCell>{getStatusBadge(order.status)}</TableCell>
                     <TableCell>{getDeliveryStatusBadge(order.delivery_status)}</TableCell>
                     <TableCell>

@@ -305,7 +305,7 @@ const ContractForm = ({ open, onOpenChange, contractor, contractors = [], contra
                 <input type="checkbox" checked={vatEnabled} onChange={(e) => setVatEnabled(e.target.checked)} />
                 إضافة ضريبة القيمة المضافة (15%)
               </label>
-              <span className="font-bold">الإجمالي: {fmt(total)} ر.س</span>
+              <span className="font-bold">الإجمالي: {fmt(total)} ⃁</span>
             </div>
           </div>
 

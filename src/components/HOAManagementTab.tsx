@@ -142,8 +142,8 @@ const HOAManagementTab = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">إجمالي الأعضاء</CardTitle><Users className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{totalMembers}</div></CardContent></Card>
         <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">أعضاء نشطون</CardTitle><CheckCircle className="h-4 w-4 text-green-500" /></CardHeader><CardContent><div className="text-2xl font-bold text-green-600">{activeMembers}</div></CardContent></Card>
-        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">إجمالي الرسوم</CardTitle><DollarSign className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{totalFees.toLocaleString()} ر.س</div></CardContent></Card>
-        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">المحصل</CardTitle><DollarSign className="h-4 w-4 text-green-500" /></CardHeader><CardContent><div className="text-2xl font-bold text-green-600">{paidFees.toLocaleString()} ر.س</div></CardContent></Card>
+        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">إجمالي الرسوم</CardTitle><DollarSign className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{totalFees.toLocaleString()} ⃁</div></CardContent></Card>
+        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">المحصل</CardTitle><DollarSign className="h-4 w-4 text-green-500" /></CardHeader><CardContent><div className="text-2xl font-bold text-green-600">{paidFees.toLocaleString()} ⃁</div></CardContent></Card>
       </div>
 
       {/* Members Table */}
@@ -218,7 +218,7 @@ const HOAManagementTab = () => {
                     <TableCell>{(f.hoa_members as any)?.member_name || '-'}</TableCell>
                     <TableCell>{(f.hoa_members as any)?.unit_number || '-'}</TableCell>
                     <TableCell>{f.fee_type}</TableCell>
-                    <TableCell>{f.amount?.toLocaleString()} ر.س</TableCell>
+                    <TableCell>{f.amount?.toLocaleString()} ⃁</TableCell>
                     <TableCell>{f.due_date}</TableCell>
                     <TableCell><Badge className={f.payment_status === 'مدفوع' ? 'bg-green-100 text-green-800 hover:bg-green-100' : f.payment_status === 'متأخر' ? 'bg-red-100 text-red-800 hover:bg-red-100' : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100'}>{f.payment_status}</Badge></TableCell>
                     <TableCell>
@@ -279,7 +279,7 @@ const HOAManagementTab = () => {
                 <Select value={feeForm.fee_type} onValueChange={v => setFeeForm(p => ({...p, fee_type: v}))}><SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent><SelectItem value="صيانة شهرية">صيانة شهرية</SelectItem><SelectItem value="صيانة سنوية">صيانة سنوية</SelectItem><SelectItem value="رسوم خدمات">رسوم خدمات</SelectItem><SelectItem value="رسوم طوارئ">رسوم طوارئ</SelectItem><SelectItem value="أخرى">أخرى</SelectItem></SelectContent></Select>
               </div>
-              <div className="space-y-2"><Label>المبلغ (ر.س)</Label><Input type="number" min="0" value={feeForm.amount} onChange={e => setFeeForm(p => ({...p, amount: parseFloat(e.target.value) || 0}))} required /></div>
+              <div className="space-y-2"><Label>المبلغ (⃁)</Label><Input type="number" min="0" value={feeForm.amount} onChange={e => setFeeForm(p => ({...p, amount: parseFloat(e.target.value) || 0}))} required /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2"><Label>تاريخ الاستحقاق</Label><Input type="date" value={feeForm.due_date} onChange={e => setFeeForm(p => ({...p, due_date: e.target.value}))} required /></div>

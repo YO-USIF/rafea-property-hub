@@ -114,11 +114,11 @@ export async function printContract(
     <head>
       <meta charset="UTF-8" />
       <title>عقد مقاولة - ${escapeHtml(contract.contract_number)}</title>
-      <style>
+      <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap');
         * { margin:0; padding:0; box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
         html,body { background:#fff; }
-        body { font-family:'Tajawal',Arial,sans-serif; color:#1a202c; direction:rtl; line-height:1.85; font-size:13px; }
+        body { font-family: 'Tajawal',Arial,sans-serif, 'saudi_riyal'; color:#1a202c; direction:rtl; line-height:1.85; font-size:13px; }
 
         .page {
           width:210mm; min-height:297mm; padding:18mm 16mm 24mm;
@@ -228,9 +228,9 @@ export async function printContract(
         </table>
 
         <table class="totals">
-          <tr><td>الإجمالي قبل الضريبة:</td><td>${fmt(subtotal)} ر.س</td></tr>
-          ${contract.vat_enabled ? `<tr><td>ضريبة القيمة المضافة (15%):</td><td>${fmt(vatAmount)} ر.س</td></tr>` : ''}
-          <tr><td>الإجمالي النهائي:</td><td>${fmt(total)} ر.س</td></tr>
+          <tr><td>الإجمالي قبل الضريبة:</td><td>${fmt(subtotal)} ⃁</td></tr>
+          ${contract.vat_enabled ? `<tr><td>ضريبة القيمة المضافة (15%):</td><td>${fmt(vatAmount)} ⃁</td></tr>` : ''}
+          <tr><td>الإجمالي النهائي:</td><td>${fmt(total)} ⃁</td></tr>
         </table>
 
         <div class="footer">

@@ -136,9 +136,9 @@ const CustomReportForm = ({ open, onOpenChange, onSuccess }: CustomReportFormPro
           <meta charset="utf-8">
           <title>${escapeHtml(title)}</title>
           <script src="https://cdn.tailwindcss.com"></script>
-          <style>
+          <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}
             @page { size: A4; margin: 15mm; }
-            body { font-family: system-ui, -apple-system, sans-serif; }
+            body { font-family: system-ui, -apple-system, sans-serif, 'saudi_riyal'; }
             .no-print { display: none !important; }
             @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
           </style>

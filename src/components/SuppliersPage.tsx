@@ -162,13 +162,13 @@ const SuppliersPage = () => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>كشف حساب المورد - ${escapeHtml(supplier.name)}</title>
-        <style>
+        <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}
           @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
           
           * { margin: 0; padding: 0; box-sizing: border-box; }
           
           body { 
-            font-family: 'Tajawal', Arial, sans-serif; 
+            font-family: 'Tajawal', Arial, sans-serif, 'saudi_riyal'; 
             line-height: 1.6; 
             color: #2c3e50; 
             direction: rtl;
@@ -401,15 +401,15 @@ const SuppliersPage = () => {
             <div class="summary-cards">
               <div class="summary-card total">
                 <h3>إجمالي الفواتير</h3>
-                <div class="amount">${totalAmount.toLocaleString()} ر.س</div>
+                <div class="amount">${totalAmount.toLocaleString()} ⃁</div>
               </div>
               <div class="summary-card paid">
                 <h3>المبلغ المدفوع</h3>
-                <div class="amount">${paidAmount.toLocaleString()} ر.س</div>
+                <div class="amount">${paidAmount.toLocaleString()} ⃁</div>
               </div>
               <div class="summary-card remaining">
                 <h3>الرصيد المتبقي</h3>
-                <div class="amount">${remainingAmount.toLocaleString()} ر.س</div>
+                <div class="amount">${remainingAmount.toLocaleString()} ⃁</div>
               </div>
             </div>
             
@@ -431,7 +431,7 @@ const SuppliersPage = () => {
                     <td>${escapeHtml(invoice.invoice_number) || 'غير محدد'}</td>
                     <td>${new Date(invoice.invoice_date).toLocaleDateString('en-GB')}</td>
                     <td>${escapeHtml(invoice.description) || 'غير محدد'}</td>
-                    <td>${Number(invoice.amount).toLocaleString()} ر.س</td>
+                    <td>${Number(invoice.amount).toLocaleString()} ⃁</td>
                     <td>${invoice.due_date ? new Date(invoice.due_date).toLocaleDateString('en-GB') : 'غير محدد'}</td>
                     <td>
                       <span class="status-badge ${invoice.status === 'مدفوع' ? 'status-paid' : invoice.status === 'غير مدفوع' ? 'status-unpaid' : 'status-review'}">
@@ -607,8 +607,8 @@ const SuppliersPage = () => {
                     <TableCell>{supplier.category}</TableCell>
                     <TableCell>{supplier.company}</TableCell>
                     <TableCell>{supplier.phone}</TableCell>
-                    <TableCell>{(supplierStats[supplier.id]?.totalPurchases || 0).toLocaleString()} ر.س</TableCell>
-                    <TableCell className="text-red-600">{(supplierStats[supplier.id]?.outstandingBalance || 0).toLocaleString()} ر.س</TableCell>
+                    <TableCell>{(supplierStats[supplier.id]?.totalPurchases || 0).toLocaleString()} ⃁</TableCell>
+                    <TableCell className="text-red-600">{(supplierStats[supplier.id]?.outstandingBalance || 0).toLocaleString()} ⃁</TableCell>
                     <TableCell>{supplierStats[supplier.id]?.paymentTerms || '30 يوم'}</TableCell>
                     <TableCell>
                       <Badge variant="outline">{supplierStats[supplier.id]?.rating || 'ممتاز'}</Badge>
@@ -666,9 +666,9 @@ const SuppliersPage = () => {
                                 <meta charset="UTF-8">
                                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                                 <title>بيانات المورد - ${escapeHtml(supplier.name)}</title>
-                                <style>
+                                <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}
                                   body {
-                                    font-family: 'Arial', sans-serif;
+                                    font-family: 'Arial', sans-serif, 'saudi_riyal';
                                     padding: 40px;
                                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                                     min-height: 100vh;
@@ -860,11 +860,11 @@ const SuppliersPage = () => {
                                     <div class="info-grid">
                                       <div class="info-item">
                                         <span class="label">إجمالي المشتريات</span>
-                                        <span class="value">${(supplierData.totalPurchases || 0).toLocaleString()} ر.س</span>
+                                        <span class="value">${(supplierData.totalPurchases || 0).toLocaleString()} ⃁</span>
                                       </div>
                                       <div class="info-item">
                                         <span class="label">الرصيد المستحق</span>
-                                        <span class="value" style="color: #dc3545;">${(supplierData.outstandingBalance || 0).toLocaleString()} ر.س</span>
+                                        <span class="value" style="color: #dc3545;">${(supplierData.outstandingBalance || 0).toLocaleString()} ⃁</span>
                                       </div>
                                       <div class="info-item">
                                         <span class="label">شروط الدفع</span>
@@ -879,7 +879,7 @@ const SuppliersPage = () => {
                                     ${supplierData.outstandingBalance > 0 ? `
                                       <div class="highlight-box">
                                         <div style="font-size: 1.2em;">المبلغ المستحق الدفع</div>
-                                        <div class="amount">${(supplierData.outstandingBalance || 0).toLocaleString()} ر.س</div>
+                                        <div class="amount">${(supplierData.outstandingBalance || 0).toLocaleString()} ⃁</div>
                                         <div style="font-size: 0.9em; opacity: 0.9;">يرجى المتابعة مع قسم المحاسبة</div>
                                       </div>
                                     ` : ''}
@@ -944,7 +944,7 @@ const SuppliersPage = () => {
                     <TableRow key={invoice.id}>
                       <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
                       <TableCell>{invoice.supplier_name}</TableCell>
-                      <TableCell>{Number(invoice.amount).toLocaleString()} ر.س</TableCell>
+                      <TableCell>{Number(invoice.amount).toLocaleString()} ⃁</TableCell>
                       <TableCell>{invoice.invoice_date}</TableCell>
                       <TableCell>{invoice.due_date}</TableCell>
                       <TableCell>{getInvoiceStatusBadge(invoice.status)}</TableCell>

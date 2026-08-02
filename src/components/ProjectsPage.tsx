@@ -440,6 +440,7 @@ const ProjectsPage = () => {
                   <TableHead className="text-right">الوحدات</TableHead>
                   <TableHead className="text-right">نسبة الإنجاز</TableHead>
                   <TableHead className="text-right">إجمالي المبيعات</TableHead>
+                  <TableHead className="text-right">قيمة الأرض</TableHead>
                   <TableHead className="text-right">التكلفة الإجمالية</TableHead>
                   <TableHead className="text-right">الحالة</TableHead>
                   <TableHead className="text-right">تاريخ الانتهاء المتوقع</TableHead>

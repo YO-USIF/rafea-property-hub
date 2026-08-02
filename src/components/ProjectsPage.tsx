@@ -467,6 +467,7 @@ const ProjectsPage = () => {
                       </div>
                     </TableCell>
                     <TableCell className="text-green-600 font-medium">{project.total_sales.toLocaleString()} ر.س</TableCell>
+                    <TableCell className="font-medium">{(Number((project as any).land_value) || 0).toLocaleString()} ر.س</TableCell>
                     <TableCell className="text-red-600 font-medium">
                       {project.total_expenses.toLocaleString()} ر.س
                       {project.zone ? (

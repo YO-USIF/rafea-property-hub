@@ -1030,6 +1030,7 @@ export type Database = {
           created_at: string
           expected_completion: string
           id: string
+          land_value: number
           location: string
           name: string
           progress: number
@@ -1047,6 +1048,7 @@ export type Database = {
           created_at?: string
           expected_completion: string
           id?: string
+          land_value?: number
           location: string
           name: string
           progress?: number
@@ -1064,6 +1066,7 @@ export type Database = {
           created_at?: string
           expected_completion?: string
           id?: string
+          land_value?: number
           location?: string
           name?: string
           progress?: number

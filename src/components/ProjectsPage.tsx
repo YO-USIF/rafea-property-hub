@@ -131,6 +131,14 @@ const ProjectsPage = () => {
         }
       });
 
+      // إضافة قيمة الأرض كمصروف للمشاريع بدون نطاق
+      (projectsData || []).forEach((p: any) => {
+        const land = Number(p.land_value) || 0;
+        if (land > 0 && !(p.zone || '').trim()) {
+          expensesByProject[p.id] = (expensesByProject[p.id] || 0) + land;
+        }
+      });
+
       // حساب إجمالي تكلفة كل نطاق (Zone)
       const projectZoneMap: Record<string, string | null> = {};
       (projectsData || []).forEach((p: any) => { projectZoneMap[p.id] = p.zone; });
@@ -144,6 +152,8 @@ const ProjectsPage = () => {
       (extractsData || []).forEach((e: any) => addZone(e.zone || (e.project_id ? projectZoneMap[e.project_id] : null), e.amount));
       (invoicesData || []).forEach((i: any) => addZone(i.zone || (i.project_id ? projectZoneMap[i.project_id] : null), i.amount));
       (assignmentOrdersData || []).forEach((a: any) => addZone(a.project_id ? projectZoneMap[a.project_id] : null, a.amount));
+      // قيمة الأرض للمشاريع ذات النطاق تُضاف لإجمالي النطاق ثم تُقسَّم
+      (projectsData || []).forEach((p: any) => addZone(p.zone, p.land_value));
       setZoneTotals(zoneTotalsCalc);
 
       // حساب عدد المشاريع في كل نطاق لتقسيم التكلفة بالتساوي
@@ -154,8 +164,8 @@ const ProjectsPage = () => {
       });
 
       // تحديث بيانات كل مشروع:
-      // - المشاريع التي لها نطاق (Zone) تُقسَّم تكلفة النطاق بالتساوي بين مشاريعه
-      // - المشاريع بدون نطاق تعرض تكلفتها الخاصة فقط
+      // - المشاريع التي لها نطاق (Zone) تُقسَّم تكلفة النطاق (شاملة الأراضي) بالتساوي بين مشاريعه
+      // - المشاريع بدون نطاق تعرض تكلفتها الخاصة فقط (شاملة قيمة أرضها)
       const updatedProjects = projectsData?.map((project: any) => {
         const zoneKey = (project.zone || '').trim();
         const totalExpenses = zoneKey
@@ -430,6 +440,7 @@ const ProjectsPage = () => {
                   <TableHead className="text-right">الوحدات</TableHead>
                   <TableHead className="text-right">نسبة الإنجاز</TableHead>
                   <TableHead className="text-right">إجمالي المبيعات</TableHead>
+                  <TableHead className="text-right">قيمة الأرض</TableHead>
                   <TableHead className="text-right">التكلفة الإجمالية</TableHead>
                   <TableHead className="text-right">الحالة</TableHead>
                   <TableHead className="text-right">تاريخ الانتهاء المتوقع</TableHead>
@@ -456,6 +467,7 @@ const ProjectsPage = () => {
                       </div>
                     </TableCell>
                     <TableCell className="text-green-600 font-medium">{project.total_sales.toLocaleString()} ر.س</TableCell>
+                    <TableCell className="font-medium">{(Number((project as any).land_value) || 0).toLocaleString()} ر.س</TableCell>
                     <TableCell className="text-red-600 font-medium">
                       {project.total_expenses.toLocaleString()} ر.س
                       {project.zone ? (

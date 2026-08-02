@@ -238,6 +238,7 @@ const ReportsPage = () => {
       const totalS = pSales.reduce((sum, s) => sum + (s.price || 0), 0);
 
       let pInvoices: any[], pExtracts: any[], totalI: number, totalE: number, share = 1;
+      let landCost = Number(project.land_value) || 0;
       if (zoneKey) {
         const zProjects = projectsInZone(zoneKey);
         const zIds = new Set(zProjects.map((p: any) => p.id));
@@ -246,19 +247,22 @@ const ReportsPage = () => {
         pExtracts = zoneRowsFilter(extractsData, zoneKey, zIds);
         totalI = pInvoices.reduce((sum, i) => sum + (i.amount || 0), 0) / share;
         totalE = pExtracts.reduce((sum, e) => sum + (e.amount || 0), 0) / share;
+        landCost = zProjects.reduce((sum: number, p: any) => sum + (Number(p.land_value) || 0), 0) / share;
       } else {
         pInvoices = invoicesData.filter(i => i.project_id === project.id);
         pExtracts = extractsData.filter(e => e.project_id === project.id);
         totalI = pInvoices.reduce((sum, i) => sum + (i.amount || 0), 0);
         totalE = pExtracts.reduce((sum, e) => sum + (e.amount || 0), 0);
       }
+      const totalCosts = totalI + totalE + landCost;
       return {
         id: project.id, name: project.name,
         totalSales: totalS, salesCount: pSales.length,
         totalInvoices: totalI, invoicesCount: pInvoices.length,
         totalExtracts: totalE, extractsCount: pExtracts.length,
-        netProfit: totalS - (totalI + totalE),
-        profitMargin: totalS > 0 ? ((totalS - (totalI + totalE)) / totalS) * 100 : 0
+        landCost,
+        netProfit: totalS - totalCosts,
+        profitMargin: totalS > 0 ? ((totalS - totalCosts) / totalS) * 100 : 0
       };
     });
   };
@@ -267,6 +271,7 @@ const ReportsPage = () => {
     return projectsDataFiltered.map(project => {
       const zoneKey = (project.zone || '').trim();
       let pInvoices: any[], pExtracts: any[], invoiceCosts: number, extractCosts: number;
+      let landCosts = Number(project.land_value) || 0;
       if (zoneKey) {
         const zProjects = projectsInZone(zoneKey);
         const zIds = new Set(zProjects.map((p: any) => p.id));
@@ -275,6 +280,7 @@ const ReportsPage = () => {
         pExtracts = zoneRowsFilter(extractsData, zoneKey, zIds);
         invoiceCosts = pInvoices.reduce((sum, i) => sum + (i.amount || 0), 0) / share;
         extractCosts = pExtracts.reduce((sum, e) => sum + (e.amount || 0), 0) / share;
+        landCosts = zProjects.reduce((sum: number, p: any) => sum + (Number(p.land_value) || 0), 0) / share;
       } else {
         pInvoices = invoicesData.filter(i => i.project_id === project.id);
         pExtracts = extractsData.filter(e => e.project_id === project.id);
@@ -284,7 +290,8 @@ const ReportsPage = () => {
       return {
         ...project,
         invoiceDetails: pInvoices, extractDetails: pExtracts,
-        invoiceCosts, extractCosts, totalProjectCosts: invoiceCosts + extractCosts,
+        invoiceCosts, extractCosts, landCosts,
+        totalProjectCosts: invoiceCosts + extractCosts + landCosts,
         invoiceCount: pInvoices.length, extractCount: pExtracts.length
       };
     }).filter(p => p.totalProjectCosts > 0 || p.invoiceCount > 0 || p.extractCount > 0);

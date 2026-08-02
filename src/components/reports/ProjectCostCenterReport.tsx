@@ -7,6 +7,7 @@ interface ProjectCostData {
   extractDetails: any[];
   invoiceCosts: number;
   extractCosts: number;
+  landCosts?: number;
   totalProjectCosts: number;
   invoiceCount: number;
   extractCount: number;
@@ -88,7 +89,7 @@ export const ProjectCostCenterReport: React.FC<ProjectCostCenterReportProps> = (
             </CardHeader>
             <CardContent className="space-y-4">
               {/* ملخص التكاليف */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
                 <div className="text-center">
                   <div className="text-lg font-semibold text-orange-600">
                     {formatCurrency(project.invoiceCosts)}
@@ -106,6 +107,14 @@ export const ProjectCostCenterReport: React.FC<ProjectCostCenterReportProps> = (
                     تكاليف المستخلصات ({project.extractCount} مستخلص)
                   </div>
                 </div>
+
+                <div className="text-center">
+                  <div className="text-lg font-semibold text-emerald-600">
+                    {formatCurrency(project.landCosts || 0)}
+                  </div>
+                  <div className="text-sm text-gray-600">قيمة الأرض</div>
+                </div>
+                
                 
                 <div className="text-center">
                   <div className="text-lg font-semibold text-red-600">

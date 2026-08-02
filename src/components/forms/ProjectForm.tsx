@@ -16,6 +16,7 @@ interface Project {
   total_units: number;
   sold_units: number;
   total_cost: number;
+  land_value?: number;
   progress: number;
   start_date: string;
   expected_completion: string;
@@ -41,6 +42,7 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
     total_units: 0,
     sold_units: 0,
     total_cost: 0,
+    land_value: 0,
     progress: 0,
     start_date: '',
     expected_completion: '',
@@ -57,6 +59,7 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
         total_units: project.total_units || 0,
         sold_units: project.sold_units || 0,
         total_cost: project.total_cost || 0,
+        land_value: project.land_value || 0,
         progress: project.progress || 0,
         start_date: project.start_date || '',
         expected_completion: project.expected_completion || '',
@@ -71,6 +74,7 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
         total_units: 0,
         sold_units: 0,
         total_cost: 0,
+        land_value: 0,
         progress: 0,
         start_date: '',
         expected_completion: '',
@@ -205,6 +209,21 @@ const ProjectForm = ({ open, onOpenChange, project, onSuccess }: ProjectFormProp
               />
               <p className="text-xs text-muted-foreground">
                 يتم حساب التكلفة تلقائياً من المستخلصات والفواتير وأوامر التكليف
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="land_value">قيمة الأرض (ر.س)</Label>
+              <Input
+                id="land_value"
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.land_value ?? 0}
+                onChange={(e) => setFormData(prev => ({ ...prev, land_value: parseFloat(e.target.value) || 0 }))}
+              />
+              <p className="text-xs text-muted-foreground">
+                تُحتسب قيمة الأرض ضمن مصروفات المشروع، وفي حال وجود نطاق تُقسَّم على مشاريع النطاق
               </p>
             </div>
 

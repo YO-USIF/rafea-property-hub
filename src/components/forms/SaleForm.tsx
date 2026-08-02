@@ -345,7 +345,7 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="price">السعر (ر.س)</Label>
+              <Label htmlFor="price">السعر (⃁)</Label>
               <Input
                 id="price"
                 type="number"
@@ -356,7 +356,7 @@ const SaleForm = ({ open, onOpenChange, sale, onSuccess, defaultStatus, title, d
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="remaining_amount">المبلغ المتبقي (ر.س)</Label>
+              <Label htmlFor="remaining_amount">المبلغ المتبقي (⃁)</Label>
               <Input
                 id="remaining_amount"
                 type="number"

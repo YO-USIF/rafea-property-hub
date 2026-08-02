@@ -107,8 +107,8 @@ const InvoicesPage = () => {
         <html dir="rtl">
           <head>
             <title>تقرير الفواتير</title>
-            <style>
-              body { font-family: Arial, sans-serif; direction: rtl; text-align: right; }
+            <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}
+              body { font-family: Arial, sans-serif, 'saudi_riyal'; direction: rtl; text-align: right; }
               .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #333; }
               .logo { height: 60px; object-fit: contain; }
             </style>
@@ -118,7 +118,7 @@ const InvoicesPage = () => {
               <img src="/lovable-uploads/c6fbcf40-7e64-42f0-b1da-d735b0b632c8.png" alt="شعار الشركة" class="logo" />
               <h1>تقرير الفواتير</h1>
             </div>
-            <pre style="white-space: pre-wrap; font-family: Arial, sans-serif;">${printContent}</pre>
+            <pre style="white-space: pre-wrap; font-family: Arial, sans-serif, 'saudi_riyal';">${printContent}</pre>
           </body>
         </html>
       `);

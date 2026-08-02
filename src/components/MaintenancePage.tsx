@@ -221,7 +221,7 @@ const MaintenancePage = () => {
                   <AlertTriangle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{totalCost.toLocaleString()} ر.س</div>
+                  <div className="text-2xl font-bold">{totalCost.toLocaleString()} ⃁</div>
                 </CardContent>
               </Card>
             </div>
@@ -286,7 +286,7 @@ const MaintenancePage = () => {
                           <TableCell>{request.priority}</TableCell>
                           <TableCell>{getStatusBadge(request.status)}</TableCell>
                           <TableCell>{request.assigned_to || 'غير محدد'}</TableCell>
-                          <TableCell>{request.estimated_cost} ر.س</TableCell>
+                          <TableCell>{request.estimated_cost} ⃁</TableCell>
                           <TableCell>{request.reported_date}</TableCell>
                           <TableCell>
                             {request.approved ? (

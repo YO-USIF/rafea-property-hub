@@ -33,7 +33,7 @@ const formatDate = (d?: string | null) => {
 };
 
 const formatPrice = (p?: number | null) =>
-  typeof p === 'number' && p > 0 ? p.toLocaleString('en-US') + ' ر.س' : '-';
+  typeof p === 'number' && p > 0 ? p.toLocaleString('en-US') + ' ⃁' : '-';
 
 export const ReservationsPage = () => {
   const { sales, isLoading, updateSale } = useSales();

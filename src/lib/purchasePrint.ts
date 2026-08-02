@@ -29,7 +29,7 @@ const signatureBox = (label: string, name?: string | null) => {
 const baseStyles = (accent: string, accent2: string) => `
   * { margin: 0; padding: 0; box-sizing: border-box; }
   @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
-  body { font-family: 'Tajawal', 'Segoe UI', Tahoma, sans-serif; direction: rtl; text-align: right; color: #1e293b; background: #f1f5f9; padding: 24px; }
+  body { font-family: 'Tajawal', 'Segoe UI', Tahoma, sans-serif, 'saudi_riyal'; direction: rtl; text-align: right; color: #1e293b; background: #f1f5f9; padding: 24px; }
   .sheet { max-width: 850px; margin: 0 auto; background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 35px rgba(0,0,0,.12); }
   .header { background: linear-gradient(135deg, ${accent}, ${accent2}); color: #fff; padding: 28px 32px; }
   .header .top { display: flex; align-items: center; justify-content: space-between; }
@@ -88,7 +88,7 @@ export const printPurchaseOrder = async (order: any) => {
 
   const html = `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8" />
     <title>طلب شراء ${escapeHtml(order.order_number)}</title>
-    <style>${baseStyles('#f59e0b', '#d97706')}</style></head>
+    <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}${baseStyles('#f59e0b', '#d97706')}</style></head>
     <body><div class="sheet">
       <div class="header">
         <div class="top">
@@ -134,7 +134,7 @@ export const printInvoice = async (invoice: any, linkedPurchase?: any) => {
 
   const html = `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8" />
     <title>فاتورة ${escapeHtml(invoice.invoice_number)}</title>
-    <style>${baseStyles('#4f46e5', '#7c3aed')}</style></head>
+    <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}${baseStyles('#4f46e5', '#7c3aed')}</style></head>
     <body><div class="sheet">
       <div class="header">
         <div class="top">

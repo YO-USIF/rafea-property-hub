@@ -1,5 +1,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
+@import '@emran-alhaddad/saudi-riyal-font/index.css';
 
 @tailwind base;
 @tailwind components;
@@ -95,6 +96,7 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground font-cairo;
+    font-family: 'Cairo', 'Arial', 'saudi_riyal', sans-serif;
     direction: rtl;
   }
 
@@ -105,7 +107,7 @@ All colors MUST be HSL.
 
 @layer utilities {
   .font-cairo {
-    font-family: 'Cairo', 'Arial', sans-serif;
+    font-family: 'Cairo', 'Arial', 'saudi_riyal', sans-serif;
   }
   
   .gradient-real-estate {

@@ -173,7 +173,7 @@ const ContractsPage = () => {
                       <TableCell>{companyInfo[contract.company]?.name || contract.company}</TableCell>
                       <TableCell>{contract.project_name || '-'}</TableCell>
                       <TableCell>{contract.contract_date}</TableCell>
-                      <TableCell>{fmt(contract.total)} ر.س</TableCell>
+                      <TableCell>{fmt(contract.total)} ⃁</TableCell>
                       <TableCell>
                         {contract.approved ? (
                           <Badge className="bg-green-100 text-green-800 hover:bg-green-100">معتمد</Badge>

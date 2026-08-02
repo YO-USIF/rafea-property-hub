@@ -28,7 +28,7 @@ const signatureBox = (role: string, name?: string | null, sigPath?: string | nul
 const baseStyles = `
   * { margin: 0; padding: 0; box-sizing: border-box; }
   @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
-  body { font-family: 'Tajawal', 'Segoe UI', Tahoma, sans-serif; direction: rtl; text-align: right; color: #1e293b; background: #f1f5f9; padding: 20px; }
+  body { font-family: 'Tajawal', 'Segoe UI', Tahoma, sans-serif, 'saudi_riyal'; direction: rtl; text-align: right; color: #1e293b; background: #f1f5f9; padding: 20px; }
   .sheet { max-width: 850px; margin: 0 auto; background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 35px rgba(0,0,0,.12); }
   .header { background: linear-gradient(135deg, #0e7490, #0891b2); color: #fff; padding: 24px 32px; text-align: center; }
   .header .logo { height: 70px; object-fit: contain; background: #fff; padding: 6px 10px; border-radius: 8px; margin: 0 auto 10px; display: block; }
@@ -129,7 +129,7 @@ export const printExtract = (extract: any, company: 'suhail' | 'tamlik' = 'suhai
   const html = `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>مستخلص ${escapeHtml(extract.extract_number || '')}</title>
-    <style>${baseStyles}</style></head>
+    <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}${baseStyles}</style></head>
     <body><div class="sheet">
       <div class="header">
         ${logo}

@@ -94,6 +94,14 @@ export const useProjects = () => {
         }
       });
 
+      // إضافة قيمة الأرض كمصروف
+      projectsData?.forEach((p: any) => {
+        const land = Number(p.land_value) || 0;
+        if (land > 0) {
+          expensesByProject[p.id] = (expensesByProject[p.id] || 0) + land;
+        }
+      });
+
       // تحديث بيانات كل مشروع
       const updatedProjects = projectsData?.map((project: any) => ({
         ...project,

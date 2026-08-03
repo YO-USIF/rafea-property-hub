@@ -60,18 +60,31 @@ const baseStyles = (accent: string, accent2: string) => `
   @media print { body { background: #fff; padding: 0; } .sheet { box-shadow: none; } }
 `;
 
-const openAndPrint = (html: string) => {
-  const w = window.open('', '_blank');
-  if (!w) return;
+// يجب فتح النافذة أثناء نقرة المستخدم (قبل أي await) وإلا يمنعها المتصفح
+const openPrintWindow = () => window.open('', '_blank');
+
+const writeAndPrint = (w: Window | null, html: string) => {
+  if (!w) {
+    alert('يرجى السماح بالنوافذ المنبثقة لطباعة المستند');
+    return;
+  }
+  w.document.open();
   w.document.write(html);
   w.document.close();
-  w.onload = () => {
-    w.focus();
-    w.print();
+  const doPrint = () => {
+    try {
+      w.focus();
+      w.print();
+    } catch {
+      /* ignore */
+    }
   };
+  if (w.document.readyState === 'complete') setTimeout(doPrint, 400);
+  else w.onload = doPrint;
 };
 
 export const printPurchaseOrder = async (order: any) => {
+  const printWindow = openPrintWindow();
   const preparerName = await resolvePreparerName(order.user_id || order.created_by);
   const statusColor =
     order.status === 'معتمد'
@@ -120,10 +133,11 @@ export const printPurchaseOrder = async (order: any) => {
       <div class="footer">تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')} &nbsp;•&nbsp; ${COMPANY_NAME}</div>
     </div></body></html>`;
 
-  openAndPrint(html);
+  writeAndPrint(printWindow, html);
 };
 
 export const printInvoice = async (invoice: any, linkedPurchase?: any) => {
+  const printWindow = openPrintWindow();
   const preparerName = await resolvePreparerName(invoice.user_id || invoice.created_by);
   const statusColor =
     invoice.status === 'مدفوع'
@@ -164,5 +178,5 @@ export const printInvoice = async (invoice: any, linkedPurchase?: any) => {
       <div class="footer">تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')} &nbsp;•&nbsp; ${COMPANY_NAME}</div>
     </div></body></html>`;
 
-  openAndPrint(html);
+  writeAndPrint(printWindow, html);
 };

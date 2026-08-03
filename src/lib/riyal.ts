@@ -32,7 +32,15 @@ export const installRiyalSymbol = () => {
 
   const patchInstance = (instance: Intl.NumberFormat) => {
     const originalFormat = instance.format.bind(instance);
-    instance.format = (value: number | bigint) => withRiyalSymbol(originalFormat(value as number));
+    try {
+      Object.defineProperty(instance, 'format', {
+        configurable: true,
+        writable: true,
+        value: (value: number | bigint) => withRiyalSymbol(originalFormat(value as number)),
+      });
+    } catch {
+      // engine forbids overriding format on the instance — leave as-is
+    }
     return instance;
   };
 

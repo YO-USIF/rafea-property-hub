@@ -133,10 +133,11 @@ export const printPurchaseOrder = async (order: any) => {
       <div class="footer">تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')} &nbsp;•&nbsp; ${COMPANY_NAME}</div>
     </div></body></html>`;
 
-  openAndPrint(html);
+  writeAndPrint(printWindow, html);
 };
 
 export const printInvoice = async (invoice: any, linkedPurchase?: any) => {
+  const printWindow = openPrintWindow();
   const preparerName = await resolvePreparerName(invoice.user_id || invoice.created_by);
   const statusColor =
     invoice.status === 'مدفوع'
@@ -177,5 +178,5 @@ export const printInvoice = async (invoice: any, linkedPurchase?: any) => {
       <div class="footer">تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')} &nbsp;•&nbsp; ${COMPANY_NAME}</div>
     </div></body></html>`;
 
-  openAndPrint(html);
+  writeAndPrint(printWindow, html);
 };

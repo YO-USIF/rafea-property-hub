@@ -7,7 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Search, Edit, Trash2, Printer, Home, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Printer, Home, CheckCircle, Clock, XCircle, Paperclip } from 'lucide-react';
+import { useFileHandler } from '@/hooks/useFileHandler';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -25,6 +26,7 @@ const UnitHandoversTab = () => {
   const [printingHandover, setPrintingHandover] = useState<any>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { viewFile } = useFileHandler();
 
   useEffect(() => {
     if (user) fetchHandovers();
@@ -286,6 +288,9 @@ const UnitHandoversTab = () => {
                     <TableCell>{h.customer_signature_confirmed ? <Badge className="bg-green-100 text-green-800">موقع</Badge> : <Badge variant="outline">غير موقع</Badge>}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
+                        {h.attached_file_url && (
+                          <Button variant="outline" size="sm" title={h.attached_file_name || 'عرض المرفق'} onClick={() => viewFile(h.attached_file_url)}><Paperclip className="w-4 h-4" /></Button>
+                        )}
                         <Button variant="outline" size="sm" onClick={() => { setPrintingHandover(h); setPrintDialogOpen(true); }}><Printer className="w-4 h-4" /></Button>
                         <Button variant="outline" size="sm" onClick={() => { setEditing(h); setFormOpen(true); }}><Edit className="w-4 h-4" /></Button>
                         <PermissionGate pageName="maintenance" requirePermission="delete">

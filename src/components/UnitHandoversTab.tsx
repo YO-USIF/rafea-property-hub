@@ -26,6 +26,7 @@ const UnitHandoversTab = () => {
   const [printingHandover, setPrintingHandover] = useState<any>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { viewFile } = useFileHandler();
 
   useEffect(() => {
     if (user) fetchHandovers();

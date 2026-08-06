@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { FileUpload } from '@/components/ui/file-upload';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -39,6 +40,8 @@ interface UnitHandover {
   warranty_notes: string;
   notes: string;
   customer_signature_confirmed: boolean;
+  attached_file_url?: string;
+  attached_file_name?: string;
 }
 
 interface UnitHandoverFormProps {
@@ -75,6 +78,8 @@ const defaultFormData: UnitHandover = {
   warranty_notes: '',
   notes: '',
   customer_signature_confirmed: false,
+  attached_file_url: '',
+  attached_file_name: '',
 };
 
 const UnitHandoverForm = ({ open, onOpenChange, handover, onSuccess }: UnitHandoverFormProps) => {
@@ -113,6 +118,8 @@ const UnitHandoverForm = ({ open, onOpenChange, handover, onSuccess }: UnitHando
         warranty_notes: handover.warranty_notes || '',
         notes: handover.notes || '',
         customer_signature_confirmed: handover.customer_signature_confirmed || false,
+        attached_file_url: handover.attached_file_url || '',
+        attached_file_name: handover.attached_file_name || '',
       });
     } else {
       setFormData(defaultFormData);
@@ -315,6 +322,17 @@ const UnitHandoverForm = ({ open, onOpenChange, handover, onSuccess }: UnitHando
             <div className="space-y-2 mt-4">
               <Label>ملاحظات إضافية</Label>
               <Textarea value={formData.notes} onChange={(e) => update('notes', e.target.value)} rows={3} />
+            </div>
+            <div className="space-y-2 mt-4">
+              <Label>مرفق نموذج استلام الشقة (اختياري)</Label>
+              <FileUpload
+                onFileUploaded={(url, name) => setFormData(prev => ({ ...prev, attached_file_url: url, attached_file_name: name }))}
+                currentFileUrl={formData.attached_file_url}
+                currentFileName={formData.attached_file_name}
+                onFileRemoved={() => setFormData(prev => ({ ...prev, attached_file_url: '', attached_file_name: '' }))}
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx"
+                maxSizeMB={10}
+              />
             </div>
           </div>
 

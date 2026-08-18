@@ -152,16 +152,18 @@ const ProjectsPage = () => {
       (extractsData || []).forEach((e: any) => addZone(e.zone || (e.project_id ? projectZoneMap[e.project_id] : null), e.amount));
       (invoicesData || []).forEach((i: any) => addZone(i.zone || (i.project_id ? projectZoneMap[i.project_id] : null), i.amount));
       (assignmentOrdersData || []).forEach((a: any) => addZone(a.project_id ? projectZoneMap[a.project_id] : null, a.amount));
-      // قيمة الأرض للمشاريع ذات النطاق: تُجمَّع وتُوزَّع بالتساوي على جميع النطاقات
+      // قيمة الأرض لأي مشروع له نطاق: تُجمَّع وتُوزَّع مباشرة بالتساوي على جميع النطاقات
       const zonedProjects = (projectsData || []).filter((p: any) => (p.zone || '').trim());
-      const allZones = Array.from(new Set(zonedProjects.map((p: any) => (p.zone || '').trim()))) as string[];
+      const allZones = Array.from(new Set([
+        ...zonedProjects.map((p: any) => (p.zone || '').trim()),
+        ...Object.keys(zoneTotalsCalc),
+      ].filter(Boolean))) as string[];
       const totalZonedLand = zonedProjects.reduce((s: number, p: any) => s + (Number(p.land_value) || 0), 0);
-      if (allZones.length > 0 && totalZonedLand > 0) {
+      if (allZones.length > 0) {
         const landPerZone = totalZonedLand / allZones.length;
         allZones.forEach((z) => addZone(z, landPerZone));
-      } else {
-        allZones.forEach((z) => addZone(z, 0));
       }
+
       setZoneTotals(zoneTotalsCalc);
 
 

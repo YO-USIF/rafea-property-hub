@@ -484,7 +484,13 @@ const ProjectsPage = () => {
                       </div>
                     </TableCell>
                     <TableCell className="text-green-600 font-medium">{project.total_sales.toLocaleString()} ⃁</TableCell>
-                    <TableCell className="font-medium">{(Number((project as any).land_value) || 0).toLocaleString()} ⃁</TableCell>
+                    <TableCell className="font-medium">
+                      {Math.round(Number((project as any).land_share ?? (project as any).land_value) || 0).toLocaleString()} ⃁
+                      {project.zone ? (
+                        <div className="text-[10px] text-muted-foreground font-normal">حصة موزعة على النطاقات</div>
+                      ) : null}
+                    </TableCell>
+
                     <TableCell className="text-red-600 font-medium">
                       {project.total_expenses.toLocaleString()} ⃁
                       {project.zone ? (

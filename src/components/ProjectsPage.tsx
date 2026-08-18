@@ -177,17 +177,23 @@ const ProjectsPage = () => {
       // تحديث بيانات كل مشروع:
       // - المشاريع التي لها نطاق (Zone) تُقسَّم تكلفة النطاق (شاملة الأراضي) بالتساوي بين مشاريعه
       // - المشاريع بدون نطاق تعرض تكلفتها الخاصة فقط (شاملة قيمة أرضها)
+      const landPerZoneFinal = allZones.length > 0 ? totalZonedLand / allZones.length : 0;
       const updatedProjects = projectsData?.map((project: any) => {
         const zoneKey = (project.zone || '').trim();
         const totalExpenses = zoneKey
           ? ((zoneTotalsCalc[zoneKey] || 0) / (zoneProjectCount[zoneKey] || 1))
           : (expensesByProject?.[project.id] || 0);
+        const landShare = zoneKey
+          ? landPerZoneFinal / (zoneProjectCount[zoneKey] || 1)
+          : (Number(project.land_value) || 0);
         return {
           ...project,
           total_sales: salesByProject?.[project.id] || 0,
           total_expenses: totalExpenses,
+          land_share: landShare,
         };
       });
+
 
       setProjects(updatedProjects || []);
     } catch (error: any) {

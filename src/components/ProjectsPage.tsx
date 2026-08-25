@@ -6,11 +6,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, Building, MapPin, Calendar, TrendingUp, Edit, Trash2, Printer } from 'lucide-react';
+import { Plus, Search, Building, MapPin, Calendar, TrendingUp, Edit, Trash2, Printer, Layers } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import ProjectForm from './forms/ProjectForm';
+import ZoneManagerDialog from './forms/ZoneManagerDialog';
 import { PermissionButton } from '@/components/PermissionButton';
 
 interface Project {

@@ -294,11 +294,18 @@ const ProjectsPage = () => {
           <h1 className="text-3xl font-bold text-gray-900">إدارة المشاريع</h1>
           <p className="text-gray-600 mt-2">متابعة وإدارة جميع المشاريع العقارية</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90" onClick={() => setFormOpen(true)}>
-          <Plus className="w-4 h-4 ml-2" />
-          إضافة مشروع جديد
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setZoneManagerOpen(true)}>
+            <Layers className="w-4 h-4 ml-2" />
+            إدارة النطاقات
+          </Button>
+          <Button className="bg-primary hover:bg-primary/90" onClick={() => setFormOpen(true)}>
+            <Plus className="w-4 h-4 ml-2" />
+            إضافة مشروع جديد
+          </Button>
+        </div>
       </div>
+
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

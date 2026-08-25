@@ -564,6 +564,13 @@ const ProjectsPage = () => {
         project={editingProject}
         onSuccess={fetchProjects}
       />
+
+      <ZoneManagerDialog
+        open={zoneManagerOpen}
+        onOpenChange={setZoneManagerOpen}
+        projects={projects}
+        onSuccess={fetchProjects}
+      />
     </div>
   );
 };

@@ -41,6 +41,7 @@ const ProjectsPage = () => {
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | undefined>();
+  const [zoneManagerOpen, setZoneManagerOpen] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 

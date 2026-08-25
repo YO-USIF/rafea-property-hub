@@ -6,11 +6,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, Building, MapPin, Calendar, TrendingUp, Edit, Trash2, Printer } from 'lucide-react';
+import { Plus, Search, Building, MapPin, Calendar, TrendingUp, Edit, Trash2, Printer, Layers } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import ProjectForm from './forms/ProjectForm';
+import ZoneManagerDialog from './forms/ZoneManagerDialog';
 import { PermissionButton } from '@/components/PermissionButton';
 
 interface Project {
@@ -40,6 +41,7 @@ const ProjectsPage = () => {
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | undefined>();
+  const [zoneManagerOpen, setZoneManagerOpen] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -292,11 +294,18 @@ const ProjectsPage = () => {
           <h1 className="text-3xl font-bold text-gray-900">إدارة المشاريع</h1>
           <p className="text-gray-600 mt-2">متابعة وإدارة جميع المشاريع العقارية</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90" onClick={() => setFormOpen(true)}>
-          <Plus className="w-4 h-4 ml-2" />
-          إضافة مشروع جديد
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setZoneManagerOpen(true)}>
+            <Layers className="w-4 h-4 ml-2" />
+            إدارة النطاقات
+          </Button>
+          <Button className="bg-primary hover:bg-primary/90" onClick={() => setFormOpen(true)}>
+            <Plus className="w-4 h-4 ml-2" />
+            إضافة مشروع جديد
+          </Button>
+        </div>
       </div>
+
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -553,6 +562,13 @@ const ProjectsPage = () => {
         open={formOpen}
         onOpenChange={handleFormClose}
         project={editingProject}
+        onSuccess={fetchProjects}
+      />
+
+      <ZoneManagerDialog
+        open={zoneManagerOpen}
+        onOpenChange={setZoneManagerOpen}
+        projects={projects}
         onSuccess={fetchProjects}
       />
     </div>

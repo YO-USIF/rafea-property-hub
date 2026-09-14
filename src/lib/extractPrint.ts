@@ -86,7 +86,7 @@ export const printExtract = (extract: any, company: 'suhail' | 'tamlik' = 'suhai
     : '';
 
   // التفاصيل المالية
-  const amountBeforeTax = (Number(extract.previous_amount) || 0) + (Number(extract.current_amount) || 0);
+  const amountBeforeTax = Math.max(0, (Number(extract.current_amount) || 0) - (Number(extract.previous_amount) || 0));
   let finRows = '';
   if (extract.previous_amount) {
     finRows += `<div class="row"><span>المبلغ المدفوع سابقاً</span><b>${formatCurrency(extract.previous_amount)}</b></div>`;

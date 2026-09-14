@@ -96,7 +96,7 @@ export const printExtract = (extract: any, company: 'suhail' | 'tamlik' = 'suhai
   }
   if (extract.tax_included) {
     const tax = amountBeforeTax * 0.15;
-    finRows += `<div class="row"><span>إجمالي المبلغ قبل الضريبة</span><b>${formatCurrency(amountBeforeTax)}</b></div>`;
+    finRows += `<div class="row"><span>صافي المبلغ قبل الضريبة (بعد خصم المدفوع سابقاً)</span><b>${formatCurrency(amountBeforeTax)}</b></div>`;
     finRows += `<div class="row"><span>ضريبة القيمة المضافة (15%)</span><b>${formatCurrency(tax)}</b></div>`;
     finRows += `<div class="row total"><span>إجمالي المبلغ شامل الضريبة</span><b>${formatCurrency(amountBeforeTax + tax)}</b></div>`;
   } else {

@@ -140,10 +140,10 @@ const ExtractForm = ({ open, onOpenChange, extract, onSuccess, isProjectManager 
     }
   }, [extract]);
 
-  // حساب المبلغ قبل الضريبة من المبلغ المدفوع سابقاً + قيمة المستخلص الحالي
+  // حساب المبلغ قبل الضريبة = قيمة المستخلص الحالي - المبلغ المدفوع سابقاً
   // ثم حساب الضريبة وإجمالي المبلغ
   useEffect(() => {
-    const amountBeforeTax = (formData.previous_amount || 0) + (formData.current_amount || 0);
+    const amountBeforeTax = Math.max(0, (formData.current_amount || 0) - (formData.previous_amount || 0));
     
     let total: number;
     if (formData.tax_included && amountBeforeTax > 0) {

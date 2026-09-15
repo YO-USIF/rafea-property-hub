@@ -436,6 +436,13 @@ const ExtractsPage = () => {
         onOpenChange={setShowPrintView}
         extract={printingExtract}
       />
+
+      {/* Attachments Dialog */}
+      <ExtractAttachmentsForm
+        open={showAttachments}
+        onOpenChange={setShowAttachments}
+        extract={attachmentsExtract}
+      />
     </div>
   );
 };

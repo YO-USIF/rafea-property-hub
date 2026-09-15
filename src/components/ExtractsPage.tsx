@@ -36,9 +36,13 @@ const ExtractsPage = () => {
   const [editingExtract, setEditingExtract] = useState<any>(null);
   const [printingExtract, setPrintingExtract] = useState<any>(null);
   const [showPrintView, setShowPrintView] = useState(false);
+  const [attachmentsExtract, setAttachmentsExtract] = useState<any>(null);
+  const [showAttachments, setShowAttachments] = useState(false);
   
   const { user } = useAuth();
+  const { checkPermission } = usePermissions();
   const { userRole, isManager, isAdmin, isProjectManager, loading: roleLoading } = useUserRole();
+  const canAttach = isAdmin || checkPermission('extracts', 'edit');
   const { extracts, isLoading, deleteExtract, approveExtract, revokeApprovalExtract, approveInstallment } = useExtracts();
 
   const handleDelete = (id: string) => {

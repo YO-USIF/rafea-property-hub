@@ -382,6 +382,16 @@ const ExtractsPage = () => {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
+                        {canAttach && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => { setAttachmentsExtract(extract); setShowAttachments(true); }}
+                            title="إضافة / تحديث المرفقات"
+                          >
+                            <Paperclip className="w-4 h-4" />
+                          </Button>
+                        )}
                         {(isAdmin || isManager) && (
                           <PermissionButton
                             pageName="extracts"

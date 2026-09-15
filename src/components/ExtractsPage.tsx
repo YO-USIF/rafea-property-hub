@@ -18,12 +18,15 @@ import {
   Filter,
   Printer,
   CheckCircle2,
-  ShieldCheck
+  ShieldCheck,
+  Paperclip
 } from 'lucide-react';
 import { useExtracts } from '@/hooks/useExtracts';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
+import { usePermissions } from '@/hooks/usePermissions';
 import ExtractForm from '@/components/forms/ExtractForm';
+import ExtractAttachmentsForm from '@/components/forms/ExtractAttachmentsForm';
 import ExtractPrintView from '@/components/forms/ExtractPrintView';
 import { ExtractsProjectSummary } from '@/components/reports/ExtractsProjectSummary';
 

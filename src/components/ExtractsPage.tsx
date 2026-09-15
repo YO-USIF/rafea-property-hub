@@ -18,12 +18,15 @@ import {
   Filter,
   Printer,
   CheckCircle2,
-  ShieldCheck
+  ShieldCheck,
+  Paperclip
 } from 'lucide-react';
 import { useExtracts } from '@/hooks/useExtracts';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
+import { usePermissions } from '@/hooks/usePermissions';
 import ExtractForm from '@/components/forms/ExtractForm';
+import ExtractAttachmentsForm from '@/components/forms/ExtractAttachmentsForm';
 import ExtractPrintView from '@/components/forms/ExtractPrintView';
 import { ExtractsProjectSummary } from '@/components/reports/ExtractsProjectSummary';
 
@@ -33,9 +36,13 @@ const ExtractsPage = () => {
   const [editingExtract, setEditingExtract] = useState<any>(null);
   const [printingExtract, setPrintingExtract] = useState<any>(null);
   const [showPrintView, setShowPrintView] = useState(false);
+  const [attachmentsExtract, setAttachmentsExtract] = useState<any>(null);
+  const [showAttachments, setShowAttachments] = useState(false);
   
   const { user } = useAuth();
+  const { checkPermission } = usePermissions();
   const { userRole, isManager, isAdmin, isProjectManager, loading: roleLoading } = useUserRole();
+  const canAttach = isAdmin || checkPermission('extracts', 'edit');
   const { extracts, isLoading, deleteExtract, approveExtract, revokeApprovalExtract, approveInstallment } = useExtracts();
 
   const handleDelete = (id: string) => {
@@ -375,6 +382,16 @@ const ExtractsPage = () => {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
+                        {canAttach && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => { setAttachmentsExtract(extract); setShowAttachments(true); }}
+                            title="إضافة / تحديث المرفقات"
+                          >
+                            <Paperclip className="w-4 h-4" />
+                          </Button>
+                        )}
                         {(isAdmin || isManager) && (
                           <PermissionButton
                             pageName="extracts"
@@ -418,6 +435,13 @@ const ExtractsPage = () => {
         open={showPrintView}
         onOpenChange={setShowPrintView}
         extract={printingExtract}
+      />
+
+      {/* Attachments Dialog */}
+      <ExtractAttachmentsForm
+        open={showAttachments}
+        onOpenChange={setShowAttachments}
+        extract={attachmentsExtract}
       />
     </div>
   );

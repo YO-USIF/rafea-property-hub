@@ -235,19 +235,19 @@ export const printContractorReport = (
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>تقرير أعمال المقاول - ${escapeHtml(contractorName)}</title>
     <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}${baseStyles}
-      .sheet { max-width: 1100px; }
-      table.rep { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 18px; }
-      table.rep th, table.rep td { border: 1px solid #cbd5e1; padding: 7px 6px; text-align: center; }
+      .sheet { max-width: 760px; }
+      table.rep { width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 18px; }
+      table.rep th, table.rep td { border: 1px solid #cbd5e1; padding: 5px 4px; text-align: center; }
       table.rep th { background: #ecfeff; color: #155e75; font-weight: 700; }
       table.rep tbody tr:nth-child(even) { background: #f8fafc; }
-      table.rep td.desc { text-align: right; max-width: 220px; }
+      table.rep td.desc { text-align: right; max-width: 160px; }
       table.rep tfoot td { background: #0e7490; color: #fff; font-weight: 800; }
       .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
       .kpi { background: #f8fafc; border: 1px solid #e2e8f0; border-top: 4px solid #0891b2; border-radius: 8px; padding: 10px; text-align: center; }
       .kpi .l { font-size: 11px; color: #64748b; font-weight: 600; }
-      .kpi .v { font-size: 16px; font-weight: 800; color: #0f172a; margin-top: 4px; }
+      .kpi .v { font-size: 15px; font-weight: 800; color: #0f172a; margin-top: 4px; }
       h3.sec { font-size: 15px; color: #0e7490; margin: 6px 0 10px; border-right: 4px solid #0891b2; padding-right: 8px; }
-      @media print { @page { size: A4 landscape; margin: 0.7cm; } }
+      @media print { @page { size: A4 portrait; margin: 0.7cm; } }
     </style></head>
     <body><div class="sheet">
       <div class="header">

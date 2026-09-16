@@ -19,7 +19,8 @@ import {
   Printer,
   CheckCircle2,
   ShieldCheck,
-  Paperclip
+  Paperclip,
+  Users
 } from 'lucide-react';
 import { useExtracts } from '@/hooks/useExtracts';
 import { useAuth } from '@/hooks/useAuth';
@@ -171,10 +172,16 @@ const ExtractsPage = () => {
           <h1 className="text-3xl font-bold text-gray-900">المستخصات</h1>
           <p className="text-gray-600 mt-2">إدارة ومتابعة مستخصات المقاولين</p>
         </div>
-        <Button onClick={() => setShowForm(true)}>
-          <Plus className="w-4 h-4 ml-2" />
-          إضافة مستخص
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowContractorReport(true)}>
+            <Users className="w-4 h-4 ml-2" />
+            تقارير المقاولين
+          </Button>
+          <Button onClick={() => setShowForm(true)}>
+            <Plus className="w-4 h-4 ml-2" />
+            إضافة مستخص
+          </Button>
+        </div>
       </div>
 
       {/* Quick Stats */}

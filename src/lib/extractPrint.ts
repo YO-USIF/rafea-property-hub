@@ -162,3 +162,142 @@ export const printExtract = (extract: any, company: 'suhail' | 'tamlik' = 'suhai
 
   openAndPrint(html);
 };
+
+// ========== تقرير أعمال المقاول ==========
+export const printContractorReport = (
+  contractorName: string,
+  extracts: any[],
+  period?: { from?: string; to?: string }
+) => {
+  const net = (e: any) => Math.max(0, (Number(e.current_amount) || 0) - (Number(e.previous_amount) || 0));
+
+  const totals = extracts.reduce(
+    (acc, e) => {
+      acc.total += Number(e.amount) || 0;
+      acc.net += net(e);
+      acc.previous += Number(e.previous_amount) || 0;
+      acc.current += Number(e.current_amount) || 0;
+      if (e.approved) acc.approved += 1;
+      return acc;
+    },
+    { total: 0, net: 0, previous: 0, current: 0, approved: 0 }
+  );
+
+  const projects = Array.from(new Set(extracts.map((e) => e.project_name).filter(Boolean)));
+
+  const rows = extracts
+    .slice()
+    .sort((a, b) => String(a.extract_date).localeCompare(String(b.extract_date)))
+    .map(
+      (e, i) => `<tr>
+        <td>${i + 1}</td>
+        <td>${escapeHtml(e.extract_number || '—')}</td>
+        <td>${escapeHtml(e.project_name || '—')}</td>
+        <td class="desc">${escapeHtml(e.description || '—')}</td>
+        <td>${formatDate(e.extract_date)}</td>
+        <td>${escapeHtml(String(e.percentage_completed ?? 0))}%</td>
+        <td>${formatCurrency(e.previous_amount)}</td>
+        <td>${formatCurrency(e.current_amount)}</td>
+        <td>${formatCurrency(net(e))}</td>
+        <td><b>${formatCurrency(e.amount)}</b></td>
+        <td>${e.approved ? '<span class="ok">معتمد</span>' : '<span class="pending">بانتظار</span>'}</td>
+      </tr>`
+    )
+    .join('');
+
+  // ملخص حسب المشروع
+  const byProject = new Map<string, { count: number; net: number; total: number }>();
+  extracts.forEach((e) => {
+    const p = e.project_name || 'غير محدد';
+    const r = byProject.get(p) || { count: 0, net: 0, total: 0 };
+    r.count += 1;
+    r.net += net(e);
+    r.total += Number(e.amount) || 0;
+    byProject.set(p, r);
+  });
+  const projectRows = Array.from(byProject.entries())
+    .map(
+      ([p, r]) => `<tr>
+        <td>${escapeHtml(p)}</td>
+        <td>${r.count}</td>
+        <td>${formatCurrency(r.net)}</td>
+        <td><b>${formatCurrency(r.total)}</b></td>
+      </tr>`
+    )
+    .join('');
+
+  const periodText =
+    period && (period.from || period.to)
+      ? `الفترة: ${period.from ? formatDate(period.from) : 'البداية'} — ${period.to ? formatDate(period.to) : 'اليوم'}`
+      : 'كل الفترات';
+
+  const html = `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>تقرير أعمال المقاول - ${escapeHtml(contractorName)}</title>
+    <style>@font-face{font-family:'saudi_riyal';src:url('https://cdn.jsdelivr.net/npm/@emran-alhaddad/saudi-riyal-font/fonts/regular/saudi_riyal.woff2') format('woff2');}${baseStyles}
+      .sheet { max-width: 1100px; }
+      table.rep { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 18px; }
+      table.rep th, table.rep td { border: 1px solid #cbd5e1; padding: 7px 6px; text-align: center; }
+      table.rep th { background: #ecfeff; color: #155e75; font-weight: 700; }
+      table.rep tbody tr:nth-child(even) { background: #f8fafc; }
+      table.rep td.desc { text-align: right; max-width: 220px; }
+      table.rep tfoot td { background: #0e7490; color: #fff; font-weight: 800; }
+      .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+      .kpi { background: #f8fafc; border: 1px solid #e2e8f0; border-top: 4px solid #0891b2; border-radius: 8px; padding: 10px; text-align: center; }
+      .kpi .l { font-size: 11px; color: #64748b; font-weight: 600; }
+      .kpi .v { font-size: 16px; font-weight: 800; color: #0f172a; margin-top: 4px; }
+      h3.sec { font-size: 15px; color: #0e7490; margin: 6px 0 10px; border-right: 4px solid #0891b2; padding-right: 8px; }
+      @media print { @page { size: A4 landscape; margin: 0.7cm; } }
+    </style></head>
+    <body><div class="sheet">
+      <div class="header">
+        <img src="${SUHAIL_LOGO}" class="logo" alt="الشعار" />
+        <h1>تقرير أعمال المقاول</h1>
+        <div class="sub">المدينة المنورة - المملكة العربية السعودية</div>
+      </div>
+      <div class="title">
+        <div class="name">${escapeHtml(contractorName)}</div>
+        <div class="no">${escapeHtml(periodText)}</div>
+      </div>
+      <div class="body">
+        <div class="kpis">
+          <div class="kpi"><div class="l">عدد المستخلصات</div><div class="v">${extracts.length}</div></div>
+          <div class="kpi"><div class="l">المعتمدة</div><div class="v">${totals.approved} / ${extracts.length}</div></div>
+          <div class="kpi"><div class="l">صافي الأعمال</div><div class="v">${formatCurrency(totals.net)}</div></div>
+          <div class="kpi"><div class="l">إجمالي المبالغ</div><div class="v">${formatCurrency(totals.total)}</div></div>
+        </div>
+
+        <h3 class="sec">ملخص حسب المشروع (${projects.length})</h3>
+        <table class="rep">
+          <thead><tr><th>المشروع</th><th>عدد المستخلصات</th><th>صافي الأعمال</th><th>الإجمالي</th></tr></thead>
+          <tbody>${projectRows}</tbody>
+        </table>
+
+        <h3 class="sec">تفاصيل المستخلصات</h3>
+        <table class="rep">
+          <thead><tr>
+            <th>#</th><th>رقم المستخلص</th><th>المشروع</th><th>وصف الأعمال</th><th>التاريخ</th>
+            <th>الإنجاز</th><th>مدفوع سابقاً</th><th>قيمة المستخلص</th><th>الصافي</th><th>الإجمالي</th><th>التعميد</th>
+          </tr></thead>
+          <tbody>${rows || '<tr><td colspan="11">لا توجد مستخلصات</td></tr>'}</tbody>
+          <tfoot><tr>
+            <td colspan="6">الإجمالي العام</td>
+            <td>${formatCurrency(totals.previous)}</td>
+            <td>${formatCurrency(totals.current)}</td>
+            <td>${formatCurrency(totals.net)}</td>
+            <td>${formatCurrency(totals.total)}</td>
+            <td>—</td>
+          </tr></tfoot>
+        </table>
+
+        <div class="signs">
+          ${signatureBox('المُعد', extracts[0]?.created_by_name)}
+          ${signatureBox('المقاول', contractorName, null)}
+          ${signatureBox('المُعتمد', 'م/ يوسف صلاح يوسف', '/signatures/yousef-signature.jpeg')}
+        </div>
+      </div>
+      <div class="footer">تاريخ الطباعة: ${new Date().toLocaleDateString('en-GB')} &nbsp;•&nbsp; جميع الحقوق محفوظة © ${new Date().getFullYear()}</div>
+    </div></body></html>`;
+
+  openAndPrint(html);
+};

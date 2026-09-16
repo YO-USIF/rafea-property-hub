@@ -452,6 +452,13 @@ const ExtractsPage = () => {
         onOpenChange={setShowAttachments}
         extract={attachmentsExtract}
       />
+
+      {/* Contractor Report Dialog */}
+      <ContractorExtractsReport
+        open={showContractorReport}
+        onOpenChange={setShowContractorReport}
+        extracts={extracts}
+      />
     </div>
   );
 };

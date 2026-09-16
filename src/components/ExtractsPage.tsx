@@ -19,7 +19,8 @@ import {
   Printer,
   CheckCircle2,
   ShieldCheck,
-  Paperclip
+  Paperclip,
+  Users
 } from 'lucide-react';
 import { useExtracts } from '@/hooks/useExtracts';
 import { useAuth } from '@/hooks/useAuth';
@@ -29,6 +30,7 @@ import ExtractForm from '@/components/forms/ExtractForm';
 import ExtractAttachmentsForm from '@/components/forms/ExtractAttachmentsForm';
 import ExtractPrintView from '@/components/forms/ExtractPrintView';
 import { ExtractsProjectSummary } from '@/components/reports/ExtractsProjectSummary';
+import ContractorExtractsReport from '@/components/reports/ContractorExtractsReport';
 
 const ExtractsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,6 +40,7 @@ const ExtractsPage = () => {
   const [showPrintView, setShowPrintView] = useState(false);
   const [attachmentsExtract, setAttachmentsExtract] = useState<any>(null);
   const [showAttachments, setShowAttachments] = useState(false);
+  const [showContractorReport, setShowContractorReport] = useState(false);
   
   const { user } = useAuth();
   const { checkPermission } = usePermissions();
@@ -169,10 +172,16 @@ const ExtractsPage = () => {
           <h1 className="text-3xl font-bold text-gray-900">المستخصات</h1>
           <p className="text-gray-600 mt-2">إدارة ومتابعة مستخصات المقاولين</p>
         </div>
-        <Button onClick={() => setShowForm(true)}>
-          <Plus className="w-4 h-4 ml-2" />
-          إضافة مستخص
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowContractorReport(true)}>
+            <Users className="w-4 h-4 ml-2" />
+            تقارير المقاولين
+          </Button>
+          <Button onClick={() => setShowForm(true)}>
+            <Plus className="w-4 h-4 ml-2" />
+            إضافة مستخص
+          </Button>
+        </div>
       </div>
 
       {/* Quick Stats */}
@@ -442,6 +451,13 @@ const ExtractsPage = () => {
         open={showAttachments}
         onOpenChange={setShowAttachments}
         extract={attachmentsExtract}
+      />
+
+      {/* Contractor Report Dialog */}
+      <ContractorExtractsReport
+        open={showContractorReport}
+        onOpenChange={setShowContractorReport}
+        extracts={extracts}
       />
     </div>
   );

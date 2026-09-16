@@ -99,7 +99,7 @@ export const ContractorExtractsReport = ({ open, onOpenChange, extracts }: Props
         </DialogHeader>
 
         {/* الفلاتر */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
           <div className="relative">
             <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
@@ -117,6 +117,21 @@ export const ContractorExtractsReport = ({ open, onOpenChange, extracts }: Props
             <span className="text-xs font-bold whitespace-nowrap">إلى</span>
             <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
           </div>
+          <select
+            className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+            value={project}
+            onChange={(e) => setProject(e.target.value)}
+          >
+            <option value="">كل المشاريع</option>
+            {projects.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
+          <Input
+            placeholder="بيان الأعمال..."
+            value={works}
+            onChange={(e) => setWorks(e.target.value)}
+          />
         </div>
 
         {!selected ? (
@@ -165,8 +180,8 @@ export const ContractorExtractsReport = ({ open, onOpenChange, extracts }: Props
                               onClick={() =>
                                 printContractorReport(
                                   c.name,
-                                  extracts.filter((e) => (e.contractor_name || 'غير محدد') === c.name && inRange(e)),
-                                  { from, to }
+                                  extracts.filter((e) => (e.contractor_name || 'غير محدد') === c.name && matches(e)),
+                                  { from, to, project }
                                 )
                               }
                             >

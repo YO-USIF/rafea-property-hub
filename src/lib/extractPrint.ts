@@ -167,7 +167,7 @@ export const printExtract = (extract: any, company: 'suhail' | 'tamlik' = 'suhai
 export const printContractorReport = (
   contractorName: string,
   extracts: any[],
-  period?: { from?: string; to?: string }
+  period?: { from?: string; to?: string; project?: string }
 ) => {
   const net = (e: any) => Math.max(0, (Number(e.current_amount) || 0) - (Number(e.previous_amount) || 0));
 

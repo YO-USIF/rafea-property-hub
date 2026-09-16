@@ -206,7 +206,7 @@ export const ContractorExtractsReport = ({ open, onOpenChange, extracts }: Props
                 <ArrowRight className="w-4 h-4 ml-2" />
                 رجوع لقائمة المقاولين
               </Button>
-              <Button size="sm" onClick={() => printContractorReport(selected, details, { from, to })}>
+              <Button size="sm" onClick={() => printContractorReport(selected, details, { from, to, project })}>
                 <Printer className="w-4 h-4 ml-2" />
                 طباعة التقرير
               </Button>

@@ -30,6 +30,8 @@ export const ContractorExtractsReport = ({ open, onOpenChange, extracts }: Props
   const [selected, setSelected] = useState<string | null>(null);
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
+  const [project, setProject] = useState('');
+  const [works, setWorks] = useState('');
 
   const inRange = (e: any) => {
     const d = e.extract_date;
@@ -38,9 +40,22 @@ export const ContractorExtractsReport = ({ open, onOpenChange, extracts }: Props
     return true;
   };
 
+  const matches = (e: any) => {
+    if (!inRange(e)) return false;
+    if (project && (e.project_name || 'غير محدد') !== project) return false;
+    if (works && !(e.description || '').toLowerCase().includes(works.trim().toLowerCase())) return false;
+    return true;
+  };
+
+  const projects = useMemo(
+    () =>
+      Array.from(new Set(extracts.map((e) => e.project_name || 'غير محدد'))).sort((a, b) => a.localeCompare(b, 'ar')),
+    [extracts]
+  );
+
   const contractors = useMemo(() => {
     const map = new Map<string, { name: string; count: number; total: number; net: number; approved: number; projects: Set<string> }>();
-    extracts.filter(inRange).forEach((e) => {
+    extracts.filter(matches).forEach((e) => {
       const name = e.contractor_name || 'غير محدد';
       const row = map.get(name) || { name, count: 0, total: 0, net: 0, approved: 0, projects: new Set<string>() };
       row.count += 1;
@@ -53,11 +68,11 @@ export const ContractorExtractsReport = ({ open, onOpenChange, extracts }: Props
     return Array.from(map.values())
       .filter((c) => c.name.toLowerCase().includes(search.toLowerCase()))
       .sort((a, b) => b.total - a.total);
-  }, [extracts, search, from, to]);
+  }, [extracts, search, from, to, project, works]);
 
   const details = useMemo(
-    () => extracts.filter((e) => (e.contractor_name || 'غير محدد') === selected && inRange(e)),
-    [extracts, selected, from, to]
+    () => extracts.filter((e) => (e.contractor_name || 'غير محدد') === selected && matches(e)),
+    [extracts, selected, from, to, project, works]
   );
 
   const totals = useMemo(() => {

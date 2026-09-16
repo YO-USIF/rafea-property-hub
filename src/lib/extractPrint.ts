@@ -227,8 +227,8 @@ export const printContractorReport = (
     .join('');
 
   const periodText =
-    period && (period.from || period.to)
-      ? `الفترة: ${period.from ? formatDate(period.from) : 'البداية'} — ${period.to ? formatDate(period.to) : 'اليوم'}`
+    period && (period.from || period.to || period.project)
+      ? `الفترة: ${period.from ? formatDate(period.from) : 'البداية'} — ${period.to ? formatDate(period.to) : 'اليوم'}${period.project ? ` • المشروع: ${period.project}` : ''}`
       : 'كل الفترات';
 
   const html = `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8" />

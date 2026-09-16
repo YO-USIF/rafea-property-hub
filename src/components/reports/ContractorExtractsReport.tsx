@@ -30,6 +30,8 @@ export const ContractorExtractsReport = ({ open, onOpenChange, extracts }: Props
   const [selected, setSelected] = useState<string | null>(null);
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
+  const [project, setProject] = useState('');
+  const [works, setWorks] = useState('');
 
   const inRange = (e: any) => {
     const d = e.extract_date;
@@ -38,9 +40,22 @@ export const ContractorExtractsReport = ({ open, onOpenChange, extracts }: Props
     return true;
   };
 
+  const matches = (e: any) => {
+    if (!inRange(e)) return false;
+    if (project && (e.project_name || 'غير محدد') !== project) return false;
+    if (works && !(e.description || '').toLowerCase().includes(works.trim().toLowerCase())) return false;
+    return true;
+  };
+
+  const projects = useMemo(
+    () =>
+      Array.from(new Set(extracts.map((e) => e.project_name || 'غير محدد'))).sort((a, b) => a.localeCompare(b, 'ar')),
+    [extracts]
+  );
+
   const contractors = useMemo(() => {
     const map = new Map<string, { name: string; count: number; total: number; net: number; approved: number; projects: Set<string> }>();
-    extracts.filter(inRange).forEach((e) => {
+    extracts.filter(matches).forEach((e) => {
       const name = e.contractor_name || 'غير محدد';
       const row = map.get(name) || { name, count: 0, total: 0, net: 0, approved: 0, projects: new Set<string>() };
       row.count += 1;
@@ -53,11 +68,11 @@ export const ContractorExtractsReport = ({ open, onOpenChange, extracts }: Props
     return Array.from(map.values())
       .filter((c) => c.name.toLowerCase().includes(search.toLowerCase()))
       .sort((a, b) => b.total - a.total);
-  }, [extracts, search, from, to]);
+  }, [extracts, search, from, to, project, works]);
 
   const details = useMemo(
-    () => extracts.filter((e) => (e.contractor_name || 'غير محدد') === selected && inRange(e)),
-    [extracts, selected, from, to]
+    () => extracts.filter((e) => (e.contractor_name || 'غير محدد') === selected && matches(e)),
+    [extracts, selected, from, to, project, works]
   );
 
   const totals = useMemo(() => {
@@ -84,7 +99,7 @@ export const ContractorExtractsReport = ({ open, onOpenChange, extracts }: Props
         </DialogHeader>
 
         {/* الفلاتر */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
           <div className="relative">
             <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
@@ -102,6 +117,21 @@ export const ContractorExtractsReport = ({ open, onOpenChange, extracts }: Props
             <span className="text-xs font-bold whitespace-nowrap">إلى</span>
             <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
           </div>
+          <select
+            className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+            value={project}
+            onChange={(e) => setProject(e.target.value)}
+          >
+            <option value="">كل المشاريع</option>
+            {projects.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
+          <Input
+            placeholder="بيان الأعمال..."
+            value={works}
+            onChange={(e) => setWorks(e.target.value)}
+          />
         </div>
 
         {!selected ? (
@@ -150,8 +180,8 @@ export const ContractorExtractsReport = ({ open, onOpenChange, extracts }: Props
                               onClick={() =>
                                 printContractorReport(
                                   c.name,
-                                  extracts.filter((e) => (e.contractor_name || 'غير محدد') === c.name && inRange(e)),
-                                  { from, to }
+                                  extracts.filter((e) => (e.contractor_name || 'غير محدد') === c.name && matches(e)),
+                                  { from, to, project }
                                 )
                               }
                             >
@@ -176,7 +206,7 @@ export const ContractorExtractsReport = ({ open, onOpenChange, extracts }: Props
                 <ArrowRight className="w-4 h-4 ml-2" />
                 رجوع لقائمة المقاولين
               </Button>
-              <Button size="sm" onClick={() => printContractorReport(selected, details, { from, to })}>
+              <Button size="sm" onClick={() => printContractorReport(selected, details, { from, to, project })}>
                 <Printer className="w-4 h-4 ml-2" />
                 طباعة التقرير
               </Button>

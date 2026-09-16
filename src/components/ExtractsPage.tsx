@@ -29,6 +29,7 @@ import ExtractForm from '@/components/forms/ExtractForm';
 import ExtractAttachmentsForm from '@/components/forms/ExtractAttachmentsForm';
 import ExtractPrintView from '@/components/forms/ExtractPrintView';
 import { ExtractsProjectSummary } from '@/components/reports/ExtractsProjectSummary';
+import ContractorExtractsReport from '@/components/reports/ContractorExtractsReport';
 
 const ExtractsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,6 +39,7 @@ const ExtractsPage = () => {
   const [showPrintView, setShowPrintView] = useState(false);
   const [attachmentsExtract, setAttachmentsExtract] = useState<any>(null);
   const [showAttachments, setShowAttachments] = useState(false);
+  const [showContractorReport, setShowContractorReport] = useState(false);
   
   const { user } = useAuth();
   const { checkPermission } = usePermissions();

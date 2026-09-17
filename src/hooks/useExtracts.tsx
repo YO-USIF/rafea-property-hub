@@ -221,6 +221,7 @@ export const useExtracts = () => {
         .from('extracts')
         .update({ 
           approved: true, 
+          status: 'معتمد',
           approved_by: user?.id,
           approved_at: new Date().toISOString()
         })
@@ -273,6 +274,7 @@ export const useExtracts = () => {
         .from('extracts')
         .update({ 
           approved: false, 
+          status: 'قيد المراجعة',
           approved_by: null,
           approved_at: null
         })
@@ -324,6 +326,7 @@ export const useExtracts = () => {
         .update({
           installments_approvals: updated,
           approved: allApproved,
+          status: allApproved ? 'معتمد' : 'قيد المراجعة',
           approved_by: allApproved ? user?.id : null,
           approved_at: allApproved ? new Date().toISOString() : null,
         })

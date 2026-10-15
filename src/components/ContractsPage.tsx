@@ -8,7 +8,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Search, FileSignature, Printer, Edit, Trash2, CheckCircle2, XCircle, FileText, ShieldCheck } from 'lucide-react';
+import { Plus, Search, FileSignature, Printer, Edit, Trash2, CheckCircle2, XCircle, FileText, ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react';
 import ContractForm from '@/components/forms/ContractForm';
 import { PermissionButton } from '@/components/PermissionButton';
 import { useContracts } from '@/hooks/useContracts';
@@ -23,6 +23,7 @@ const ContractsPage = () => {
   const [editingContract, setEditingContract] = useState<any>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [profileNames, setProfileNames] = useState<Record<string, string>>({});
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const { contracts, isLoading, deleteContract, approveContract, revokeApproval } = useContracts();
   const { contractors } = useContractors();
@@ -48,10 +49,23 @@ const ContractsPage = () => {
     printContract(contract, getContractor(contract), approverName);
   };
 
+  const getWorkItems = (contract: any) =>
+    (Array.isArray(contract.items) ? contract.items : [])
+      .map((it: any) => ({
+        description: String(it?.description || '').trim(),
+        quantity: Number(it?.quantity || 0),
+        unit: String(it?.unit || '').trim(),
+        unit_price: Number(it?.unit_price || 0),
+      }))
+      .filter((it) => it.description !== '');
+
+  const workSummary = (contract: any) => getWorkItems(contract).map((it) => it.description).join(' • ');
+
   const filtered = contracts.filter((c: any) =>
     (c.contractor_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (c.contract_number || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (c.project_name || '').toLowerCase().includes(searchTerm.toLowerCase())
+    (c.project_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    workSummary(c).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalContracts = contracts.length;
@@ -137,7 +151,7 @@ const ContractsPage = () => {
           <div className="relative flex-1 mb-6">
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
-              placeholder="البحث برقم العقد أو المقاول أو المشروع..."
+              placeholder="البحث برقم العقد أو المقاول أو المشروع أو بيان الأعمال..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pr-10"
@@ -152,6 +166,7 @@ const ContractsPage = () => {
                   <TableHead className="text-right">المقاول</TableHead>
                   <TableHead className="text-right">الجهة</TableHead>
                   <TableHead className="text-right">المشروع</TableHead>
+                  <TableHead className="text-right min-w-[240px]">بيان الأعمال</TableHead>
                   <TableHead className="text-right">تاريخ العقد</TableHead>
                   <TableHead className="text-right">القيمة</TableHead>
                   <TableHead className="text-right">التعميد</TableHead>
@@ -161,17 +176,43 @@ const ContractsPage = () => {
               <TableBody>
                 {filtered.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-10 text-gray-500">
+                    <TableCell colSpan={9} className="text-center py-10 text-gray-500">
                       لا توجد عقود مسجلة بعد
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filtered.map((contract: any) => (
-                    <TableRow key={contract.id}>
+                  filtered.map((contract: any) => {
+                    const workItems = getWorkItems(contract);
+                    const isExpanded = expandedId === contract.id;
+                    return (
+                    <React.Fragment key={contract.id}>
+                    <TableRow>
                       <TableCell className="font-medium">{contract.contract_number}</TableCell>
                       <TableCell>{contract.contractor_name}</TableCell>
                       <TableCell>{companyInfo[contract.company]?.name || contract.company}</TableCell>
                       <TableCell>{contract.project_name || '-'}</TableCell>
+                      <TableCell className="max-w-[320px]">
+                        {workItems.length === 0 ? (
+                          <span className="text-gray-400">لا يوجد بيان أعمال</span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setExpandedId(isExpanded ? null : contract.id)}
+                            title={workSummary(contract)}
+                            className="block w-full text-right group"
+                          >
+                            <span className="line-clamp-2 text-sm text-gray-700 group-hover:text-primary">
+                              {workItems.map((it) => it.description).join(' • ')}
+                            </span>
+                            <span className="inline-flex items-center gap-1 text-xs text-primary mt-1">
+                              {isExpanded
+                                ? <ChevronUp className="w-3.5 h-3.5" />
+                                : <ChevronDown className="w-3.5 h-3.5" />}
+                              {workItems.length === 1 ? 'بند واحد' : `${workItems.length} بنود`} — عرض البيان
+                            </span>
+                          </button>
+                        )}
+                      </TableCell>
                       <TableCell>{contract.contract_date}</TableCell>
                       <TableCell>{fmt(contract.total)} ⃁</TableCell>
                       <TableCell>
@@ -230,7 +271,46 @@ const ContractsPage = () => {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))
+                    {isExpanded && workItems.length > 0 && (
+                      <TableRow className="bg-muted/40 hover:bg-muted/40">
+                        <TableCell colSpan={9} className="p-0">
+                          <div className="p-4">
+                            <div className="text-sm font-bold text-gray-800 mb-3">
+                              بيان الأعمال — عقد {contract.contract_number} ({workItems.length} بند)
+                            </div>
+                            <div className="border rounded-lg overflow-hidden bg-white">
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead className="w-12 text-right">م</TableHead>
+                                    <TableHead className="text-right">وصف العمل</TableHead>
+                                    <TableHead className="w-24 text-right">الكمية</TableHead>
+                                    <TableHead className="w-24 text-right">الوحدة</TableHead>
+                                    <TableHead className="w-32 text-right">سعر الوحدة</TableHead>
+                                    <TableHead className="w-32 text-right">الإجمالي</TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {workItems.map((it, idx) => (
+                                    <TableRow key={idx}>
+                                      <TableCell>{idx + 1}</TableCell>
+                                      <TableCell className="text-right">{it.description}</TableCell>
+                                      <TableCell>{it.quantity}</TableCell>
+                                      <TableCell>{it.unit || '-'}</TableCell>
+                                      <TableCell>{fmt(it.unit_price)}</TableCell>
+                                      <TableCell className="font-semibold">{fmt(it.quantity * it.unit_price)} ⃁</TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    </React.Fragment>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>

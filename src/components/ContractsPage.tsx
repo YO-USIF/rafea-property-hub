@@ -181,12 +181,38 @@ const ContractsPage = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filtered.map((contract: any) => (
-                    <TableRow key={contract.id}>
+                  filtered.map((contract: any) => {
+                    const workItems = getWorkItems(contract);
+                    const isExpanded = expandedId === contract.id;
+                    return (
+                    <React.Fragment key={contract.id}>
+                    <TableRow>
                       <TableCell className="font-medium">{contract.contract_number}</TableCell>
                       <TableCell>{contract.contractor_name}</TableCell>
                       <TableCell>{companyInfo[contract.company]?.name || contract.company}</TableCell>
                       <TableCell>{contract.project_name || '-'}</TableCell>
+                      <TableCell className="max-w-[320px]">
+                        {workItems.length === 0 ? (
+                          <span className="text-gray-400">لا يوجد بيان أعمال</span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setExpandedId(isExpanded ? null : contract.id)}
+                            title={workSummary(contract)}
+                            className="block w-full text-right group"
+                          >
+                            <span className="line-clamp-2 text-sm text-gray-700 group-hover:text-primary">
+                              {workItems.map((it) => it.description).join(' • ')}
+                            </span>
+                            <span className="inline-flex items-center gap-1 text-xs text-primary mt-1">
+                              {isExpanded
+                                ? <ChevronUp className="w-3.5 h-3.5" />
+                                : <ChevronDown className="w-3.5 h-3.5" />}
+                              {workItems.length === 1 ? 'بند واحد' : `${workItems.length} بنود`} — عرض البيان
+                            </span>
+                          </button>
+                        )}
+                      </TableCell>
                       <TableCell>{contract.contract_date}</TableCell>
                       <TableCell>{fmt(contract.total)} ⃁</TableCell>
                       <TableCell>
@@ -245,7 +271,46 @@ const ContractsPage = () => {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))
+                    {isExpanded && workItems.length > 0 && (
+                      <TableRow className="bg-muted/40 hover:bg-muted/40">
+                        <TableCell colSpan={9} className="p-0">
+                          <div className="p-4">
+                            <div className="text-sm font-bold text-gray-800 mb-3">
+                              بيان الأعمال — عقد {contract.contract_number} ({workItems.length} بند)
+                            </div>
+                            <div className="border rounded-lg overflow-hidden bg-white">
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead className="w-12 text-right">م</TableHead>
+                                    <TableHead className="text-right">وصف العمل</TableHead>
+                                    <TableHead className="w-24 text-right">الكمية</TableHead>
+                                    <TableHead className="w-24 text-right">الوحدة</TableHead>
+                                    <TableHead className="w-32 text-right">سعر الوحدة</TableHead>
+                                    <TableHead className="w-32 text-right">الإجمالي</TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {workItems.map((it, idx) => (
+                                    <TableRow key={idx}>
+                                      <TableCell>{idx + 1}</TableCell>
+                                      <TableCell className="text-right">{it.description}</TableCell>
+                                      <TableCell>{it.quantity}</TableCell>
+                                      <TableCell>{it.unit || '-'}</TableCell>
+                                      <TableCell>{fmt(it.unit_price)}</TableCell>
+                                      <TableCell className="font-semibold">{fmt(it.quantity * it.unit_price)} ⃁</TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    </React.Fragment>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>

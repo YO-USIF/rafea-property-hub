@@ -47,6 +47,8 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
   const { projects } = useProjects();
   const { contractors } = useContractors();
   const [loading, setLoading] = useState(false);
+  // اسم المقاول اليدوي (اختياري) عندما يكون الاختيار عماله خارجية باليومية
+  const [customContractorName, setCustomContractorName] = useState('');
   const [formData, setFormData] = useState<AssignmentOrder>({
     order_number: order?.order_number || '',
     contractor_name: order?.contractor_name || '',
@@ -136,7 +138,9 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
     try {
       const orderPayload = {
         order_number: formData.order_number && formData.order_number.trim() !== '' ? formData.order_number : undefined,
-        contractor_name: formData.contractor_name,
+        contractor_name: formData.contractor_name.includes('باليومية') && customContractorName.trim() !== ''
+          ? customContractorName.trim()
+          : formData.contractor_name,
         project_name: formData.project_name,
         project_id: formData.project_id === "none" || formData.project_id === "external" || !formData.project_id ? null : formData.project_id,
         amount: Number(formData.amount),
@@ -215,7 +219,10 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
               <Label htmlFor="contractor_name">اسم المقاول</Label>
               <Select
                 value={formData.contractor_name}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, contractor_name: value }))}
+                onValueChange={(value) => {
+                  setFormData(prev => ({ ...prev, contractor_name: value }));
+                  if (!value.includes('باليومية')) setCustomContractorName('');
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="اختر المقاول" />
@@ -228,6 +235,20 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
                   ))}
                 </SelectContent>
               </Select>
+              {formData.contractor_name.includes('باليومية') && (
+                <div className="space-y-1">
+                  <Input
+                    id="custom_contractor_name"
+                    value={customContractorName}
+                    onChange={(e) => setCustomContractorName(e.target.value)}
+                    placeholder="اسم المقاول (اختياري)"
+                    maxLength={255}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    اتركه فارغاً ليُسجَّل باسم "عماله خارجية باليومية"
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">

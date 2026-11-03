@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { assignmentOrderContractorNames } from './assignmentOrderOptions';
+import { assignmentOrderContractorNames } from '../src/lib/assignmentOrderOptions.ts';
 
 describe('assignment order contractor preservation', () => {
   it('keeps a manually entered daily-labour contractor when editing', () => {

@@ -12,6 +12,7 @@ import { useAssignmentOrders } from '@/hooks/useAssignmentOrders';
 import { useProjects } from '@/hooks/useProjects';
 import { useContractors } from '@/hooks/useContractors';
 import { assignmentOrderSchema, type AssignmentOrderFormData } from '@/lib/assignmentOrderSchemas';
+import { assignmentOrderContractorNames } from '@/lib/assignmentOrderOptions';
 
 interface AssignmentOrder {
   id?: string;
@@ -53,7 +54,7 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
     order_number: order?.order_number || '',
     contractor_name: order?.contractor_name || '',
     project_name: order?.project_name || '',
-    project_id: order?.project_id || "none",
+    project_id: order?.project_id || (order?.project_name ? "external" : "none"),
     amount: order?.amount || 0,
     description: order?.description || '',
     order_date: order?.order_date || new Date().toISOString().split('T')[0],
@@ -70,12 +71,14 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
   });
 
   useEffect(() => {
+    if (!open) return;
+    setCustomContractorName('');
     if (order) {
       setFormData({
         order_number: order.order_number || '',
         contractor_name: order.contractor_name || '',
         project_name: order.project_name || '',
-        project_id: order.project_id || "none",
+        project_id: order.project_id || (order.project_name ? "external" : "none"),
         amount: order.amount || 0,
         description: order.description || '',
         order_date: order.order_date || new Date().toISOString().split('T')[0],
@@ -111,7 +114,7 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
         amount_before_tax: 0
       });
     }
-  }, [order]);
+  }, [order, open]);
 
   useEffect(() => {
     if (formData.tax_included && formData.amount > 0) {
@@ -224,13 +227,13 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
                   if (!value.includes('باليومية')) setCustomContractorName('');
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger id="contractor_name">
                   <SelectValue placeholder="اختر المقاول" />
                 </SelectTrigger>
                 <SelectContent>
-                  {contractors.map((contractor: any) => (
-                    <SelectItem key={contractor.id} value={contractor.name}>
-                      {contractor.name}
+                  {assignmentOrderContractorNames(formData.contractor_name, contractors.map(contractor => contractor.name)).map(name => (
+                    <SelectItem key={name} value={name}>
+                      {name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -270,6 +273,10 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
                 <SelectContent>
                   <SelectItem value="none">بدون مشروع</SelectItem>
                   <SelectItem value="external">مشروع خارجي</SelectItem>
+                  {formData.project_id && !['none', 'external'].includes(formData.project_id) &&
+                    !projects.some(project => project.id === formData.project_id) && (
+                      <SelectItem value={formData.project_id}>{formData.project_name}</SelectItem>
+                    )}
                   {projects.map((project: any) => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.name}
@@ -385,6 +392,9 @@ const AssignmentOrderForm = ({ open, onOpenChange, order, onSuccess }: Assignmen
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  {!['قيد التنفيذ', 'مكتمل', 'ملغي'].includes(formData.status) && formData.status && (
+                    <SelectItem value={formData.status}>{formData.status}</SelectItem>
+                  )}
                   <SelectItem value="قيد التنفيذ">قيد التنفيذ</SelectItem>
                   <SelectItem value="مكتمل">مكتمل</SelectItem>
                   <SelectItem value="ملغي">ملغي</SelectItem>

@@ -35,7 +35,7 @@ function openWin(html: string) {
 export function printPhase(phase: Phase, docs: CostDoc[]) {
   const { linked, total } = phaseCost(phase, docs);
   const delay = phaseDelay(phase);
-  const rows = linked.map((x) => `<tr><td>${e(x.kind)}</td><td>${e(x.number)}</td><td>${d(x.date)}</td><td>${e(x.contractor_name)}</td><td>${e(x.description || '')}</td><td>${fmt(x.amount)} &#xE900;</td></tr>`).join('');
+  const rows = linked.map((x) => `<tr><td>${e(x.kind)}</td><td>${e(x.number)}</td><td>${d(x.date)}</td><td>${e(x.contractor_name)}</td><td>${e(x.description || '')}</td><td>${fmt(x.amount)} \u20C1</td></tr>`).join('');
   const body = `${header('تقرير مرحلة: ' + phase.phase_name, phase.project_name)}
 <div class="grid">
 <div class="box">الحالة<b>${e(computedStatus(phase))}</b></div>

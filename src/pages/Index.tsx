@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import Dashboard from '../components/Dashboard';
 import ProjectsPage from '../components/ProjectsPage';
 import SalesPage from '../components/SalesPage';
+import ProjectPhasesPage from '../components/ProjectPhasesPage';
 import ContractorsPage from '../components/ContractorsPage';
 import ContractsPage from '../components/ContractsPage';
 import SuppliersPage from '../components/SuppliersPage';
@@ -40,6 +41,12 @@ const Index = () => {
         return (
           <ProtectedPage pageName="projects">
             <ProjectsPage />
+          </ProtectedPage>
+        );
+      case 'project_phases':
+        return (
+          <ProtectedPage pageName="project_phases">
+            <ProjectPhasesPage />
           </ProtectedPage>
         );
       case 'sales':

@@ -36,6 +36,7 @@ const AVAILABLE_PAGES = [
   { name: "invoices", label: "الفواتير" },
   { name: "extracts", label: "المستخلصات" },
   { name: "assignment_orders", label: "أوامر التكليف" },
+  { name: "project_phases", label: "مراحل المشاريع" },
   { name: "contractors", label: "المقاولون" },
   { name: "suppliers", label: "الموردون" },
   { name: "maintenance", label: "الصيانة" },

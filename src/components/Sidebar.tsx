@@ -61,6 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed,
   const menuItems: MenuItem[] = [
     { id: 'dashboard', name: 'لوحة التحكم', icon: LayoutDashboard, group: 'main' },
     { id: 'projects', name: 'إدارة المشاريع', icon: Building, group: 'projects' },
+    { id: 'project_phases', name: 'مراحل المشاريع', icon: CalendarCheck, group: 'projects' },
     { id: 'sales', name: 'مبيعات الشقق', icon: ShoppingCart, group: 'projects' },
     { id: 'reservations', name: 'الحجوزات', icon: CalendarCheck, group: 'projects' },
     { id: 'contractors', name: 'المقاولون', icon: Users, group: 'operations' },

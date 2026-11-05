@@ -46,7 +46,8 @@ const ProjectPhasesPage: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const qc = useQueryClient();
-  const [projectId, setProjectId] = useState<string>('');
+  const [selection, setSelection] = useState<string>('');
+  const [targetId, setTargetId] = useState<string>('');
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Phase | null>(null);
   const [form, setForm] = useState<any>(emptyForm);
@@ -58,40 +59,48 @@ const ProjectPhasesPage: React.FC = () => {
   const { data: projects = [] } = useQuery({
     queryKey: ['phase-projects'],
     queryFn: async () => {
-      const { data, error } = await db.from('projects').select('id,name,type,location,start_date,expected_completion,total_cost,land_value,total_units').order('name');
+      const { data, error } = await db.from('projects').select('id,name,type,location,start_date,expected_completion,total_cost,land_value,total_units,zone').order('name');
       if (error) throw error;
       return data || [];
     },
     enabled: !!user,
   });
+  const zones = useMemo(() => Array.from(new Set(projects.map((p: any) => (p.zone || '').trim()).filter(Boolean))).sort() as string[], [projects]);
+  const isZone = selection.startsWith('zone:');
+  const zoneName = isZone ? selection.slice(5) : '';
+  const scopeProjects = isZone ? projects.filter((p: any) => (p.zone || '').trim() === zoneName) : projects.filter((p: any) => p.id === selection);
+  const scopeIds: string[] = scopeProjects.map((p: any) => p.id);
+  const projectId = isZone ? (scopeIds.includes(targetId) ? targetId : scopeIds[0] || '') : selection;
   const project = projects.find((p: any) => p.id === projectId);
+  const scopeLabel = isZone ? `نطاق ${zoneName} (${scopeProjects.map((p: any) => p.name).join('، ')})` : project?.name || '';
+  const nameOf = (id: string | null) => projects.find((p: any) => p.id === id)?.name || '';
 
   const { data: phases = [] } = useQuery({
-    queryKey: ['project_phases', projectId],
+    queryKey: ['project_phases', scopeIds.join(',')],
     queryFn: async () => {
-      const { data, error } = await db.from('project_phases').select('*').eq('project_id', projectId).order('sort_order').order('planned_start');
+      const { data, error } = await db.from('project_phases').select('*').in('project_id', scopeIds).order('sort_order').order('planned_start');
       if (error) throw error;
       return (data || []) as Phase[];
     },
-    enabled: !!projectId,
+    enabled: scopeIds.length > 0,
   });
 
   const { data: docs = [] } = useQuery({
-    queryKey: ['phase-docs', projectId],
+    queryKey: ['phase-docs', scopeIds.join(',')],
     queryFn: async () => {
       const [ex, ao] = await Promise.all([
-        db.from('extracts').select('extract_number,extract_date,amount,current_amount,previous_amount,contractor_name,description,project_id,project_name').eq('project_id', projectId),
-        db.from('assignment_orders').select('order_number,order_date,amount,contractor_name,description,project_id,project_name').eq('project_id', projectId),
+        db.from('extracts').select('extract_number,extract_date,amount,current_amount,previous_amount,contractor_name,description,project_id,project_name').in('project_id', scopeIds),
+        db.from('assignment_orders').select('order_number,order_date,amount,contractor_name,description,project_id,project_name').in('project_id', scopeIds),
       ]);
       const list: CostDoc[] = [];
       (ex.data || []).forEach((x: any) => list.push({ kind: 'مستخلص', number: x.extract_number, date: x.extract_date, amount: Number(x.amount || 0), contractor_name: x.contractor_name, description: x.description, project_id: x.project_id, project_name: x.project_name }));
       (ao.data || []).forEach((x: any) => list.push({ kind: 'أمر تكليف', number: x.order_number, date: x.order_date, amount: Number(x.amount || 0), contractor_name: x.contractor_name, description: x.description, project_id: x.project_id, project_name: x.project_name }));
       return list;
     },
-    enabled: !!projectId,
+    enabled: scopeIds.length > 0,
   });
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: ['project_phases', projectId] });
+  const invalidate = () => qc.invalidateQueries({ queryKey: ['project_phases'] });
 
   const save = useMutation({
     mutationFn: async (values: any) => {
@@ -101,8 +110,8 @@ const ProjectPhasesPage: React.FC = () => {
         actual_end: values.actual_end || null,
         progress: Math.min(100, Math.max(0, Number(values.progress) || 0)),
         budget: Number(values.budget) || 0,
-        project_id: projectId,
-        project_name: project?.name || '',
+        project_id: values.project_id || projectId,
+        project_name: nameOf(values.project_id || projectId),
       };
       row.status = computedStatus(row as Phase);
       const q = editing ? db.from('project_phases').update(row).eq('id', editing.id) : db.from('project_phases').insert(row);
@@ -119,7 +128,7 @@ const ProjectPhasesPage: React.FC = () => {
     onError: (e: any) => toast({ title: 'خطأ', description: e.message, variant: 'destructive' }),
   });
 
-  const openNew = () => { setEditing(null); setForm({ ...emptyForm, sort_order: phases.length + 1, planned_start: today(), planned_end: today() }); setFormOpen(true); };
+  const openNew = () => { setEditing(null); setForm({ ...emptyForm, project_id: projectId, sort_order: phases.length + 1, planned_start: today(), planned_end: today() }); setFormOpen(true); };
   const openEdit = (p: Phase) => {
     setEditing(p);
     setForm({ ...emptyForm, ...Object.fromEntries(Object.entries(p).map(([k, v]) => [k, v ?? ''])) });
@@ -159,8 +168,8 @@ const ProjectPhasesPage: React.FC = () => {
     setAnalyzing(true);
     try {
       const payload = {
-        project: project?.name, expected_completion: project?.expected_completion,
-        phases: phases.map((p) => ({ name: p.phase_name, planned_start: p.planned_start, planned_end: p.planned_end, actual_start: p.actual_start, actual_end: p.actual_end, progress: p.progress, budget: p.budget, actual_cost: phaseCost(p, docs).total, delay_days: phaseDelay(p) })),
+        scope: scopeLabel, projects: scopeProjects.map((p: any) => ({ name: p.name, expected_completion: p.expected_completion })),
+        phases: phases.map((p) => ({ project: p.project_name, name: p.phase_name, planned_start: p.planned_start, planned_end: p.planned_end, actual_start: p.actual_start, actual_end: p.actual_end, progress: p.progress, budget: p.budget, actual_cost: phaseCost(p, docs).total, delay_days: phaseDelay(p) })),
       };
       setAnalysis(await callAI('analyze', payload));
     } catch (e: any) {
@@ -187,17 +196,28 @@ const ProjectPhasesPage: React.FC = () => {
           <p className="text-sm text-muted-foreground">تخطيط المراحل وجدولها الزمني ومتابعة التأخير والتكلفة بمساعدة الذكاء الصناعي</p>
         </div>
         <div className="w-72">
-          <Select value={projectId} onValueChange={(v) => { setProjectId(v); setAnalysis(null); }}>
-            <SelectTrigger><SelectValue placeholder="اختر المشروع" /></SelectTrigger>
-            <SelectContent>{projects.map((p: any) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
+          <Select value={selection} onValueChange={(v) => { setSelection(v); setTargetId(''); setAnalysis(null); }}>
+            <SelectTrigger><SelectValue placeholder="اختر المشروع أو النطاق" /></SelectTrigger>
+            <SelectContent>
+              {zones.map((z) => <SelectItem key={'z' + z} value={'zone:' + z}>🔗 نطاق {z} — كل مشاريعه معاً</SelectItem>)}
+              {projects.map((p: any) => <SelectItem key={p.id} value={p.id}>{p.name}{p.zone ? ` (${p.zone})` : ''}</SelectItem>)}
+            </SelectContent>
           </Select>
         </div>
       </div>
 
-      {!projectId ? (
+      {!selection ? (
         <Card><CardContent className="py-16 text-center text-muted-foreground">اختر مشروعاً لعرض مراحله والجدول الزمني</CardContent></Card>
       ) : (
         <>
+          {isZone && (
+            <Card className="border-primary/40"><CardContent className="p-4 flex flex-wrap items-center gap-3 text-sm">
+              <span>عرض موحّد لمشاريع النطاق <b>{zoneName}</b>: {scopeProjects.map((p: any) => <Badge key={p.id} variant="secondary" className="mx-0.5">{p.name}</Badge>)}</span>
+              <span className="mr-auto flex items-center gap-2">المشروع عند الإضافة/الاقتراح:
+                <Select value={projectId} onValueChange={setTargetId}><SelectTrigger className="w-48 h-8"><SelectValue /></SelectTrigger>
+                  <SelectContent>{scopeProjects.map((p: any) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent></Select></span>
+            </CardContent></Card>
+          )}
           <div className="flex flex-wrap gap-2">
             <PermissionButton pageName="project_phases" requirePermission="create" onClick={openNew}><Plus className="h-4 w-4 ml-1" /> إضافة مرحلة</PermissionButton>
             <PermissionButton pageName="project_phases" requirePermission="create" variant="secondary" onClick={suggest} disabled={suggesting}>
@@ -206,7 +226,7 @@ const ProjectPhasesPage: React.FC = () => {
             <Button variant="outline" onClick={analyze} disabled={analyzing || !phases.length}>
               {analyzing ? <Loader2 className="h-4 w-4 ml-1 animate-spin" /> : <BrainCircuit className="h-4 w-4 ml-1" />} تحليل وتوقع التأخير
             </Button>
-            <Button variant="outline" onClick={() => printTimelineReport(project?.name || '', phases, docs, analysis)} disabled={!phases.length}>
+            <Button variant="outline" onClick={() => printTimelineReport(scopeLabel, phases, docs, analysis)} disabled={!phases.length}>
               <Printer className="h-4 w-4 ml-1" /> التقرير الشامل للزمن
             </Button>
           </div>
@@ -254,7 +274,7 @@ const ProjectPhasesPage: React.FC = () => {
                   const late = phaseDelay(p) > 0;
                   return (
                     <div key={p.id} className="flex items-center gap-3 min-w-[640px]">
-                      <div className="w-44 text-sm truncate" title={p.phase_name}>{p.phase_name}</div>
+                      <div className="w-44 text-sm truncate" title={p.phase_name}>{p.phase_name}{isZone && <div className="text-xs text-muted-foreground truncate">{p.project_name}</div>}</div>
                       <div className="relative flex-1 h-7 bg-muted rounded">
                         <div className={`absolute top-1 h-5 rounded ${late ? 'bg-destructive/70' : 'bg-primary/80'}`} style={pos(p.planned_start, p.planned_end)}>
                           <div className="h-full rounded bg-primary" style={{ width: `${p.progress}%` }} />
@@ -286,7 +306,7 @@ const ProjectPhasesPage: React.FC = () => {
                       return (
                         <tr key={p.id} className="border-b hover:bg-muted/40">
                           <td className="p-2">{i + 1}</td>
-                          <td className="p-2"><div className="font-medium">{p.phase_name}</div>{p.contractor_name && <div className="text-xs text-muted-foreground">{p.contractor_name}</div>}</td>
+                          <td className="p-2"><div className="font-medium">{p.phase_name}</div>{isZone && <div className="text-xs text-primary">{p.project_name}</div>}{p.contractor_name && <div className="text-xs text-muted-foreground">{p.contractor_name}</div>}</td>
                           <td className="p-2 whitespace-nowrap text-xs">{fd(p.planned_start)} ← {fd(p.planned_end)}</td>
                           <td className="p-2 whitespace-nowrap text-xs">{fd(p.actual_start)} ← {fd(p.actual_end)}</td>
                           <td className="p-2 w-32"><Progress value={p.progress} className="h-2" /><span className="text-xs">{p.progress}%</span></td>
@@ -314,6 +334,9 @@ const ProjectPhasesPage: React.FC = () => {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
           <DialogHeader><DialogTitle>{editing ? 'تعديل مرحلة' : 'إضافة مرحلة'}</DialogTitle></DialogHeader>
           <div className="grid grid-cols-2 gap-3">
+            {isZone && <div className="col-span-2"><Label>المشروع</Label>
+              <Select value={form.project_id || projectId} onValueChange={(v) => setForm({ ...form, project_id: v })}><SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{scopeProjects.map((p: any) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent></Select></div>}
             <div className="col-span-2"><Label>اسم المرحلة *</Label><Input value={form.phase_name} onChange={(e) => setForm({ ...form, phase_name: e.target.value })} /></div>
             <div className="col-span-2"><Label>الوصف</Label><Textarea rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
             <div><Label>البدء المخطط *</Label><Input type="date" value={form.planned_start} onChange={(e) => setForm({ ...form, planned_start: e.target.value })} /></div>
@@ -330,7 +353,7 @@ const ProjectPhasesPage: React.FC = () => {
           </div>
           <DialogFooter>
             <Button disabled={save.isPending || !form.phase_name || !form.planned_start || !form.planned_end || form.planned_end < form.planned_start}
-              onClick={() => { const { id, user_id, created_at, updated_at, project_id, project_name, status, ...v } = form; save.mutate(v); }}>
+              onClick={() => { const { id, user_id, created_at, updated_at, project_name, status, ...v } = form; save.mutate(v); }}>
               {save.isPending && <Loader2 className="h-4 w-4 ml-1 animate-spin" />} حفظ
             </Button>
           </DialogFooter>

@@ -61,11 +61,15 @@ Deno.serve(async (req) => {
 
     let text = "";
     try {
-      for await (const chunk of result.textStream) text += chunk;
+      for await (const part of result.fullStream) {
+        if (part.type === "text-delta") text += (part as any).text ?? (part as any).delta ?? "";
+        else if (part.type === "error") throw (part as any).error;
+      }
     } catch (e: any) {
       const status = e?.statusCode ?? e?.status ?? 500;
       if (status === 429) return json({ error: "تم تجاوز حد الطلبات، حاول بعد قليل" }, 429);
       if (status === 402) return json({ error: "رصيد الذكاء الصناعي غير كافٍ، يرجى إضافة رصيد" }, 402);
+      if (status === 403) return json({ error: "خدمة الذكاء الصناعي غير متاحة حالياً لهذا المشروع" }, 403);
       return json({ error: e?.message || "AI error" }, status >= 400 && status < 600 ? status : 500);
     }
     const match = text.match(/\{[\s\S]*\}/);
